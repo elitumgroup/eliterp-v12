@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_purchase_invoice" model="ir.ui.view">
+            <field name="name">view_form_purchase_invoice</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="purchase.view_invoice_supplier_purchase_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='purchase_id']" position="replace"/>
+                <field name="partner_id" position="after"><!--Proveedor-->
+                    <field name="purchase_id"
+                           attrs="{'readonly': [('state','not in',['draft'])], 'invisible': ['|', ('state', '=', 'purchase'), ('type', '=', 'in_refund')]}"
+                           class="oe_edit_only"
+                           options="{'no_create': True}" context="{'show_total_amount': True}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

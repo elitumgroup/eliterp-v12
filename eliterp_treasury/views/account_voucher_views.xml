@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--TODO: Pendiente búsqueda de comprobantes de ingreso, Searchs-->
+        <record id="view_search_voucher_purchase" model="ir.ui.view">
+            <field name="name">view_search_voucher_purchase</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="beneficiary" string="Beneficiario"/>
+                    <field name="bank_journal_id" string="Banco" widget="selection"/>
+                    <!--
+                    <separator/>
+                    <filter string="Borrador" domain="[('state','=','draft')]"/>
+                    <filter string="Contabilizado" domain="[('state','=','posted')]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Proveedor" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Banco" domain="[]" context="{'group_by':'bank_journal_id'}"/>
+                        <filter string="Fecha de comprobante" domain="[]" context="{'group_by':'date'}"/>
+                    </group>
+                    -->
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_voucher_sale" model="ir.actions.act_window">
+            <field name="name">Cobros</field>
+            <field name="res_model">account.voucher</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('voucher_type', '=', 'sale')]</field>
+            <field name="context">{'default_voucher_type': 'sale', 'voucher_type': 'sale'}</field>
+            <field name="help" type="html">
+                <p>
+                    Se registran los cobros de clientes correspondientes a facturas.
+                </p>
+            </field>
+        </record>
+        <record id="action_voucher_purchase" model="ir.actions.act_window">
+            <field name="name">Pagos</field>
+            <field name="res_model">account.voucher</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('voucher_type', '=','purchase')]</field>
+            <field name="context">{'default_voucher_type': 'purchase', 'voucher_type': 'purchase'}</field>
+            <field name="search_view_id" ref="view_search_voucher_purchase"/>
+            <field name="help" type="html">
+                <p>
+                    Se registran los pagos desde la orden de pago.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_voucher_sale"
+                  name="Cobros"
+                  parent="menu_accounts_receivable"
+                  action="action_voucher_sale"
+                  sequence="2"/>
+
+        <menuitem id="menu_cash_payments"
+                  name="Pagos"
+                  parent="menu_accounts_payable"
+                  sequence="3"/>
+        <menuitem id="menu_voucher_purchase"
+                  name="Pagos"
+                  parent="menu_cash_payments"
+                  action="action_voucher_purchase"
+                  sequence="10"/>
+
+        <!--Views-->
+        <record id="view_tree_voucher_sale" model="ir.ui.view">
+            <field name="name">view_tree_voucher_sale</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <tree decoration-muted="state=='cancel'"
+                      decoration-success="state=='posted'"
+                      decoration-bf="state=='posted'">
+                    <field name="name" string="Referencia de pago"/>
+                    <field name="partner_id" string="Cliente"/>
+                    <field name="date" string="Fecha emisión"/>
+                    <field name="reference" string="Concepto"/>
+                    <field name="amount_collection" sum="Total cobrado"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_voucher_sale" model="ir.ui.view">
+            <field name="name">view_form_voucher_sale</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted"
+                               modifiers="{'readonly': true}"/>
+                        <button name="post_voucher" string="Validar" states="draft" class="oe_highlight"
+                                type="object"/>
+                        <button name="print_voucher"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir comprobante"/>
+                        <button name="action_button_cancel" string="Anular" states="posted"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date" required="1" string="Fecha de comprobante"/>
+                            <field name="partner_id" required="1"
+                                   domain="[('is_contact', '=', False), ('customer','=',True)]"/>
+                            <field name="reference" required="1" string="Concepto"
+                                   placeholder="p.e. Colocar referencia del cobro."/>
+                            <label for="advance" class="oe_edit_only" string="Anticipo?"/>
+                            <div class="o_row">
+                                <field name="advance" class="oe_edit_only"/>
+                                <button name="load_invoices"
+                                        attrs="{'invisible':['|', ('state', '!=', 'draft'), ('advance', '==', True)]}"
+                                        type="object"
+                                        string="Cargar facturas"
+                                        class="oe_link"/>
+                            </div>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Detalle de comprobante">
+                                <field name="out_invoice_line" nolabel="1"
+                                       attrs="{'invisible':[('advance', '==', True)]}">
+                                    <tree create="false" editable="bottom">
+                                        <field name="invoice_id" invisible="1"/>
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="name"/>
+                                        <field name="date_due"/>
+                                        <field name="amount_total" sum="Total de facturas"/>
+                                        <field name="residual" sum="Total pendiente"/>
+                                        <field name="amount_payable" required="1" string="Monto a pagar"/>
+                                    </tree>
+                                </field>
+                                <group string="Líneas de recaudación">
+                                    <button name="load_amount"
+                                            attrs="{'invisible':['|', ('state', '!=', 'draft'), ('advance', '==', True)]}"
+                                            type="object"
+                                            string="Cargar monto"
+                                            class="oe_highlight"/>
+                                </group>
+                                <!--Pendiente colocar la recaudación de cheques-->
+                                <field name="collection_line">
+                                    <tree editable="bottom">
+                                        <field name="type_payment"/>
+                                        <field name="date_issue"/>
+                                        <field name="date_due"/>
+                                        <field name="account_id"
+                                               domain="[('internal_type', '!=', 'view'), ('company_id', '=', parent.company_id)]"/>
+                                        <field name="amount" sum="Total de recaudación"/>
+                                        <field name="move_id" string="Asiento contable (Interno)" readonly="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tree_voucher_purchase" model="ir.ui.view">
+            <field name="name">view_tree_voucher_purchase</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <tree create="false"
+                      decoration-muted="state=='cancel'"
+                      decoration-success="state=='posted'"
+                      decoration-bf="state=='posted'">
+                    <field name="name" string="Referencia de pago"/>
+                    <field name="type_egress"/>
+                    <field name="date" string="Fecha de comprobante"/>
+                    <field name="bank_journal_id"/>
+                    <field name="transfer_code"/>
+                    <field name="beneficiary"/>
+                    <field name="amount_cancel" sum="Total"/>
+                    <field name="reference" string="Concepto"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_voucher_purchase" model="ir.ui.view">
+            <field name="name">view_form_voucher_purchase</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <form create="false">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted"
+                               modifiers="{'readonly': true}"/>
+                        <button name="post_voucher" string="Validar" states="draft" class="oe_highlight"
+                                type="object"/>
+                        <button name="print_voucher"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir comprobante"/>
+                        <button name="action_button_cancel" string="Anular" states="posted"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Información general">
+                                <field name="date" required="1" string="Fecha de comprobante"/>
+                                <!--Orden de pago colocar aquí-->
+                                <field name="type_egress" required="1"/>
+                                <field name="amount_cancel" required="1"/>
+                                <field name="beneficiary" required="1"/>
+                                <field name="reference" string="Concepto" required="1"/>
+                                <field name="account_id"
+                                       domain="[('company_id', '=', company_id), ('internal_type', '!=', 'view')]"
+                                       attrs="{'invisible':[('type_egress', '!=', 'cash')], 'required':[('type_egress', '=', 'cash')]}"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="partner_id" string="Proveedor" invisible="1"/>
+                            </group>
+                            <group col="1">
+                                <group string="Análisis de gasto"
+                                       attrs="{'invisible':[('type_pay_order', '=', 'invoice')]}">
+                                    <field name="company_division_id" required="1"
+                                           attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
+                                           context="{'default_company_id': company_id}"
+                                           domain="[('company_id', '=', company_id)]"/>
+                                    <field name="project_id"
+                                           attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
+                                           domain="[('company_division_id', '=', company_division_id)]"
+                                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name="account_analytic_id"
+                                           attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
+                                           options="{'no_open': True, 'no_create': True}"
+                                           domain="[('company_division_id', '=', company_division_id)]"
+                                           groups="analytic.group_analytic_accounting"/>
+                                </group>
+                                <group string="Información del banco"
+                                       attrs="{'invisible':[('type_egress', '=', 'cash')]}">
+                                    <field name="bank_journal_id"
+                                           domain="[('company_id', '=', company_id), ('type', '=', 'bank')]"
+                                           attrs="{'required':[('type_egress', '!=', 'cash')]}"/>
+                                    <field name="bank_date"
+                                           attrs="{'required':[('type_egress', '!=', 'cash')]}"/>
+                                    <field name="transfer_code"
+                                           placeholder="p.e Código del sistema del banco al realizar transferencia."
+                                           attrs="{'invisible':[('type_egress', '!=', 'transfer')]}"/>
+                                </group>
+                            </group>
+                        </group>
+                        <group>
+                            <notebook>
+                                <page string="Líneas de cuenta" name="accounts">
+                                    <field name="account_line" nolabel="1">
+                                        <tree editable="bottom">
+                                            <field name="company_id" invisible="1"/>
+                                            <field name="account_id"
+                                                   domain="[('internal_type', '!=', 'view'), ('company_id', '=', parent.company_id)]"/>
+                                            <field name="amount"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <!--En atributos colocar invisible si es diferente de factura la orden de pago-->
+                                <page string="Facturas" name="invoices">
+                                    <field name="in_invoice_line" nolabel="1">
+                                        <tree create="false" editable="bottom" delete="false">
+                                            <field name="invoice_id" invisible="1"/>
+                                            <field name="currency_id" invisible="1"/>
+                                            <field name="name"/>
+                                            <field name="date_due"/>
+                                            <field name="amount_total" sum="Total de facturas"/>
+                                            <field name="residual" sum="Total pendiente"/>
+                                            <field name="amount_payable" required="1" string="Monto a pagar"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Asientos contables"
+                                      attrs="{'invisible': [('state','=', 'draft')]}"
+                                      groups="account.group_account_manager">
+                                    <group>
+                                        <field name="move_id"/>
+                                    </group>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Action Views-->
+        <record model="ir.actions.act_window.view" id="action_view_tree_voucher_sale">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_voucher_sale"/>
+            <field name="act_window_id" ref="action_voucher_sale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_voucher_sale">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_voucher_sale"/>
+            <field name="act_window_id" ref="action_voucher_sale"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_view_tree_voucher_purchase">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_voucher_purchase"/>
+            <field name="act_window_id" ref="action_voucher_purchase"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_voucher_purchase">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_voucher_purchase"/>
+            <field name="act_window_id" ref="action_voucher_purchase"/>
+        </record>
+    </data>
+</odoo>
+
+

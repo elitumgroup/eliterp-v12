@@ -1,0 +1,8 @@
+id,name,active
+account_fiscal_position_1,CONTRIBUYENTE ESPECIAL,True
+account_fiscal_position_2,PERSONA NATURAL NO OBLIGADA A LLEVAR CONTABILIDAD,True
+account_fiscal_position_3,SOCIEDADES,True
+account_fiscal_position_4,SECTOR PÚBLICO,True
+account_fiscal_position_5,OTRAS SOCIEDADES Y PERSONAS NATURALES OBLIGADAS A LLEVAR CONTABILIDAD,True
+account_fiscal_position_6,PERSONAS NATURALES POR LIQUIDACIÓN DE COMPRA,True
+account_fiscal_position_7,EMPLEADOS EN RELACIÓN DE DEPENDENCIA,True

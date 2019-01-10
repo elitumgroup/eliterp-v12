@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem name="SRI" id="menu_account_sri"
+                  parent="account.menu_finance_configuration"
+                  groups="account.group_account_user" sequence="4"/>
+
+        <record id="action_sri_payment_forms" model="ir.actions.act_window">
+            <field name="name">Formas de pago SRI</field>
+            <field name="res_model">sri.payment.forms</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para añadir una nueva forma de pago SRI.
+                </p>
+            </field>
+        </record>
+        <menuitem action="action_sri_payment_forms" id="menu_sri_payment_forms" parent="menu_account_sri" sequence="1"/>
+
+        <record id="action_sri_proof_support" model="ir.actions.act_window">
+            <field name="name">Sustentos del comprobante</field>
+            <field name="res_model">sri.proof.support</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para añadir un nuevo sustento del comprobante.
+                </p>
+            </field>
+        </record>
+        <menuitem action="action_sri_proof_support" id="menu_sri_proof_support" parent="menu_account_sri" sequence="2"/>
+
+        <record id="action_authorized_vouchers" model="ir.actions.act_window">
+            <field name="name">Comprobantes autorizados</field>
+            <field name="res_model">sri.authorized.vouchers</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para añadir un nuevo comprobante autorizado.
+                </p>
+            </field>
+        </record>
+        <menuitem action="action_authorized_vouchers" id="menu_authorized_vouchers" parent="menu_account_sri"
+                  sequence="3"/>
+
+        <menuitem action="eliterp_sale.action_sale_shop" id="menu_sale_shop" parent="menu_account_sri"
+                  sequence="4"/>
+
+        <record id="view_form_sri_authorized_vouchers" model="ir.ui.view">
+            <field name="name">view_form_sri_authorized_vouchers</field>
+            <field name="model">sri.authorized.vouchers</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="code"/>
+                            <field name="proof_support_ids" widget="many2many_tags"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tree_sale_shop_sri" model="ir.ui.view">
+            <field name="name">view_tree_sale_shop_sri</field>
+            <field name="model">sale.shop</field>
+            <field name="inherit_id" ref="eliterp_sale.view_tree_sale_shop"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="establishment" groups="account.group_account_user"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_form_sale_shop_sri" model="ir.ui.view">
+            <field name="name">view_form_sale_shop_sri</field>
+            <field name="model">sale.shop</field>
+            <field name="inherit_id" ref="eliterp_sale.view_form_sale_shop"/>
+            <field name="arch" type="xml">
+                <field name="type" position="after">
+                    <field name="establishment" groups="account.group_account_manager"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="action_sri_authorization" model="ir.actions.act_window">
+            <field name="name">Autorizaciones SRI</field>
+            <field name="res_model">sri.authorization</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="action_sri_authorization" id="menu_sri_authorization" parent="menu_account_sri"
+                  sequence="5"/>
+
+        <record id="view_form_sri_point_printing" model="ir.ui.view">
+            <field name="name">view_form_sri_point_printing</field>
+            <field name="model">sri.point.printing</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group col="4">
+                            <field name="shop_id"
+                                   domain="[('company_id', '=', company_id)]"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="emission_point"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tree_sri_authorization" model="ir.ui.view">
+            <field name="name">view_tree_sri_authorization</field>
+            <field name="model">sri.authorization</field>
+            <field name="arch" type="xml">
+                <tree decoration-muted="(not is_valid)">
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="authorized_voucher_id"/>
+                    <field name="is_electronic"/>
+                    <field name="point_printing_id"/>
+                    <field name="authorization"/>
+                    <field name="is_valid"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_sri_authorization" model="ir.ui.view">
+            <field name="name">view_form_sri_authorization</field>
+            <field name="model">sri.authorization</field>
+            <field name="arch" type="xml">
+                <form duplicate="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="company_id" invisible="1"/>
+                                <field name="is_electronic" invisible="1"/>
+                                <field name="authorized_voucher_id" widget="selection"/>
+                                <field name="point_printing_id"
+                                       context="{'default_company_id': company_id}"
+                                       domain="[('company_id', '=', company_id)]"/>
+                                <field name="authorization"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="initial_number"/>
+                                <field name="final_number"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"/>
+                                <field name="expiration_date"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

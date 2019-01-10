@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_bank_journal_checks" model="ir.ui.view">
+        <field name="name">view_account_bank_journal_checks</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account_check_printing.view_account_journal_form_inherited"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='outbound_payment_method_ids']" position="after">
+                <field name="start_check"
+                       attrs="{'invisible': [('check_printing_payment_method_selected', '=', False)],
+                    'required': [('check_printing_payment_method_selected', '=', True)]}"/>
+                <field name="check_padding"
+                       attrs="{'invisible': [('check_printing_payment_method_selected', '=', False)],
+                    'required': [('check_printing_payment_method_selected', '=', True)]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

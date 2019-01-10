@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Financial Situation-->
+        <template id="report_financial_situation">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_title">ESTADO DE SITUACIÓN FINANCIERA</t>
+                    <t t-set="report_code">REPO-CONT-001-V1</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <strong>Compañía:</strong>
+                                    <p t-field="user.company_id.name"/>
+                                </div>
+                                <div class="col-xs-4">
+                                    <strong>Fecha inicio:</strong>
+                                    <p t-field="doc.start_date"/>
+                                </div>
+                                <div class="col-xs-">
+                                    <strong>Fecha fin:</strong>
+                                    <p t-field="doc.end_date"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <table class="col-xs-6 table_financial_situation">
+                                    <tbody>
+                                        <t t-foreach="get_report('1',doc)" t-as="line">
+                                            <t t-if="line['monto']!=0.00">
+                                                <t t-if="line['tipo'] == 'padre'">
+                                                    <tr style="font-size: 12pt;">
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['tipo'] == 'vista'">
+                                                    <tr>
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['sub_cuenta'] != False">
+                                                    <t t-foreach="get_cuentas_orden(line['sub_cuenta'])"
+                                                       t-as="line_movimiento">
+                                                        <t t-if="abs(line_movimiento['monto'])!=0.00">
+                                                            <tr>
+                                                                <td class="text-left col-xs-1">
+                                                                    <span t-esc="line_movimiento['code']"/>
+                                                                </td>
+                                                                <td class="text-left col-xs-8">
+                                                                    <span t-esc="line_movimiento['name']"/>
+                                                                </td>
+                                                                <td class="text-right col-xs-3">
+                                                                    <span t-esc="'{0:,.2f}'.format(line_movimiento['monto'])"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-left col-xs-1">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-3">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                        </tr>
+                                        <tr style="font-size: 12pt;">
+                                            <td class="text-left col-xs-1">
+                                                <span></span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <b>
+                                                    <span>TOTAL ACTIVO</span>
+                                                </b>
+                                            </td>
+                                            <td class="text-right col-xs-3">
+                                                <span t-esc="'{0:,.2f}'.format(get_total_activo())"/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <table class="col-xs-6 table_financial_situation">
+                                    <tbody>
+                                        <t t-foreach="get_report('2',doc)" t-as="line">
+                                            <t t-if="line['monto']!=0.00">
+                                                <t t-if="line['tipo'] == 'padre'">
+                                                    <tr style="font-size: 12pt;">
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['tipo'] == 'vista'">
+                                                    <tr>
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['sub_cuenta'] != False">
+                                                    <t t-foreach="get_cuentas_orden(line['sub_cuenta'])"
+                                                       t-as="line_movimiento">
+                                                        <t t-if="abs(line_movimiento['monto'])!=0.00">
+                                                            <tr>
+                                                                <td class="text-left col-xs-1">
+                                                                    <span t-esc="line_movimiento['code']"/>
+                                                                </td>
+                                                                <td class="text-left col-xs-8">
+                                                                    <span t-esc="line_movimiento['name']"/>
+                                                                </td>
+                                                                <td class="text-right col-xs-3">
+                                                                    <span t-esc="'{0:,.2f}'.format(line_movimiento['monto'])"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-left col-xs-1">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-3">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                        </tr>
+                                        <tr style="font-size: 12pt;">
+                                            <td class="text-left col-xs-1">
+                                                <span></span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <b>
+                                                    <span>TOTAL PASIVO</span>
+                                                </b>
+                                            </td>
+                                            <td class="text-right col-xs-3">
+                                                <span t-esc="'{0:,.2f}'.format(get_total_pasivo())"/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <hr style="height:1px;border:none;color:#ddd;background-color:#ddd;"/>
+
+                            <div class="row">
+                                <table class="col-xs-6 pull-right table_financial_situation">
+                                    <tbody>
+                                        <t t-foreach="get_report('3',doc)" t-as="line">
+                                            <t t-if="line['monto']!=0.00">
+                                                <t t-if="line['tipo'] == 'padre'">
+                                                    <tr style="font-size: 12pt;">
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['tipo'] == 'vista'">
+                                                    <tr>
+                                                        <td class="text-left col-xs-1">
+                                                            <b>
+                                                                <span t-esc="line['code']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-left col-xs-8">
+                                                            <b>
+                                                                <span t-esc="line['name']"/>
+                                                            </b>
+                                                        </td>
+                                                        <td class="text-right col-xs-3">
+                                                            <b>
+                                                                <span t-esc="'{0:,.2f}'.format(line['monto'])"/>
+                                                            </b>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                                <t t-if="line['sub_cuenta'] != False">
+                                                    <t t-foreach="get_cuentas_orden(line['sub_cuenta'])"
+                                                       t-as="line_movimiento">
+                                                        <t t-if="abs(line_movimiento['monto'])!=0.00">
+                                                            <tr>
+                                                                <td class="text-left col-xs-1">
+                                                                    <span t-esc="line_movimiento['code']"/>
+                                                                </td>
+                                                                <td class="text-left col-xs-8">
+                                                                    <span t-esc="line_movimiento['name']"/>
+                                                                </td>
+                                                                <td class="text-right col-xs-3">
+                                                                    <span t-esc="'{0:,.2f}'.format(line_movimiento['monto'])"/>
+                                                                </td>
+                                                            </tr>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-left col-xs-1">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                            <td class="text-left col-xs-3">
+                                                <span>&amp;nbsp;</span>
+                                            </td>
+                                        </tr>
+                                        <tr style="font-size: 12pt;">
+                                            <td class="text-left col-xs-1">
+                                                <span></span>
+                                            </td>
+                                            <td class="text-left col-xs-8">
+                                                <b>
+                                                    <span>PASIVO + PATRIMONIO</span>
+                                                </b>
+                                            </td>
+                                            <td class="text-right col-xs-3">
+                                                <span t-esc="'{0:,.2f}'.format(get_total_ejercicio())"/>
+                                            </td>
+                                        </tr>
+
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_financial_situation"
+                model="account.financial.situation"
+                string="Estado de situación financiera"
+                report_type="qweb-pdf"
+                name="eliterp_accounting_reports.report_financial_situation"
+                file="eliterp_accounting_reports.report_financial_situation"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+        <!--General Ledger-->
+        <template id="report_general_ledger">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_title">LIBRO MAYOR</t>
+                    <t t-set="report_code">REPO-CONT-003-V1</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="row">
+                                <div class="col-xs-4">
+                                    <strong>Compañía:</strong>
+                                    <p t-field="user.company_id.name"/>
+                                </div>
+                                <div class="col-xs-4">
+                                    <strong>Período:</strong>
+                                    <p t-field="doc.start_date" t-options='{"format": "yyyy"}'/>
+                                </div>
+                                <div class="col-xs-4">
+                                    <strong>Fecha de Corte:</strong>
+                                    <p t-field="doc.end_date"/>
+                                </div>
+                            </div>
+                            <t t-foreach="get_lines(doc)" t-as="account">
+                                <caption class="text-center">
+                                    Cuenta:&amp;nbsp;
+                                    <strong>
+                                        <span t-esc="account['code']"/>[<span t-esc="account['account']"/>]
+                                    </strong>
+                                </caption>
+                                <table class="table_general_ledger table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Fecha</th>
+                                            <th class="text-center">No. Compensación</th>
+                                            <th class="text-center">Detalle</th>
+                                            <th class="text-right">Debe</th>
+                                            <th class="text-right">Haber</th>
+                                            <th class="text-right">Saldo</th>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid gray;">
+                                            <td colspan="5" class="text-right">
+                                                <span>SALDO INICIAL</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <b>
+                                                    <span t-esc="'%.2f' % account['beginning_balance']"/>
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="account['moves']" t-as="line">
+                                            <td>
+                                                <span t-esc="line['date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['name']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['detail']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % line['debit']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % line['credit']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % line['balance']"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="border-top: 3px solid black; font-size:15px;">
+                                            <td colspan="4" class="text-right">
+                                                <span t-esc="'%.2f' % account['total_debit']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % account['total_credit']"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="'%.2f' % account['total_balance']"/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_general_ledger"
+                model="account.general.ledger.report"
+                string="Libro mayor"
+                report_type="qweb-pdf"
+                name="eliterp_accounting_reports.report_general_ledger"
+                file="eliterp_accounting_reports.report_general_ledger"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+    </data>
+</odoo>

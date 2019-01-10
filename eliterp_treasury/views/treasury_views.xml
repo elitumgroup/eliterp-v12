@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Actions: TODO: Se deja libre para futuras ajustes del módulo
+        <record id="action_treasury_settings" model="ir.actions.act_window">
+            <field name="name">Ajustes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'eliterp_treasury'}</field>
+        </record>
+        -->
+
+        <!--Menus-->
+        <menuitem name="Tesorería"
+                  id="menu_treasury"
+                  web_icon="eliterp_treasury,static/description/icon.png"
+                  groups="account.group_account_user"
+                  sequence="25"/>
+
+        <menuitem id="menu_accounts_receivable"
+                  name="Cuentas a cobrar"
+                  parent="menu_treasury"
+                  sequence="1"/>
+        <menuitem id="menu_out_invoice"
+                  name="Facturas de cliente"
+                  action="account.action_invoice_tree1"
+                  parent="menu_accounts_receivable"
+                  sequence="1"/>
+
+        <menuitem id="menu_accounts_payable"
+                  name="Cuentas a pagar"
+                  parent="menu_treasury"
+                  sequence="2"/>
+        <menuitem id="menu_in_invoice"
+                  name="Facturas de proveedor"
+                  action="account.action_invoice_tree2"
+                  parent="menu_accounts_payable"
+                  sequence="1"/>
+
+        <!--TODO: Para futuras aplicaciones (Ej. Requerimientos de pago)-->
+        <menuitem id="menu_transactions"
+                  name="Transacciones"
+                  parent="menu_treasury"
+                  sequence="3"/>
+
+         <menuitem id="menu_treasury_reports"
+                  name="Informes"
+                  parent="menu_treasury"
+                  sequence='10'/>
+        <menuitem id="menu_account_report_aged_receivable"
+                  action="account_reports.action_account_report_ar"
+                  parent="menu_treasury_reports"
+                  name="Vencida por Cobrar"
+                  sequence="1"/>
+        <menuitem id="menu_account_report_aged_payable"
+                  action="account_reports.action_account_report_ap"
+                  parent="menu_treasury_reports"
+                  name="Vencida por Pagar"
+                  sequence="2"/>
+
+        <menuitem id="menu_treasury_configuration"
+                  name="Configuración"
+                  groups="account.group_account_manager"
+                  parent="menu_treasury"
+                  sequence='100'/>
+        <!--TODO: Pendiente para futuras ajustes-->
+        <menuitem id="menu_treasury_settings"
+                  name="Ajustes"
+                  groups="base.group_erp_manager"
+                  parent="menu_treasury_configuration"
+                  sequence='1'/>
+    </data>
+</odoo>

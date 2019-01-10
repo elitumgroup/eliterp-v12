@@ -1,0 +1,7 @@
+id,code,name
+sri_authorized_vouchers_1,01,FACTURA
+sri_authorized_vouchers_2,04,NOTA DE CRÉDITO
+sri_authorized_vouchers_3,05,NOTA DE DÉBITO
+sri_authorized_vouchers_4,07,COMPROBANTE DE RETENCIÓN
+sri_authorized_vouchers_5,06,GUÍAS DE REMISIÓN
+sri_authorized_vouchers_6,18,DOCUMENTOS AUTORIZADOS UTILIZADOS EN VENTAS EXCEPTO N/C N/D

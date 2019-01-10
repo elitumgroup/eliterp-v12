@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_period_manager,account.period,model_account_period,account.group_account_manager,1,1,1,1
+access_account_period_invoice,account.period invoice,model_account_period,account.group_account_invoice,1,0,0,0
+
+access_account_period_line_manager,account.period.line,model_account_period_line,account.group_account_manager,1,1,1,1
+access_account_period_line_invoice,account.period.line invoice,model_account_period_line,account.group_account_invoice,1,0,0,0
+
+access_account_deposit_line_cash_manager,account.deposit.line.cash,model_account_deposit_line_cash,account.group_account_user,1,1,1,1
+
+access_account_deposit_line_external_checks_manager,account.deposit.line.external.checks,model_account_deposit_line_external_checks,account.group_account_user,1,1,1,1

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="category_approvals" model="ir.module.category">
+            <field name="name">Aprobaciones de documentos</field>
+            <field name="sequence">0</field>
+            <field name="description">
+                Categoría de grupo para botones especiales dentro del sistema.
+                Botones qué permiten aprobar o negar un registro.
+            </field>
+        </record>
+    </data>
+</odoo>

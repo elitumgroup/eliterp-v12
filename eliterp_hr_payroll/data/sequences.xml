@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_salary_advance">
+            <field name="name">Anticipo de quincena</field>
+            <field name="code">hr.salary.advance</field>
+            <field name="prefix">ADQ-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_payslip_run">
+            <field name="name">Rol consolidado</field>
+            <field name="code">hr.payslip.run</field>
+            <field name="prefix">ROL-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <!--Journals-->
+        <!--TODO: Al crear colocar las cuentas por defecto para mejora del proceso-->
+        <record model="account.journal" id="journal_salary_advance">
+            <field name="name">Anticipo de quincena</field>
+            <field name="type">general</field>
+            <field name="code">ADQ</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_salary_advance"/>
+        </record>
+        <record model="account.journal" id="journal_payslip_run">
+            <field name="name">Rol consolidado</field>
+            <field name="type">general</field>
+            <field name="code">ROL</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_payslip_run"/>
+        </record>
+    </data>
+</odoo>

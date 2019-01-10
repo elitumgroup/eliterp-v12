@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_retention_customer">
+            <field name="name">Retención a cliente</field>
+            <field name="code">retention.customer</field>
+            <field name="prefix">REV-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_retention_supplier">
+            <field name="name">Retención a proveedor</field>
+            <field name="code">retention.supplier</field>
+            <field name="prefix">REC-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_pay_order">
+            <field name="name">Orden de pago</field>
+            <field name="code">pay.order</field>
+            <field name="prefix">ORP-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_voucher_sale">
+            <field name="name">Comprobante de ingreso</field>
+            <field name="code">account.voucher.sale</field>
+            <field name="prefix">CI-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <!--TODO: Colocar secuencia en empresa-->
+        <record model="ir.sequence" id="sequence_voucher_purchase_cash">
+            <field name="name">Egreso efectivo</field>
+            <field name="code">account.voucher.purchase.cash</field>
+            <field name="padding">7</field>
+        </record>
+
+        <!--Journals-->
+        <record model="account.journal" id="journal_retention_customer">
+            <field name="name">Retención a cliente</field>
+            <field name="type">general</field>
+            <field name="code">RVE</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_retention_customer"/>
+        </record>
+        <record model="account.journal" id="journal_voucher_sale">
+            <field name="name">Comprobante de ingreso</field>
+            <field name="type">general</field>
+            <field name="code">CI</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_voucher_sale"/>
+        </record>
+        <record model="account.journal" id="journal_voucher_purchase">
+            <field name="name">Comprobante de egreso</field>
+            <field name="type">general</field>
+            <field name="code">CEG</field>
+            <field name="show_on_dashboard">False</field>
+        </record>
+    </data>
+</odoo>

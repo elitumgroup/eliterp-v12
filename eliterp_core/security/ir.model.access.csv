@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_canton_manager,canton,model_canton,base.group_partner_manager,1,1,1,1
+access_canton_all,canton all,model_canton,,1,0,0,0
+
+access_parish_manager,parish,model_parish,base.group_partner_manager,1,1,1,1
+access_parish_all,parish all,model_parish,,1,0,0,0

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Searchs-->
+    <record id="view_search_salary_advance" model="ir.ui.view">
+        <field name="name">view_search_salary_advance</field>
+        <field name="model">hr.salary.advance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="state"/>
+                <filter string="Contabilizado" name="posted" domain="[('state', '=', 'posted')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Estado" name='group_by_state' domain="[]" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Actions-->
+    <record id="action_salary_advance" model="ir.actions.act_window">
+        <field name="name">Anticipo de quincena</field>
+        <field name="res_model">hr.salary.advance</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="search_view_id" ref="view_search_salary_advance"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Clic para crear nuevo anticipo de sueldo.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_salary_advance_pay_order" model="ir.actions.act_window">
+        <field name="name">Crear orden de pago</field>
+        <field name="res_model">account.pay.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="context">{'default_salary_advance_id': [(4, active_id, None)]}
+        </field>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menus: TODO: Creamos este menú para agrupar Anticipos, Roles, etc.-->
+    <menuitem id="menu_hr_paysheet"
+              name="Nómina"
+              parent="hr.menu_hr_root"
+              sequence='10'/>
+
+    <menuitem id="menu_salary_advance"
+              parent="menu_hr_paysheet"
+              action="action_salary_advance"
+              sequence='1'/>
+
+    <!--Views-->
+    <!--Pay Order-->
+    <record id="view_form_pay_order_salary_advance_wizard" model="ir.ui.view">
+        <field name="name">view_form_pay_order_salary_advance_wizard</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="salary_advance_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_form_pay_order_salary_advance" model="ir.ui.view">
+        <field name="name">view_form_pay_order_salary_advance</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="salary_advance_id"
+                       attrs="{'invisible': [('salary_advance_id', '=', False)]}"/>
+            </xpath>
+            <xpath expr="//group[@name='information']" position="after">
+                <group string="Lista de empleados"
+                       attrs="{'invisible':[('type', 'not in', ('salary advance', 'payslip run'))]}">
+                    <field name="employee_ids"
+                           nolabel="1">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="name" readonly="1"/>
+                            <field name="amount"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_tree_salary_advance" model="ir.ui.view">
+        <field name="name">view_tree_salary_advance</field>
+        <field name="model">hr.salary.advance</field>
+        <field name="arch" type="xml">
+            <tree decoration-muted="state=='deny'"
+                  decoration-success="state == 'posted'"
+                  decoration-bf="state == 'posted'"
+            >
+                <field name="name"/>
+                <field name="date"/>
+                <field name="period"/>
+                <field name="count_lines"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <button string="Aprobar" name="action_approve" type="object"
+                        icon="fa-check text-success"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"/>
+                <button string="Negar" name="action_deny" type="object"
+                        icon="fa-ban text-danger"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"/>
+                <field name="state_pay_order"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_form_salary_advance" model="ir.ui.view">
+        <field name="name">view_form_salary_advance</field>
+        <field name="model">hr.salary.advance</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,to_approve,posted"
+                           modifiers="{'readonly': true}"/>
+                    <button name="print_advance"
+                            string="Imprimir anticipo"
+                            class="oe_highlight"
+                            type="object"/>
+                    <button name="to_approve"
+                            states="draft"
+                            type="object"
+                            string="Solicitar aprobación"
+                            class="oe_highlight"/>
+                    <button name="action_approve"
+                            states="to_approve"
+                            type="object"
+                            groups="hr_payroll.group_hr_payroll_manager"
+                            string="Aprobar"
+                            class="oe_highlight"/>
+                    <button name="action_deny"
+                            type="object"
+                            states="to_approve"
+                            groups="hr_payroll.group_hr_payroll_manager"
+                            string="Negar"/>
+                    <button name="posted_advance"
+                            states="approve"
+                            type="object"
+                            string="Contabilizar"
+                            class="oe_highlight"/>
+
+                    <field name="state_pay_order" invisible="1"/>
+                    <button string="Generar orden de pago"
+                            type="action"
+                            name="%(action_salary_advance_pay_order)d"
+                            attrs="{'invisible':['|', ('state','!=', 'posted'), ('state_pay_order', '=', 'paid')]}"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                            <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="period"/>
+                            <field name="move_id" readonly="1"
+                                   attrs="{'invisible':[('state', '!=', 'posted')]}"/>
+                            <field name="approval_user" readonly="1" attrs="{'invisible':[('state', '!=', 'posted')]}"/>
+                            <field name="total_pay_order" invisible="1"/>
+                        </group>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="amount_total"/>
+                            <field name="improved_pay_order"/>
+                            <field name="residual_pay_order" string="Saldo" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Notas">
+                            <field name="comment" nolabel="1" placeholder="p.e Colocar alguna otra referencia."/>
+                        </group>
+                    </group>
+                    <group string="Lista de empleados" col="1">
+                        <group col="1">
+                            <button name="load_employees"
+                                    type="object"
+                                    attrs="{'invisible':[('state', 'in', ('posted', 'deny'))]}"
+                                    string="Cargar empleados"
+                                    class="oe_highlight"/>
+                        </group>
+                        <field name="line_ids" nolabel="1">
+                            <tree create="false"
+                                  decoration-bg="reconciled == True"
+                                  decoration-success="reconciled == True"
+                                  editable="bottom">
+                                <field name="parent_state" invisible="1"/>
+                                <field name="reconciled" invisible="1"/>
+                                <field name="selected"
+                                       string="&#x02611;"
+                                       attrs="{'invisible': ['|', ('reconciled', '=', True), ('parent_state', '!=', 'posted')], 'readonly': [('reconciled', '=', True)]}"/>
+                                <field name="employee_id" readonly="1"/>
+                                <field name="job_id" invisible="1"/>
+                                <field name="admission_date" readonly="1"/>
+                                <field name="amount_advance" attrs="{'readonly':[('parent_state', '=', 'posted')]}"/>
+                                <field name="paid_amount"/>
+                                <field name="residual" string="Saldo"/>
+                                <field name="amount_payable"
+                                       sum="Total a pagar"
+                                       attrs="{'invisible': ['|', ('reconciled', '=', True), ('parent_state', '!=', 'posted')], 'readonly': [('reconciled', '=', True)]}"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

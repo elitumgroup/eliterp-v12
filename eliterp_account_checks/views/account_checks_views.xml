@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Searchs-->
+        <record id="view_search_checks_issued" model="ir.ui.view">
+            <field name="name">view_search_checks_issued</field>
+            <field name="model">account.checks</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="No. Cheque"/>
+                    <field name="recipient" string="Beneficiario/Girador"/>
+                    <separator/>
+                    <filter name="delivered" string="Entregado" domain="[('state', '=', 'delivered')]"/>
+                    <filter name="charged" string="Debitado" domain="[('state', '=', 'charged')]"/>
+                    <filter name="protested" string="Anulado" domain="[('state', '=', 'cancel')]"/>
+                    <separator/>
+                    <filter name="deposited" string="Depositado" domain="[('state', '=', 'deposited')]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Banco de emisión" name="groupby_bank_journal_id" domain="[]"
+                                context="{'group_by': 'bank_journal_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_checks_receipts" model="ir.actions.act_window">
+            <field name="name">Cheques recibidos</field>
+            <field name="res_model">account.checks</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'receipts')]</field>
+            <field name="context">{'group_by': 'check_type'}</field>
+            <field name="help" type="html">
+                <p>
+                    Se registran los cheques recibidos desde un comprobante de ingreso.
+                </p>
+            </field>
+        </record>
+        <record id="action_checks_issued" model="ir.actions.act_window">
+            <field name="name">Cheques emitidos</field>
+            <field name="res_model">account.checks</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'issued')]</field>
+            <field name="context">{"search_default_groupby_bank_journal_id": 1}</field>
+            <field name="search_view_id" ref="view_search_checks_issued"/>
+            <field name="help" type="html">
+                <p>
+                    Se registran los cheques emitidos desde un comprobante de egreso.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_query_checks"
+                  name="Consulta de cheques"
+                  parent="eliterp_treasury.menu_treasury"
+                  sequence="5"/>
+        <menuitem id="menu_query_checks_received"
+                  parent="menu_query_checks"
+                  action="action_checks_receipts"
+                  sequence="1"/>
+        <menuitem id="menu_query_checks_issued"
+                  parent="menu_query_checks"
+                  action="action_checks_issued"
+                  sequence="2"/>
+
+        <!--Views-->
+        <record id="view_tree_checks_receipts" model="ir.ui.view">
+            <field name="name">view_tree_checks_receipts</field>
+            <field name="model">account.checks</field>
+            <field name="arch" type="xml">
+                <tree create="false"
+                      edit="false"
+                      decoration-success="state=='deposited'"
+                      decoration-bf="state=='deposited'"
+                >
+                    <field name="name"/>
+                    <field name="partner_id" string="Cliente"/>
+                    <field name="bank_id"/>
+                    <field name="recipient" string="Girador"/>
+                    <field name="check_type"/>
+                    <field name="date" string="Fecha recepción"/>
+                    <field name="check_date"/>
+                    <field name="account_number"/>
+                    <field name="amount"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_checks_receipts" model="ir.ui.view">
+            <field name="name">view_form_checks_receipts</field>
+            <field name="model">account.checks</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="received,deposited"
+                               modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                            <h2>
+                                <field name="voucher_id"
+                                       context="{'form_view_ref': 'eliterp_treasury.view_form_voucher_sale'}"
+                                       readonly="1"/>
+                            </h2>
+                        </div>
+                        <group col="4">
+                            <field name="partner_id" string="Cliente"/>
+                            <field name="recipient" string="Girador"/>
+                            <field name="amount"/>
+                            <field name="amount_in_letters"/>
+                        </group>
+                        <group string="Datos del banco" col="4">
+                            <field name="bank_id"/>
+                            <field name="account_number"/>
+                            <field name="date" string="Fecha recepción"/>
+                            <field name="check_date"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_tree_checks_issued" model="ir.ui.view">
+            <field name="name">view_tree_checks_issued</field>
+            <field name="model">account.checks</field>
+            <field name="arch" type="xml">
+                <tree create="false"
+                      edit="false"
+                      decoration-danger="state=='protested'"
+                      decoration-success="state=='charged'"
+                      decoration-bf="state=='charged'">
+                    <field name="name"/>
+                    <field name="bank_journal_id"/>
+                    <field name="recipient" string="Beneficiario"/>
+                    <field name="date" string="Fecha emisión"/>
+                    <field name="check_date"/>
+                    <field name="amount"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_checks_issued" model="ir.ui.view">
+            <field name="name">view_form_checks_issued</field>
+            <field name="model">account.checks</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                    <header>
+                        <field name="state" statusbar_visible="issued,delivered,charged"
+                               states="issued,delivered,charged"
+                               widget="statusbar" clickable="True"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                            <label for="voucher_id"
+                                   string="Documento de pago"
+                                   class="oe_edit_only"/>
+                            <h2>
+                                <field name="voucher_id"
+                                       context="{'form_view_ref': 'eliterp_treasury.view_form_voucher_purchase'}"
+                                       readonly="1"/>
+                            </h2>
+                        </div>
+                        <group col="4">
+                            <field name="partner_id" string="Proveedor"/>
+                            <field name="recipient" string="Beneficiario"/>
+                            <field name="amount"/>
+                            <field name="amount_in_letters"/>
+                        </group>
+                        <group string="Datos del banco" col="4">
+                            <field name="bank_journal_id"/>
+                            <field name="date" string="Fecha emisión"/>
+                            <field name="check_date"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Actions Views-->
+        <record model="ir.actions.act_window.view" id="action_view_tree_checks_receipts">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_checks_receipts"/>
+            <field name="act_window_id" ref="action_checks_receipts"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_checks_receipts">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_checks_receipts"/>
+            <field name="act_window_id" ref="action_checks_receipts"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_tree_checks_issued">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_checks_issued"/>
+            <field name="act_window_id" ref="action_checks_issued"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_checks_issued">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_checks_issued"/>
+            <field name="act_window_id" ref="action_checks_issued"/>
+        </record>
+    </data>
+</odoo>

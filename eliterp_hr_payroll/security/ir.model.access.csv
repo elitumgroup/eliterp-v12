@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_salary_advance_user,hr.salary.advance user,model_hr_salary_advance,hr_payroll.group_hr_payroll_user,1,1,1,1
+access_hr_salary_advance_line_user,hr_salary_advance_line user,model_hr_salary_advance_line,hr_payroll.group_hr_payroll_user,1,1,1,1
+
+access_hr_payslip_input_2_user,hr.payslip.input.2 user,model_hr_payslip_input_2,hr_payroll.group_hr_payroll_user,1,1,1,1
+access_hr_payslip_input_3_user,hr.payslip.input.3 user,model_hr_payslip_input_3,hr_payroll.group_hr_payroll_user,1,1,1,1
+
+access_hr_payslip_run_line_user,hr.payslip.run.line user,model_hr_payslip_run_line,hr_payroll.group_hr_payroll_user,1,1,1,1
+
+access_employee_order_line_invoice,employee.order.line invoice,model_account_employee_order_line,hr_payroll.group_hr_payroll_user,1,1,1,1

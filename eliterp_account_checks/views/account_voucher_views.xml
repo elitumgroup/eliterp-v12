@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Voucher Sale-->
+        <record id="view_form_voucher_sale_checks" model="ir.ui.view">
+            <field name="name">view_form_voucher_sale_checks</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_form_voucher_sale"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='collection_line']//tree//field[@name='type_payment']"
+                       position="after">
+                    <field name="check_type"
+                           attrs="{'invisible': [('type_payment', '!=', 'check')], 'required': [('type_payment', '==', 'check')]}"/>
+                </xpath>
+                <xpath expr="//field[@name='collection_line']//tree//field[@name='date_due']"
+                       position="after">
+                    <field name="bank_id"
+                           attrs="{'invisible': [('type_payment', '!=', 'check')], 'required': [('type_payment', '==', 'check')]}"/>
+                    <field name="account_number"
+                           attrs="{'invisible': [('type_payment', '!=', 'check')], 'required': [('type_payment', '==', 'check')]}"/>
+                    <field name="check_number"
+                           attrs="{'invisible': [('type_payment', '!=', 'check')], 'required': [('type_payment', '==', 'check')]}"/>
+                    <field name="drawer"
+                           attrs="{'invisible': [('type_payment', '!=', 'check')], 'required': [('type_payment', '==', 'check')]}"/>
+
+                </xpath>
+            </field>
+        </record>
+
+        <!--Voucher Purchase-->
+        <record id="view_tree_voucher_purchase_checks" model="ir.ui.view">
+            <field name="name">view_tree_voucher_purchase_checks</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_tree_voucher_purchase"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='transfer_code']" position="after">
+                    <field name="check_number"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_form_voucher_purchase_checks" model="ir.ui.view">
+            <field name="name">view_form_voucher_purchase_checks</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_form_voucher_purchase"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='transfer_code']" position="before">
+                    <field name="check_number"
+                           attrs="{'required':[('type_egress', '=', 'check')], 'invisible':[('type_egress', '!=', 'check')]}"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+
+

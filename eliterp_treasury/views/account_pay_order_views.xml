@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Searchs-->
+        <record id="view_search_pay_order" model="ir.ui.view">
+            <field name="name">view_search_pay_order</field>
+            <field name="model">account.pay.order</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="Referencia u origen"
+                           filter_domain="['|', ('name','ilike',self), ('origin','ilike',self)]"/>
+                    <field name="beneficiary"/>
+                    <separator/>
+                    <filter name="draft" string="Borrador" domain="[('state','=','draft')]"/>
+                    <filter name="paid" string="Pagado" domain="[('state', '=', 'paid')]"/>
+                    <filter name="cancel" string="Anulada" domain="[('state', '=', 'cancel')]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Tipo de origen" name="groupby_type" domain="[]"
+                                context="{'group_by': 'type'}"/>
+                        <filter string="Creado por" name="groupby_create_uid" domain="[]"
+                                context="{'group_by': 'create_uid'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_pay_order" model="ir.actions.act_window">
+            <field name="name">Orden de pago</field>
+            <field name="res_model">account.pay.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_groupby_type": 1}
+            </field>
+            <field name="search_view_id" ref="view_search_pay_order"/>
+            <field name="help" type="html">
+                <p>
+                    Aquí se registran todas la ordenes de pago de los diferentes documentos.
+                    No se puede crear un pago (Comprobante de egreso) sin una orden de pago.
+                </p>
+                <p>
+                    <i>Ejemplo: Facturas de proveedor</i>
+                </p>
+            </field>
+        </record>
+
+        <record id="view_form_pay_order_wizard" model="ir.ui.view">
+            <field name="name">view_form_pay_order_wizard</field>
+            <field name="model">account.pay.order.wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="date"/>
+                        <field name="amount"/>
+                        <field name="type_egress"/>
+                        <field name="journal_id"
+                               domain="[('company_id', '=', company_id), ('type', '=', 'bank')]"
+                               widget="selection"
+                               attrs="{'invisible': [('type_egress', '=', 'cash')], 'required': [('type_egress', '!=', 'cash')]}"
+                               options="{'no_open': True, 'no_create': True}"/>
+                        <field name="origin"/>
+                        <!--Campos para transacciones (Para saber ded dónde se origina el pago) y restricciones
+                        de lod datos (Ej. Fecha del documento)-->
+                        <field name="type" invisible="1"/>
+                        <field name="default_amount" invisible="1"/>
+                        <field name="default_date" invisible="1"/>
+                        <field name="beneficiary" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <!--Documentos origen-->
+                        <field name="invoice_ids" invisible="1"/>
+                        <field name="purchase_order_id" invisible="1"/>
+                    </group>
+                    <group string="Notas y comentarios">
+                        <field name="comment" nolabel="1" placeholder="p.e Colocar referencia del pago"/>
+                    </group>
+                    <footer>
+                        <button special="save" class="oe_highlight"
+                                string="Crear orden de pago"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_invoice_pay_order" model="ir.actions.act_window">
+            <field name="name">Crear orden de pago</field>
+            <field name="res_model">account.pay.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_pay_order_wizard"/>
+            <field name="context">{'default_invoice_ids': [(4, active_id, None)]}
+            </field>
+            <field name="target">new</field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_pay_order"
+                  parent="menu_cash_payments"
+                  action="action_pay_order"
+                  sequence="1"/>
+
+        <!--Views-->
+        <record id="view_tree_pay_order" model="ir.ui.view">
+            <field name="name">view_tree_pay_order</field>
+            <field name="model">account.pay.order</field>
+            <field name="arch" type="xml">
+                <tree create="false" edit="false"
+                      decoration-muted="state == 'cancel'"
+                      decoration-success="state == 'paid'"
+                      decoration-bf="state == 'paid'">
+                    <field name="name"/>
+                    <field name="origin"/>
+                    <field name="date"/>
+                    <field name="beneficiary"/>
+                    <field name="amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_pay_order" model="ir.ui.view">
+            <field name="name">view_form_pay_order</field>
+            <field name="model">account.pay.order</field>
+            <field name="arch" type="xml">
+                <form create="false" duplicate="false">
+                    <header>
+                        <field name="state"
+                               widget="statusbar"
+                               modifiers="{'readonly': true}"/>
+                        <!--TODO: context="{'default_voucher_type': 'purchase'}"
+                        Colocar grupo para qué soló los usuarios de
+                        aquí puedan generar el pago-->
+                        <button name="generate_payment"
+                                string="Generar pago"
+                                states="draft"
+                                type="object"
+                                confirm="Desea confirmar la generación del pago para está orden?"
+                                class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group name="information">
+                            <group>
+                                <field name="create_uid" string="Creado por" readonly="1"/>
+                                <field name="date"/>
+                                <field name="type" readonly="1"/>
+                                <field name="amount"/>
+                                <!--TODO: Documentos relacionados, colocar aquí los de otras aplicaciones-->
+                                <field name="purchase_order_id"
+                                       attrs="{'invisible': [('purchase_order_id', '=', False)]}"/>
+                            </group>
+                            <group>
+                                <field name="type_egress"/>
+                                <field name="journal_id"
+                                       domain="[('company_id', '=', company_id), ('type', '=', 'bank')]"
+                                       options="{'no_open': True, 'no_create': True}"
+                                       attrs="{'invisible': [('type_egress', '=', 'cash')], 'required': [('type_egress', '!=', 'cash')]}"/>
+                                <field name="voucher_id"
+                                       attrs="{'invisible': [('voucher_id', '=', False)]}"
+                                       context="{'form_view_ref': 'eliterp_treasury.view_form_voucher_purchase'}"
+                                       groups="account.group_account_manager"/>
+                                <field name="comment" placeholder="p.e Colocar referencia del pago"/>
+                                <field name="company_id" invisible="1"/>
+                                <field name="default_amount" invisible="1"/>
+                                <field name="default_date" invisible="1"/>
+                            </group>
+                        </group>
+                        <group string="Facturas" attrs="{'invisible': [('type', '!=', 'invoice')]}">
+                            <field name="invoice_ids" widget="many2many_tags" nolabel="1" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Account Voucher-->
+        <record id="view_form_voucher_purchase_pay_order" model="ir.ui.view">
+            <field name="name">view_form_voucher_purchase_pay_order</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_form_voucher_purchase"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date']" position="after">
+                    <field name="pay_order_id" required="1"/>
+                    <field name="type_pay_order" invisible="1"/>
+                </xpath>
+                <xpath expr="//page[@name='invoices']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('type_pay_order', '!=', 'invoice')]}</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

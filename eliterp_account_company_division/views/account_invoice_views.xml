@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Search-->
+        <record id="view_search_invoice_company_division" model="ir.ui.view">
+            <field name="name">view_search_invoice_company_division</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='group_by_partner_id']" position="after">
+                    <filter name="companydivision" string="Divisiones" context="{'group_by':'company_division_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Invoice-->
+        <record id="view_form_invoice_company_division" model="ir.ui.view">
+            <field name="name">view_form_invoice_company_division</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="company_division_id" required="1"
+                           context="{'default_company_id': company_id}"
+                           domain="[('company_id', '=', company_id)]"/>
+                </field>
+            </field>
+        </record>
+
+        <!--Purchase Invoice-->
+        <record id="view_form_purchase_invoice_company_division" model="ir.ui.view">
+            <field name="name">view_form_purchase_invoice_company_division</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_bank_id']"
+                       position="replace"><!--Cuenta bancaria, soló la ocultamos-->
+                    <field name="partner_bank_id" invisible="1"/>
+                    <field name="company_division_id" required="1"
+                           context="{'default_company_id': company_id}"
+                           domain="[('company_id', '=', company_id)]"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

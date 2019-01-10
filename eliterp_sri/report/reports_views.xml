@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Sale Order-->
+        <record id="view_pivot_all_printing_points" model="ir.ui.view">
+            <field name="name">view_pivot_all_printing_points</field>
+            <field name="model">report.all.printing.points</field>
+            <field name="arch" type="xml">
+                <pivot disable_linking="True">
+                    <field name="name" type="row"/>
+                    <field name="price_total" string="Total" type="measure"/>
+                    <field name="product_qty" string="Cantidad de producto" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+        <record id="view_search_all_printing_points" model="ir.ui.view">
+            <field name="name">view_search_all_printing_points</field>
+            <field name="model">report.all.printing.points</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="date_order"/>
+                    <filter string="Ventas del año actual" name="current_year"
+                            domain="[('date_order','&gt;=',time.strftime('%%Y-01-01'))]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Puntos de impresión" name="point_printing_id"
+                                context="{'group_by':'point_printing_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_report_all_printing_points" model="ir.actions.act_window">
+            <field name="name">Pedidos de venta de todos los puntos de impresión</field>
+            <field name="res_model">report.all.printing.points</field>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="view_pivot_all_printing_points"/>
+            <field name="search_view_id" ref="view_search_all_printing_points"/>
+            <field name="context">{'search_default_point_printing_id': 1, 'search_default_current_year': 1}</field>
+        </record>
+    </data>
+</odoo>
+

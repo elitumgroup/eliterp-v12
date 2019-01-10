@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_form_invoice_supplier_pay_order" model="ir.ui.view">
+        <field name="name">view_form_invoice_supplier_pay_order</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                    <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                </button>
+            </xpath>
+            <!--TODO: Realizar operación cómo registrar pago-->
+            <button name="%(account.action_account_invoice_payment)d" position="replace"><!--Registrar pago-->
+                <field name="state_pay_order" invisible="1"/>
+                <button string="Generar orden de pago"
+                        type="action"
+                        name="%(action_invoice_pay_order)d"
+                        attrs="{'invisible':['|', '|', ('state','!=', 'open'), ('state_pay_order', '=', 'paid'), ('type', '=', 'in_refund')]}"
+                        class="oe_highlight"/>
+
+            </button>
+        </field>
+    </record>
+    <record id="view_tree_invoice_supplier_pay_order" model="ir.ui.view">
+        <field name="name">view_tree_invoice_supplier_pay_order</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="eliterp_sri.view_tree_invoice_supplier_sri"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="replace"><!--Estado-->
+                <button type="action"
+                        name="%(action_invoice_pay_order)d"
+                        string="Generar orden de pago"
+                        attrs="{'invisible': ['|', '|', ('state','!=', 'open'), ('state_pay_order', '=', 'paid'), ('type', '=', 'in_refund')]}"
+                        icon='fa-dollar text-success'/>
+                <field name="state_pay_order" attrs="{'invisible': [('type', '=', 'in_refund')]}"/>
+                <field name="state" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Invoice Sales-->
+    <record id="view_form_invoice_voucher" model="ir.ui.view">
+        <field name="name">view_form_invoice_voucher</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <button name="%(account.action_account_invoice_payment)d"
+                    position="attributes"><!--Registrar pago-->
+                <attribute name="invisible">1</attribute>
+            </button>
+            <xpath expr="//page[@name='other_info']//field[@name='reference']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

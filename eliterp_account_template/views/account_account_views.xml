@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Account Tax Template-->
+        <record id="view_form_account_tax_template" model="ir.ui.view">
+            <field name="name">view_form_account_tax_template</field>
+            <field name="model">account.tax.template</field>
+            <field name="inherit_id" ref="account.view_account_tax_template_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="code"
+                           attrs="{'invisible': [('tax_type', '=', 'iva')], 'required': [('tax_type', '!=', 'iva')]}"/>
+                </field>
+                <field name="type_tax_use" position="after">
+                    <field name="tax_type"/>
+                    <field name="retention_type"
+                           attrs="{'invisible': [('tax_type', '=', 'iva')], 'required': [('tax_type', '=', 'retention')]}"/>
+                </field>
+            </field>
+        </record>
+
+        <!--Account-->
+        <record id="view_tree_account" model="ir.ui.view">
+            <field name="name">view_tree_account</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_list"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-bf">internal_type=='view'</attribute>
+                    <attribute name="decoration-danger">internal_type=='view' and balance&lt;0</attribute>
+                </tree>
+                <field name="user_type_id" position="after">
+                    <field name="internal_type" invisible="1"/>
+                    <field name="debit"/>
+                    <field name="credit"/>
+                    <field name="balance"/>
+                </field>
+            </field>
+        </record>
+        <record id="view_form_account" model="ir.ui.view">
+            <field name="name">view_form_account</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form"/>
+            <field name="arch" type="xml">
+                <field name="user_type_id" position="after">
+                    <field name="parent_id" domain="[('internal_type', '=', 'view')]"/>
+                    <field name="debit"/>
+                    <field name="credit"/>
+                    <field name="balance"/>
+                </field>
+            </field>
+        </record>
+
+        <!--Tax-->
+        <record id="action_tax_group" model="ir.actions.act_window">
+            <field name="name">Grupo de impuestos</field>
+            <field name="res_model">account.tax.group</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem action="action_tax_group" id="menu_tax_group"
+                  parent="account.account_account_menu"
+                  sequence="0"/>
+
+        <record id="view_tree_tax" model="ir.ui.view">
+            <field name="name">view_tree_tax</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="tax_type"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_search_tax" model="ir.ui.view">
+            <field name="name">view_search_tax</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_account_tax_search"/>
+            <field name="arch" type="xml">
+                <field name="name" position="replace">
+                    <field name="name"
+                           filter_domain="['|', '|', ('name','ilike',self), ('code','ilike',self), ('description','ilike',self)]"
+                           string="Impuesto"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_form_tax" model="ir.ui.view">
+            <field name="name">view_form_tax</field>
+            <field name="model">account.tax</field>
+            <field name="inherit_id" ref="account.view_tax_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="code"
+                           attrs="{'invisible': [('tax_type', '=', 'iva')], 'required': [('tax_type', '!=', 'iva')]}"/>
+                </field>
+                <field name="type_tax_use" position="after">
+                    <field name="tax_type"/>
+                    <field name="retention_type"
+                           attrs="{'invisible': [('tax_type', '=', 'iva')], 'required': [('tax_type', '=', 'retention')]}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

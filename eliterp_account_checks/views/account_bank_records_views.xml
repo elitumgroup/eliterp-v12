@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_bank_deposit_checks" model="ir.ui.view">
+            <field name="name">view_form_bank_deposit_checks</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="eliterp_account.view_form_bank_deposit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[last()]" position="after">
+                    <group col="1" string="Líneas de cheques recaudados"
+                           attrs="{'invisible':[('type_deposit', '!=', 'checks_collected')]}">
+                        <group>
+                            <button name="load_checks"
+                                    attrs="{'invisible':[('state','!=','draft')]}"
+                                    type="object"
+                                    string="Cargar cheques"
+                                    class="oe_highlight"/>
+                        </group>
+                        <field name="deposit_line_checks_collected" nolabel="1">
+                            <tree editable="bottom" create="false" edit="false">
+                                <field name="bank_id"/>
+                                <field name="name"/>
+                                <field name="check_date"/>
+                                <field name="account_id"/>
+                                <field name="amount"/>
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

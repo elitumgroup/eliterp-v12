@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sector_code_user,hr.sector.code user,model_hr_sector_code,hr.group_hr_user,1,1,1,1
+access_type_history_user,hr.type.history user,model_hr_type_history,hr.group_hr_user,1,1,1,1
+access_employee_history_user,hr.employee.history user,model_hr_employee_history,hr.group_hr_user,1,1,1,1
+access_employee_children_user,hr.employee.children user,model_hr_employee_children,hr.group_hr_user,1,1,1,1

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Actions-->
+
+    <!--Menus: TODO: Creamos este menú para agrupar Asistencias, Ausencias, etc.-->
+    <menuitem id="menu_hr_employees_news"
+              name="Novedades de empleados"
+              parent="hr.menu_hr_root"
+              sequence='5'/>
+
+    <menuitem id="menu_absences"
+              name="Ausencias"
+              parent="menu_hr_employees_news"
+              sequence='10'/>
+    <menuitem id="menu_absences_register"
+              parent="menu_absences"
+              action="hr_holidays.hr_leave_action_all"
+              sequence="1"/>
+    <menuitem id="menu_absences_dashboard"
+              parent="menu_absences"
+              action="hr_holidays.action_hr_holidays_dashboard"
+              sequence="2"/>
+
+    <menuitem id="menu_holiday_status"
+              parent="hr.menu_human_resources_configuration"
+              action="hr_holidays.open_view_holiday_status"
+              sequence="25"/>
+
+    <!--Views-->
+    <!--Leave Type-->
+    <record id="view_tree_leave_type" model="ir.ui.view">
+        <field name="name">view_tree_leave_type</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.view_holiday_status_normal_tree"/>
+        <field name="arch" type="xml">
+            <tree position="replace">
+                <tree>
+                    <field name="name" string="Nombre"/>
+                    <field name="description"/>
+                    <field name="color_name"/>
+                    <field name="time_type"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </tree>
+        </field>
+    </record>
+    <!--TODO: Revisar vista si no existen campos necesarios de la reemplazada-->
+    <record id='view_form_leave_type' model='ir.ui.view'>
+        <field name='name'>view_form_leave_type</field>
+        <field name='model'>hr.leave.type</field>
+        <field name='inherit_id' ref='hr_holidays.edit_holiday_status_form'/>
+        <field name='arch' type='xml'>
+            <xpath expr="//form" position="replace">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="toggle_active" icon="fa-archive">
+                                <field name="active" widget="boolean_button"
+                                       options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                            </button>
+                        </div>
+                        <group>
+                            <group name="description" string="Descripción">
+                                <field name="name"/>
+                                <field name="description" required="1"/>
+                            </group>
+                            <group name="options" string="Opciones">
+                                <field name="color_name"/>
+                                <field name="time_type" required="1"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Leave: TODO: Pendiente vista tree
+    <button string="Approve" name="action_approve" type="object"
+                    icon="fa-check text-success"
+                    states="confirm"
+                    groups="hr_holidays.group_hr_holidays_user"/>
+    <button string="Validate" name="action_validate" type="object"
+                    icon="fa-check text-success"
+                    states="validate1"
+                    groups="hr_holidays.group_hr_holidays_manager"/>
+    <button string="Refuse" name="action_refuse" type="object"
+                    icon="fa-ban text-danger"
+                    states="confirm,validate,validate1"
+                    groups="hr_holidays.group_hr_holidays_manager"/>
+    -->
+    <record id='view_form_leave' model='ir.ui.view'>
+        <field name='name'>view_form_leave</field>
+        <field name='model'>hr.leave</field>
+        <field name='inherit_id' ref='hr_holidays.hr_leave_view_form_manager'/>
+        <field name='arch' type='xml'>
+            <xpath expr="//form" position="replace">
+                <form>
+                    <field name="can_reset" invisible="1"/>
+                    <field name="time_type" invisible="1"/>
+                    <header>
+                        <button string="Imprimir solicitud" name="print_request"
+                                attrs="{'invisible':[('state', '!=', 'validate1'), ('time_type', '!=', 'vacation')]}"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button string="Solicitar aprobación"
+                                name="action_confirm" states="draft" type="object"
+                                class="oe_highlight"/>
+                        <button string="Aprobar"
+                                name="action_approve"
+                                states="confirm"
+                                type="object"
+                                groups="hr_holidays.group_hr_holidays_manager"
+                                class="oe_highlight"/>
+                        <button string="Negar"
+                                name="action_refuse"
+                                states="confirm"
+                                groups="hr_holidays.group_hr_holidays_manager"
+                                type="object"/>
+                        <button string="Validar"
+                                name="action_validate"
+                                states="validate1"
+                                groups="hr.group_hr_manager"
+                                type="object"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm,validate1"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                                <field name="company_id" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="holiday_type"
+                                       options="{'no_create':True}"
+                                       string="Aplica" context="{'employee_id': employee_id}"/>
+                                <field name="employee_id"
+                                       domain="[('company_id', '=', company_id)]"
+                                       options="{'no_create':True}"
+                                       attrs="{'required':[('holiday_type', '=', 'employee')], 'invisible':[('holiday_type','=','category')]}"/>
+                                <field name="category_id"
+                                       attrs="{'required':[('holiday_type','=','category')], 'readonly': [('state','not in', ('draft','confirm'))], 'invisible':[('holiday_type','=','employee')]}"/>
+                                <label for="number_of_days_display" string="Duración"/>
+                                <div>
+                                    <div>
+                                        <field name="date_from" class="oe_inline"/>
+                                        <span class="oe_inline">-</span>
+                                        <field name="date_to" class="oe_inline"/>
+                                    </div>
+                                    <div>
+                                        <field name="number_of_days" class="oe_inline"/>
+                                        días
+                                    </div>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="holiday_status_id"
+                                       options="{'no_create':True}"/>
+                                <field name="name" required="1"/>
+                                <field name="department_id"
+                                       options="{'no_create':True}"
+                                       attrs="{'readonly':['|',('holiday_type','=','category'),('state','=', 'validate')],'invisible':[('holiday_type','=','category')]}"/>
+                                <field name="adjunt_name" invisible="1"/>
+                                <field name="adjunt"
+                                       widget="binary"
+                                       filename="adjunt_name"
+                                       attrs="{'invisible':[('time_type', '=', 'vacation')]}"/>
+                                <field name="payslip_status" invisible="1"/><!--TODO: Botón importante, para nómina-->
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Notas y comentarios">
+                                <field name="report_note" nolabel="1"
+                                       placeholder="p.e Colocar alguna otra referencia."/>
+                            </group>
+                            <group attrs="{'invisible':['|', ('time_type', '!=', 'vacation'), ('holiday_type', '=', 'category')]}"
+                                   string="Líneas de vacaciones" col="1">
+                                <field name="vacation_line"
+                                       attrs="{'readonly':[('state', '=','validate')]}"
+                                       nolabel="1" readonly="0">
+                                    <tree decoration-success="vacations_generated==vacations_taken"
+                                          decoration-bf="vacations_generated==vacations_taken"
+                                          create="false" edit="false">
+                                        <field name="employee_id"
+                                               invisible="1"/><!--Sirve para guardar datos de empleado-->
+                                        <field name="name"/>
+                                        <field name="vacations_generated"/>
+                                        <field name="vacations_taken"/>
+                                        <field name="vacations_available" sum="Total"/>
+                                        <field name="holiday_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Menus-->
+        <menuitem id="menu_start"
+                  name="Inicio"
+                  groups="base.group_user"
+                  web_icon="eliterp_start,static/description/icon.png"
+                  sequence="1"/>
+
+        <menuitem id="menu_messenger"
+                  name="Mensajería"
+                  action="mail.action_discuss"
+                  parent="menu_start"
+                  sequence="1"/>
+        <menuitem id="menu_calendar"
+                  name="Calendario"
+                  action="calendar.action_calendar_event"
+                  parent="menu_start"
+                  sequence="2"/>
+        <!--TODO: Este menú queda libre para otras aplicaciones-->
+        <menuitem id="menu_requirements"
+                  name="Requerimientos"
+                  parent="menu_start"
+                  sequence="3"/>
+    </data>
+</odoo>

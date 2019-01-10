@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Searchs-->
+    <record id="view_search_payment_requirement" model="ir.ui.view">
+        <field name="name">view_search_payment_requirement</field>
+        <field name="model">payment.requirement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="beneficiary"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Creado" name="groupby_create_uid" domain="[]"
+                            context="{'group_by': 'create_uid'}"/>
+                    <filter string="Estado" name="groupby_state" domain="[]"
+                            context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Actions-->
+    <record id="action_payment_requirement" model="ir.actions.act_window">
+        <field name="name">Requerimiento de pago</field>
+        <field name="res_model">payment.requirement</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{"search_default_groupby_create_uid": 1}
+        </field>
+        <field name="search_view_id" ref="view_search_payment_requirement"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo requerimiento de pago.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_start_payment_requirement" model="ir.actions.act_window">
+        <field name="name">Requerimiento de pago</field>
+        <field name="res_model">payment.requirement</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo requerimiento de pago. Soló se mostrarán los creados por el usuario activo.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_requirement_pay_order" model="ir.actions.act_window">
+        <field name="name">Crear orden de pago</field>
+        <field name="res_model">account.pay.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="context">{'default_payment_requirement_id': [(4, active_id, None)]}
+        </field>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menus-->
+    <menuitem id="menu_payment_requirement"
+              action="action_payment_requirement"
+              parent="eliterp_treasury.menu_transactions"
+              sequence="1"/>
+
+    <menuitem id="menu_start_payment_requirement"
+              action="action_start_payment_requirement"
+              parent="eliterp_start.menu_requirements"
+              sequence="9"/>
+
+    <!--Views-->
+    <!--Pay Order-->
+    <record id="view_form_pay_order_payment_requirement_wizard" model="ir.ui.view">
+        <field name="name">view_form_pay_order_payment_requirement_wizard</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="payment_requirement_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_form_pay_order_payment_requirement" model="ir.ui.view">
+        <field name="name">view_form_pay_order_payment_requirement</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="payment_requirement_id"
+                       attrs="{'invisible': [('payment_requirement_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Payment Requirement-->
+    <record id="view_tree_payment_requirement" model="ir.ui.view">
+        <field name="name">view_tree_payment_requirement</field>
+        <field name="model">payment.requirement</field>
+        <field name="arch" type="xml">
+            <tree
+                    decoration-success="state == 'approve'"
+                    decoration-bf="state == 'approve'"
+                    decoration-muted="state == 'deny'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="payment_date"/>
+                <field name="beneficiary"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <button name="action_button_approve"
+                        string="Aprobar"
+                        type="object"
+                        class="oe_stat_button"
+                        states="to_approve"
+                        icon="fa-check text-success"/>
+                <button name="action_button_deny"
+                        string="Negar"
+                        type="object"
+                        class="oe_stat_button"
+                        states="to_approve"
+                        icon="fa-ban text-danger"/>
+                <button type="action"
+                        name="%(action_requirement_pay_order)d"
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar text-success'/>
+                <field name="state_pay_order"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_form_payment_requirement" model="ir.ui.view">
+        <field name="name">view_form_payment_requirement</field>
+        <field name="model">payment.requirement</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state"
+                           statusbar_visible="draft,approve"
+                           widget="statusbar"
+                           modifiers="{'readonly': true}"/>
+                    <button name="print_request" type="object"
+                            attrs="{'invisible':[('state', '==', 'draft')]}"
+                            class="oe_highlight" string="Imprimir requerimiento"/>
+                    <button name="to_approve"
+                            states="draft"
+                            string="Solicitar aprobación"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_button_approve"
+                            states="to_approve"
+                            string="Aprobar"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_button_deny"
+                            states="to_approve"
+                            string="Negar"
+                            type="object"/>
+                    <field name="state_pay_order" invisible="1"/>
+                    <button type="action"
+                            name="%(action_requirement_pay_order)d" string="Generar orden de pago"
+                            attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                            <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" attrs="{'invisible':[('state', '==', 'draft')]}">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="request_date"/>
+                            <field name="type" widget="radio"/>
+                            <field name="amount_total"/>
+                            <field name="document"
+                                   filename="document_name"
+                                   widget="binary"/>
+                            <field name="document_name" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="payment_date"/>
+                            <field name="other"
+                                   attrs="{'invisible':[('type', '!=', 'other')], 'required':[('type', '=', 'other')]}"/>
+                            <field name="employee_id"
+                                   domain="[('company_id', '=', company_id)]"
+                                   options="{'no_open':True,'no_create':True}"
+                                   attrs="{'invisible':[('type', '!=', 'employee')], 'required':[('type', '=', 'employee')]}"/>
+                            <field name="supplier_id"
+                                   options="{'no_open':True,'no_create':True}"
+                                   attrs="{'invisible':[('type', '!=', 'supplier')], 'required':[('type', '=', 'supplier')]}"/>
+                            <field name="approval_user"
+                                   attrs="{'invisible':[('state', '!=', 'approve')]}"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Notas y comentarios">
+                            <field name="comment" nolabel="1" placeholder="Notas..."/>
+                        </group>
+                        <group string="Líneas de requerimiento" col="1">
+                            <field name="line_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>

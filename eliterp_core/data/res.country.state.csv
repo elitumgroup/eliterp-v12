@@ -1,0 +1,26 @@
+id,code,name,country_id/id
+res_country_state_1,1,AZUAY,base.ec
+res_country_state_2,2,BOLÍVAR,base.ec
+res_country_state_3,3,CAÑAR,base.ec
+res_country_state_4,4,CARCHI,base.ec
+res_country_state_5,5,COTOPAXI,base.ec
+res_country_state_6,6,CHIMBORAZO,base.ec
+res_country_state_7,7,EL ORO,base.ec
+res_country_state_8,8,ESMERALDAS,base.ec
+res_country_state_9,9,GUAYAS,base.ec
+res_country_state_10,10,IMBABURA,base.ec
+res_country_state_11,11,LOJA,base.ec
+res_country_state_12,12,LOS RÍOS,base.ec
+res_country_state_13,13,MANABÍ,base.ec
+res_country_state_14,14,MORONA SANTIAGO,base.ec
+res_country_state_15,15,NAPO,base.ec
+res_country_state_16,16,PASTAZA,base.ec
+res_country_state_17,17,PICHINCHA,base.ec
+res_country_state_18,18,TUNGURAGUA,base.ec
+res_country_state_19,19,ZAMORA CHINCHIPE,base.ec
+res_country_state_20,20,GALÁPAGOS,base.ec
+res_country_state_21,21,SUCUMBIOS,base.ec
+res_country_state_22,22,ORELLANA,base.ec
+res_country_state_23,23,SANTO DOMINGO DE LOS TSACHILAS,base.ec
+res_country_state_24,24,SANTA ELENA,base.ec
+res_country_state_99,99,ZONA NO DELIMITADA,base.ec

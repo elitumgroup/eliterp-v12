@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Employee-->
+        <record id="view_tree_employee" model="ir.ui.view">
+            <field name="name">view_tree_employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="arch" type="xml">
+                <tree position="replace">
+                    <tree>
+                        <field name="name"/>
+                        <field name="identification_id"/>
+                        <field name="department_id"/>
+                        <field name="job_id"/>
+                        <field name="admission_date"/>
+                        <field name="emergency_phone"/>
+                        <field name="coach_id" invisible="1"/>
+                        <field name="message_needaction" invisible="1"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </tree>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_employee" model="ir.ui.view">
+            <field name="name">view_form_employee</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//label[@for='name']" position="replace"/><!--Nombre-->
+                <xpath expr="//field[@name='category_ids']" position="attributes"><!--Etiquetas-->
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//notebook"
+                       position="replace"><!--Reemplazamos contenido de notebook, más facilidad (Campos innecesarios)-->
+                    <notebook>
+                        <page name="public_information" string="Información pública">
+                            <group string="Datos personales" col="4">
+                                <field name="names" default_focus="1" required="1"/>
+                                <field name="surnames" required="1"/>
+                                <field name="country_id" options='{"no_open": True, "no_create": True}'/>
+                                <field name="identification_id" required="1"/>
+                                <field name="gender"/>
+                                <field name="education_level"/>
+                            </group>
+                            <group string="Datos laborales" col="4">
+                                <field name="department_id"/>
+                                <field name="admission_date"/>
+                                <field name="parent_id"/>
+                                <field name="job_id"/>
+                                <field name="sector_code"/>
+                                <field name="work_location"/>
+                                <label for="work_phone"/>
+                                <div class="o_row">
+                                    <field name="work_phone"/>
+                                    <field name="extension" placeholder="Ext."/>
+                                </div>
+                                <field name="mobile_phone"/>
+                                <field name="coach_id" invisible="1"/><!--Monitor-->
+                            </group>
+                        </page>
+                        <page string="Información personal" name="personal_information">
+                            <group string="Datos bancarios" col="4">
+                                <field name="bank_id" options='{"no_open": True, "no_create": True}'/>
+                                <field name="bank_account" attrs="{'required': [('bank_id', '!=', False)]}"/>
+                                <field name="bank_account_id" invisible="1"/><!--Número de cuenta bancaria-->
+                            </group>
+                            <group string="Otros datos personales" col="4">
+                                <field name="birthday"/>
+                                <field name="age"/>
+                                <field name="place_of_birth"/>
+                                <field name="emergency_contact"/>
+                                <field name="blood_type"/>
+                                <field name="emergency_phone"/>
+                                <field name="work_email"/>
+                                <field name="address_home_id" invisible="1"/><!--Dirección-->
+                            </group>
+                            <group string="Datos familiares">
+                                <field name="marital"/>
+                                <field name="children"/>
+                                <field name="children_ids" editable="bottom" nolabel="1"
+                                       attrs="{'invisible':[('children', '==', 0)]}">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="documentation_number"/>
+                                        <field name="birthday"/>
+                                        <field name="age"/>
+                                    </tree>
+                                </field>
+                            </group>
+                            <group string="Contactos por emergencias">
+                                <group string="Contacto 1">
+                                    <field name="contact_1"/>
+                                    <field name="relationship_1"/>
+                                    <field name="phone_1"/>
+                                </group>
+                                <group string="Contacto 2">
+                                    <field name="contact_2"/>
+                                    <field name="relationship_2"/>
+                                    <field name="phone_2"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Información de RRHH/Contabilidad" name="hr_accounting">
+                            <group string="Usuario de acceso al sistema" colspan="1" groups="base.group_erp_manager">
+                                <field name="company_id" invisible="1"/>
+                                <field name="user_id"/>
+                            </group>
+                            <group name="active_group" invisible="1">
+                                <!--No funcionan otros módulos (hr_contract)-->
+                            </group>
+                        </page>
+                        <page string="Historial" name="employee_history">
+                            <group>
+                                <field name="history_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="type"/>
+                                        <field name="date"/>
+                                        <field name="comment"/>
+                                        <field name="date_validity"/>
+                                        <field name="adjunt"
+                                               filename="adjunt_name"
+                                               widget="binary"/>
+                                        <field name="adjunt_name" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
+                </xpath>
+                <xpath expr="//button[@name='toggle_active']" position="attributes"><!--Botón Activo/Archivar-->
+                    <attribute name="groups">base.group_erp_manager</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

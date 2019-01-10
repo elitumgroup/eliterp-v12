@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_refund_customer">
+            <field name="name">Nota de crédito de cliente</field>
+            <field name="code">refund.customer</field>
+            <field name="prefix">NCC/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+        <record model="ir.sequence" id="sequence_refund_supplier">
+            <field name="name">Nota de crédito de proveedor</field>
+            <field name="code">refund.supplier</field>
+            <field name="prefix">NCP/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
+
+        <!--Journals-->
+        <record model="account.journal" id="journal_refund_customer">
+            <field name="name">Nota de crédito de cliente</field>
+            <field name="type">sale</field>
+            <field name="code">NCC</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_refund_customer"/>
+        </record>
+        <record model="account.journal" id="journal_refund_supplier">
+            <field name="name">Nota de crédito de proveedor</field>
+            <field name="type">purchase</field>
+            <field name="code">NCP</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_refund_supplier"/>
+        </record>
+    </data>
+</odoo>

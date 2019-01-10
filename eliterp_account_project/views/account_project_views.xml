@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_search_project" model="ir.ui.view">
+            <field name="name">view_search_project</field>
+            <field name="model">account.project</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Divisiones" name="companydivision" domain="[]"
+                                context="{'group_by':'company_division_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_project" model="ir.actions.act_window">
+            <field name="name">Proyecto</field>
+            <field name="res_model">account.project</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_search_project"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para crear un nuevo proyecto empresarial.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_project"
+                  action="action_project"
+                  parent="account.account_account_menu"
+                  sequence="30"/>
+
+        <!--Views-->
+        <!--Move-->
+        <record id="view_form_move_project" model="ir.ui.view">
+            <field name="name">view_form_move_project</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_division_id']" position="after">
+                    <field name="project_id"
+                           domain="[('company_division_id', '=', company_division_id)]"
+                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Company Division, TODO: Revisar el contexto-->
+        <record id="view_form_company_division_project" model="ir.ui.view">
+            <field name="name">view_form_company_division_project</field>
+            <field name="model">account.company.division</field>
+            <field name="inherit_id" ref="eliterp_account_company_division.view_form_company_division"/>
+            <field name="arch" type="xml">
+                <button name="toggle_active" position="before">
+                    <button class="oe_stat_button"
+                            name="%(action_project)d"
+                            icon="fa-th-list"
+                            type="action"
+                            context="{'search_default_company_division_id': active_id}">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="project_count"/>
+                            </span>
+                            <span class="o_stat_text">Proyectos</span>
+                        </div>
+                    </button>
+                </button>
+            </field>
+        </record>
+
+        <!--Project-->
+        <record id="view_tree_project" model="ir.ui.view">
+            <field name="name">view_tree_project</field>
+            <field name="model">account.project</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="company_division_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_project" model="ir.ui.view">
+            <field name="name">view_form_project</field>
+            <field name="model">account.project</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" string="Nombre"/>
+                            <h1>
+                                <field name="name" placeholder="p.e Puente"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="code"/>
+                            <field name="company_division_id"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

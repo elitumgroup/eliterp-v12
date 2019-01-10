@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Division-->
+        <record id="view_form_analytic_account_company_division" model="ir.ui.view">
+            <field name="name">view_form_analytic_account_company_division</field>
+            <field name="model">account.company.division</field>
+            <field name="inherit_id" ref="eliterp_account_company_division.view_form_company_division"/>
+            <field name="arch" type="xml">
+                <button name="toggle_active" position="before">
+                    <button class="oe_stat_button"
+                            name="%(analytic.action_account_analytic_account_form)d"
+                            icon="fa-book"
+                            type="action"
+                            context="{'search_default_company_division_id': active_id}">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="analytic_account_count"/>
+                            </span>
+                            <span class="o_stat_text">Centros de costo</span>
+                        </div>
+                    </button>
+                </button>
+            </field>
+        </record>
+        <record id="view_search_analytic_account_division" model="ir.ui.view">
+            <field name="name">view_search_analytic_account_division</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="company_division_id"/>
+                </field>
+                <xpath expr="//group/filter[@name='associatedpartner']" position="after">
+                    <filter string="Divisiones" name="companydivision" domain="[]"
+                            context="{'group_by':'company_division_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Analytic-->
+        <record id="view_tree_analytic_account" model="ir.ui.view">
+            <field name="name">view_tree_analytic_account</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="replace">
+                    <field name="company_division_id"/>
+                    <field name="complete_name"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_form_analytic_account" model="ir.ui.view">
+            <field name="name">view_form_analytic_account</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form"/>
+            <field name="arch" type="xml">
+                <field name="group_id" position="replace"/>
+                <xpath expr="//h1" position="before">
+                    <h1>
+                        <field name="group_id" required="1" options="{'no_open':True,'no_create':True}"/>
+                    </h1>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="replace">
+                    <field name="company_id" invisible="1"/>
+                    <field name="company_division_id" domain="[('company_id', '=', company_id)]"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

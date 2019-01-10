@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Desactivar menú Nómina-->
+    <record id="hr_payroll.menu_hr_payroll_root" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

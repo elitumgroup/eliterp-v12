@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Desactivar menú Contabilidad/Ventas/Documentos/Recibos de ventas-->
+        <record id="account_voucher.menu_action_sale_receipt" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Contabilidad/Compras/Documentos/Recibos de compra-->
+        <record id="account_voucher.menu_action_purchase_receipt" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Contabilidad/Informe/Informes de socios/Vencida por Cobrar-->
+        <record id="account_reports.menu_action_account_report_aged_receivable" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Contabilidad/Informe/Informes de socios/Vencida por Pagar-->
+        <record id="account_reports.menu_action_account_report_aged_payable" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</odoo>

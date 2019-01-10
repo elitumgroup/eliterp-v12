@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Desactivar menú Calendario-->
+        <record id="calendar.mail_menu_calendar" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Contactos-->
+        <record id="contacts.menu_contacts" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Campañas-->
+        <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Desactivar menú Debates-->
+        <record id="mail.menu_root_discuss" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_bank_reconciliation_line_user,account.bank.reconciliation.line user,model_account_bank_reconciliation_line,account.group_account_user,1,1,1,0
+access_account_bank_reconciliation__line_manager,account.bank.reconciliation.line,model_account_bank_reconciliation_line,account.group_account_manager,1,1,1,1
+
+access_account_bank_reconciliation_user,account.bank.reconciliation user,model_account_bank_reconciliation,account.group_account_user,1,1,1,0
+access_account_bank_reconciliation_manager,account.bank.reconciliation,model_account_bank_reconciliation,account.group_account_manager,1,1,1,1

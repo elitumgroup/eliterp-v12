@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--TODO: Desactivar menú Contabilidad/Informe/Declaraciones genéricas/Check Register
+        <record id="l10n_us_reports.check_register_menu" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        -->
+    </data>
+</odoo>

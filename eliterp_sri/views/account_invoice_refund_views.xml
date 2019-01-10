@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Invoice-->
+        <record id="view_form_invoice_supplier_refund" model="ir.ui.view">
+            <field name="name">view_form_invoice_supplier_refund</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <button name="%(account.action_account_invoice_refund)d" position="replace">
+                    <button name="add_refund"
+                            string="Emitir nota de crédito"
+                            groups="account.group_account_invoice"
+                            type="object"
+                            attrs="{'invisible': ['|', ('type', '=', 'in_refund'), ('state', '!=', 'open')]}"
+                            class="oe_highlight"/>
+                </button>
+                <xpath expr="//sheet/div[1]" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <field name="have_refund" invisible="1"/>
+                        <button name="action_view_refund"
+                                string="Notas de crédito"
+                                groups="account.group_account_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('have_refund', '=', False)]}"
+                                icon="fa-archive"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_form_invoice_refund" model="ir.ui.view">
+            <field name="name">view_form_invoice_refund</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <button name="%(account.action_account_invoice_refund)d" position="replace">
+                    <button name="add_refund"
+                            string="Emitir nota de crédito"
+                            groups="account.group_account_invoice"
+                            type="object"
+                            attrs="{'invisible': ['|', ('type', '=', 'in_refund'), ('state', '!=', 'open')]}"
+                            class="oe_highlight"/>
+                </button>
+                <xpath expr="//sheet/div[1]" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <field name="have_refund" invisible="1"/>
+                        <button name="action_view_refund"
+                                string="Notas de crédito"
+                                groups="account.group_account_invoice"
+                                type="object"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('have_refund', '=', False)]}"
+                                icon="fa-archive"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_search_bank_note" model="ir.ui.view">
+            <field name="name">view_search_bank_note</field>
+            <field name="model">account.bank.note</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="journal_id"/>
+                    <field name="account_id"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Banco" name="groupby_journal_id"
+                                context="{'group_by': 'journal_id'}"/>
+                        <filter string="Cuenta contable" name="groupby_account_id"
+                                context="{'group_by': 'account_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_bank_debit_note" model="ir.actions.act_window">
+            <field name="name">Nota de débito bancaria</field>
+            <field name="res_model">account.bank.note</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'debit')]</field>
+            <field name="search_view_id" ref="view_search_bank_note"/>
+            <field name="context">{'default_type': 'debit'}</field>
+        </record>
+        <record id="action_bank_credit_note" model="ir.actions.act_window">
+            <field name="name">Nota de crédito bancaria</field>
+            <field name="res_model">account.bank.note</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'credit')]</field>
+            <field name="search_view_id" ref="view_search_bank_note"/>
+            <field name="context">{'default_type': 'credit'}</field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_bank_debit_note"
+                  action="action_bank_debit_note"
+                  parent="eliterp_account.menu_bank_records"
+                  sequence="2"/>
+        <menuitem id="menu_bank_credit_note"
+                  action="action_bank_credit_note"
+                  parent="eliterp_account.menu_bank_records"
+                  sequence="3"/>
+
+        <!--Views-->
+        <record id="view_tree_bank_note" model="ir.ui.view">
+            <field name="name">view_tree_bank_note</field>
+            <field name="model">account.bank.note</field>
+            <field name="arch" type="xml">
+                <tree decoration-muted="state == 'cancel'"
+                      decoration-success="state == 'posted'"
+                      decoration-bf="state == 'posted'"
+                >
+                    <field name="name"/>
+                    <field name="note_date"/>
+                    <field name="journal_id"/>
+                    <field name="amount"/>
+                    <field name="account_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_bank_note" model="ir.ui.view">
+            <field name="name">view_form_bank_note</field>
+            <field name="model">account.bank.note</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_button_posted"
+                                class="oe_highlight"
+                                string="Contabilizar"
+                                states="draft"
+                                type="object"/>
+                        <button name="action_button_print"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir"/>
+                        <button name="action_button_cancel"
+                                string="Anular"
+                                states="posted"
+                                groups="account.group_account_manager"
+                                type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,posted"
+                               modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state', '=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="concept"/>
+                            <field name="move_id"
+                                   attrs="{'invisible': [('state', '=', 'draft')]}"
+                                   groups="account.group_account_manager"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="type" invisible="1"/>
+                        </group>
+                        <group col="2" attrs="{'invisible':[('type', '=', 'debit')]}">
+                            <group string="Debe">
+                                <field name="journal_id"
+                                       domain="[('type', '=', 'bank'), ('company_id', '=', company_id)]"
+                                       options='{"no_open": True, "no_create": True}'/>
+                            </group>
+                            <group string="Haber">
+                                <field name="note_date"/>
+                                <field name="amount"/>
+                                <field name="account_id"
+                                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                                       options='{"no_open": True, "no_create": True}'/>
+                            </group>
+                        </group>
+                        <group col="2" attrs="{'invisible':[('type', '=', 'credit')]}">
+                            <group string="Debe">
+                                <field name="note_date"/>
+                                <field name="amount"/>
+                                <field name="account_id"
+                                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                                       options='{"no_open": True, "no_create": True}'/>
+                            </group>
+                            <group string="Haber">
+                                <field name="journal_id"
+                                       domain="[('type', '=', 'bank'), ('company_id', '=', company_id)]"
+                                       options='{"no_open": True, "no_create": True}'/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
+

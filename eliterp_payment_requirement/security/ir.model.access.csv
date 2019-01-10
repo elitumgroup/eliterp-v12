@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payment_requirement_manager,payment.requirement,model_payment_requirement,base.group_user,1,1,1,1
+access_payment_requirement_lines_manager,payment.requirement.line,model_payment_requirement_line,base.group_user,1,1,1,1
+
+
+
+
+
+
+
+
+
+
+

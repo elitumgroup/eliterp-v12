@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="action_account_period" model="ir.actions.act_window">
+            <field name="name">Período contable</field>
+            <field name="res_model">account.period</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="menu_account_period" action="action_account_period"
+                  groups="account.group_account_user" parent="account.account_account_menu"
+                  sequence="15"/>
+
+        <record id="view_tree_account_period" model="ir.ui.view">
+            <field name="name">view_tree_account_period</field>
+            <field name="model">account.period</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="start_date"/>
+                    <field name="closing_date"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_account_period" model="ir.ui.view">
+            <field name="name">view_form_account_period</field>
+            <field name="model">account.period</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="load_periods"
+                                class="oe_highlight"
+                                type="object"
+                                string="Cargar períodos"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="p.e 2018"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="start_date"/>
+                            <field name="closing_date"/>
+                        </group>
+                        <group string="Líneas de período contable">
+                            <field name="period_lines" nolabel="1">
+                                <tree decoration-muted="(not state)" create="false">
+                                    <field name="name"/>
+                                    <field name="start_date"/>
+                                    <field name="closing_date"/>
+                                    <field name="state"/>
+                                    <field name="code" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Invoice-->
+        <record id="view_form_invoice_period" model="ir.ui.view">
+            <field name="name">view_form_invoice_period</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_due']" position="after">
+                    <field name="period_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_form_invoice_supplier_period" model="ir.ui.view">
+            <field name="name">view_form_invoice_supplier_period</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='date_due']" position="after">
+                    <field name="period_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

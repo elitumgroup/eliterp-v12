@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--TODO: Sale Order
+        <record id="view_search_sale_order_sri" model="ir.ui.view">
+            <field name="name">view_search_sale_order_sri</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <group>
+                    <filter string="Punto de impresión" context="{'group_by':'point_printing_id'}"/>
+                </group>
+            </field>
+        </record>
+        -->
+
+        <record id="view_tree_sale_order_sri" model="ir.ui.view">
+            <field name="name">view_tree_sale_order_sri</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-success">state=='sale'</attribute>
+                    <attribute name="decoration-bf">state=='sale'</attribute>
+                </tree>
+                <xpath expr="//field[@name='partner_id']" position="before">
+                    <field name="point_printing_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_form_sale_order_sri" model="ir.ui.view">
+            <field name="name">view_form_sale_order_sri</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after"><!--Cliente-->
+                    <field name="point_printing_id"
+                           context="{'default_company_id': company_id}"
+                           domain="[('company_id', '=', company_id)]" required="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- TODO: Revisar cuando no existe stock Report
+        <menuitem id="menu_report_all_printing_points"
+                  action="action_report_all_printing_points"
+                  parent="sale.menu_sale_report"
+                  sequence="4"/>
+        -->
+    </data>
+</odoo>

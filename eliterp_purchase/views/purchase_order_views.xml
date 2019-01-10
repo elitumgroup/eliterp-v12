@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_purchase" model="ir.ui.view">
+            <field name="name">view_form_purchase</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="attributes"><!--Compañía-->
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="company_division_id" required="1"
+                           context="{'default_company_id': company_id}"
+                           domain="[('company_id', '=', company_id)]"/>
+                    <field name="project_id"
+                           domain="[('company_division_id', '=', company_division_id)]"
+                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//tree//field[@name='company_id']"
+                       position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']//tree//field[@name='account_analytic_id']"
+                       position="replace">
+                    <field name="account_analytic_id"
+                           options="{'no_open': True, 'no_create': True}"
+                           domain="[('company_division_id', '=', parent.company_division_id)]"
+                           groups="analytic.group_analytic_accounting"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

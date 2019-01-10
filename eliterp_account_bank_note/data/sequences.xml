@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_bank_debit_note">
+            <field name="name">Nota de débito bancaria</field>
+            <field name="code">bank.debit.note</field>
+            <field name="prefix">NDB-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_bank_credit_note">
+            <field name="name">Nota de crédito bancaria</field>
+            <field name="code">bank.credit.note</field>
+            <field name="prefix">NCR-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+
+        <!--Journals-->
+        <record model="account.journal" id="journal_bank_debit_note">
+            <field name="name">Nota de débito bancaria</field>
+            <field name="type">general</field>
+            <field name="code">NDB</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_bank_debit_note"/>
+        </record>
+        <record model="account.journal" id="journal_bank_credit_note">
+            <field name="name">Nota de crédito bancaria</field>
+            <field name="type">general</field>
+            <field name="code">NCR</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_bank_credit_note"/>
+        </record>
+    </data>
+</odoo>

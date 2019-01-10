@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_payslip_run_pay_order" model="ir.actions.act_window">
+        <field name="name">Crear orden de pago</field>
+        <field name="res_model">account.pay.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="context">{'default_payslip_run_id': [(4, active_id, None)]}
+        </field>
+        <field name="target">new</field>
+    </record>
+
+    <!--Views-->
+    <!--Pay Order-->
+    <record id="view_form_pay_order_payslip_run_wizard" model="ir.ui.view">
+        <field name="name">view_form_pay_order_payslip_run_wizard</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="payslip_run_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_form_pay_order_payslip_run" model="ir.ui.view">
+        <field name="name">view_form_pay_order_payslip_run</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="payslip_run_id"
+                       attrs="{'invisible': [('payslip_run_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_tree_payslip_run" model="ir.ui.view">
+        <field name="name">eview_tree_payslip_run</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'closed'"
+                  decoration-bf="state == 'closed'"
+                  decoration-muted="state == 'deny'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="count_employees"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <button string="Aprobar" name="action_approve" type="object"
+                        icon="fa-check text-success"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"/>
+                <button string="Negar" name="action_deny" type="object"
+                        icon="fa-ban text-danger"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"/>
+                <field name="state_pay_order"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_form_payslip_run" model="ir.ui.view">
+        <field name="name">view_form_payslip_run</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="hr_payroll.hr_payslip_run_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//separator" position="replace">
+            </xpath>
+            <button name="close_payslip_run" position="replace">
+                <button name="print_payslip_run"
+                        string="Imprimir rol"
+                        class="oe_highlight"
+                        type="object"/>
+                <button name="add_roles"
+                        string="Añadir roles"
+                        type="object"
+                        states="draft"
+                        class="oe_highlight"/>
+                <button name="to_approve"
+                        string="Solicitar aprobación"
+                        type="object"
+                        states="draft"
+                        class="oe_highlight"/>
+                <button name="action_approve"
+                        string="Aprobar"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"
+                        type="object"
+                        class="oe_highlight"/>
+                <button name="action_deny"
+                        type="object"
+                        states="to_approve"
+                        groups="hr_payroll.group_hr_payroll_manager"
+                        string="Negar"/>
+                <button name="confirm_payslip_run"
+                        string="Contabilizar"
+                        type="object"
+                        states="approve"
+                        class="oe_highlight"/>
+                <field name="state_pay_order" invisible="1"/>
+                <button string="Generar orden de pago"
+                        type="action"
+                        name="%(action_payslip_run_pay_order)d"
+                        attrs="{'invisible':['|', ('state','!=', 'closed'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </button>
+            <xpath expr="//label" position="replace">
+            </xpath>
+            <button name="%(hr_payroll.action_hr_payslip_by_employees)d" position="attributes"><!--Generate Payslips-->
+                <attribute name="invisible">1</attribute>
+            </button>
+            <xpath expr="//sheet/h1" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <field name="credit_note" position="before">
+                <field name="move_id"
+                       attrs="{'invisible': [('state', '!=', 'closed')]}"
+                       readonly="1"/>
+                <field name="approval_user"
+                       attrs="{'invisible': [('state', '!=', 'closed')]}"
+                       readonly="1"/>
+                <field name="company_id" invisible="1"/>
+            </field>
+            <field name="credit_note" position="attributes"><!--Nota de crédito-->
+                <attribute name="invisible">1</attribute>
+            </field>
+
+            <xpath expr='//group[1]' position="after">
+                <group>
+                    <group string="Novedades y comentarios">
+                        <field name="comment" nolabel="1" placeholder="Notas..."/>
+                    </group>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="amount_total"/>
+                        <field name="improved_pay_order"/>
+                        <field name="residual_pay_order" string="Saldo" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </group>
+            </xpath>
+
+            <field name="slip_ids" position="replace">
+                <!--Columnas de cada fila del rol consolidado-->
+                <field name="line_ids">
+                    <tree create="false"
+                          delete="false"
+                          decoration-bg="reconciled == True"
+                          decoration-success="reconciled == True"
+                          editable="top">
+                        <field name="parent_state" invisible="1"/>
+                        <field name="reconciled" invisible="1"/>
+                        <field name="selected"
+                               string="&#x02611;"
+                               attrs="{'invisible': ['|', ('reconciled', '=', True), ('parent_state', '!=', 'closed')], 'readonly': [('reconciled', '=', True)]}"/>
+                        <field name="name" readonly="1"/>
+                        <field name="admission_date" readonly="1"/>
+                        <field name="identification_id" invisible="1"/>
+                        <field name="worked_days" readonly="1"/>
+                        <field name="wage" readonly="1" sum="Total"/>
+                        <field name="reserve_funds" readonly="1"/>
+                        <field name="tenth_3" readonly="1"/>
+                        <field name="tenth_4" readonly="1"/>
+                        <field name="other_income" readonly="1"/>
+                        <field name="total_income" readonly="1"/>
+                        <field name="payment_advance" readonly="1"/>
+                        <field name="iess_personal" readonly="1" sum="Total"/>
+                        <field name="iess_patronal" readonly="1"/>
+                        <field name="loan_unsecured" readonly="1"/>
+                        <field name="loan_mortgage" readonly="1"/>
+                        <field name="penalty" readonly="1"/>
+                        <field name="absence" readonly="1"/>
+                        <field name="cellular_plan" readonly="1"/>
+                        <field name="other_expenses" readonly="1"/>
+                        <field name="total_expenses" readonly="1"/>
+                        <field name="net_receive" readonly="1" sum="Total"/>
+                        <field name="paid_amount"/>
+                        <field name="residual"/>
+                        <field name="amount_payable"
+                               sum="Total a pagar"
+                               attrs="{'invisible': ['|', ('reconciled', '=', True), ('parent_state', '!=', 'closed')], 'readonly': [('reconciled', '=', True)]}"/>
+                        <field name="role_id" invisible="1"/>
+                    </tree>
+                </field>
+            </field>
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_form_payslip_run_1" model="ir.ui.view">
+        <field name="name">view_form_payslip_run_2</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="hr_payroll_account.hr_payslip_run_form_inherit"/>
+        <field name="arch" type="xml">
+            <field name="journal_id" position="attributes"><!--Diario de salario-->
+                <attribute name="invisible">1</attribute>
+            </field>
+        </field>
+    </record>
+
+    <!--Actions-->
+    <record id="action_payslip_run" model="ir.actions.act_window">
+        <field name="name">Rol consolidado</field>
+        <field name="res_model">hr.payslip.run</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="view_tree_payslip_run"/>
+        <field name="search_view_id" ref="hr_payroll.hr_payslip_run_filter"/>
+        <!--TODO: Cambiar búsqueda-->
+    </record>
+
+    <!--Menus-->
+    <menuitem id="menu_payslip_run"
+              parent="menu_hr_paysheet"
+              action="action_payslip_run"
+              sequence='3'/>
+
+</odoo>

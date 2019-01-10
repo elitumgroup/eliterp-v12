@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_payment_requirement">
+            <field name="name">Requerimiento de pago</field>
+            <field name="code">payment.requirement</field>
+            <field name="prefix">RPG-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+    </data>
+</odoo>

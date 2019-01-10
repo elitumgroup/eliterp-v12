@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Menus-->
+        <menuitem name="Aplicaciones"
+                  id="base.menu_management"
+                  web_icon="eliterp_core,static/description/apps.png"
+                  sequence="310"/>
+        <menuitem name="Ajustes"
+                  id="base.menu_administration"
+                  web_icon="eliterp_core,static/description/settings.png"
+                  sequence="500"/>
+        <!--Resources-->
+        <template id="core_assets_backend" name="Estilos del núcleo" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/eliterp_core/static/src/less/report_styles.less"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>

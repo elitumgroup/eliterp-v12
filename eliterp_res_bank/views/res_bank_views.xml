@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="action_res_bank" model="ir.actions.act_window">
+            <field name="name">Bancos</field>
+            <field name="res_model">res.bank</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para crear nuevo banco.
+                </p>
+            </field>
+        </record>
+
+        <!--TODO: Soló mostramos los bancos al usuario Administrador-->
+        <menuitem id="menu_res_bank"
+                  name="Bancos"
+                  groups="base.group_erp_manager"
+                  action="action_res_bank"
+                  parent="account.account_account_menu"
+                  sequence="9"/>
+
+        <record id="view_form_res_bank" model="ir.ui.view">
+            <field name="name">view_form_res_bank</field>
+            <field name="model">res.bank</field>
+            <field name="inherit_id" ref="base.view_res_bank_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('o_address_format')]" position="replace">
+                    <div class="o_address_format">
+                        <field name="street" class="o_address_street" placeholder="Calle..."/>
+                        <field name="street2" class="o_address_street" placeholder="Calle 2..."/>
+                        <div class="o_row">
+                            <field name="country" placeholder="País"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="state_id" placeholder="Provincia"
+                                   domain="[('country_id', '=', country)]"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+

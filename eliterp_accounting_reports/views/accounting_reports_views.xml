@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Accouting-->
+        <menuitem id="menu_accounting_reports"
+                  name="Reportes"
+                  parent="account.menu_finance"
+                  sequence='30'/>
+
+        <record id="action_financial_situation_report" model="ir.actions.act_window">
+            <field name="name">Estado de situación financiera</field>
+            <field name="res_model">account.financial.situation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_accounting_reports.view_form_financial_situation_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_financial_situation_report"
+                  parent="menu_accounting_reports"
+                  action="action_financial_situation_report"
+                  sequence="1"/>
+
+        <record id="action_general_ledger_report" model="ir.actions.act_window">
+            <field name="name">Reporte de libro mayor</field>
+            <field name="res_model">account.general.ledger.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_accounting_reports.view_form_general_ledger_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="menu_accountig_general_ledger_report"
+                  action="action_general_ledger_report"
+                  parent="menu_accounting_reports"
+                  sequence="10"/>
+
+        <!--Treasury-->
+        <menuitem id="menu_treasury_reports"
+                  name="Reportes"
+                  parent="eliterp_treasury.menu_treasury"
+                  sequence='30'/>
+    </data>
+</odoo>

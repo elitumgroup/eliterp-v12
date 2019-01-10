@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_account_move_cancel_wizard" model="ir.ui.view">
+            <field name="name">view_form_account_move_cancel_wizard</field>
+            <field name="model">account.move.cancel</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="confirm_cancel"
+                                type="object"
+                                class="oe_highlight"
+                                string="Confirmar"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_form_account_invoice_cancel_wizard" model="ir.ui.view">
+            <field name="name">view_form_account_invoice_cancel_wizard</field>
+            <field name="model">account.invoice.cancel</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="confirm_cancel"
+                                type="object"
+                                class="oe_highlight"
+                                string="Confirmar"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

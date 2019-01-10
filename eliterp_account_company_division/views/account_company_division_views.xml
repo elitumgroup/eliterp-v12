@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_search_company_division" model="ir.ui.view">
+            <field name="name">view_search_company_division</field>
+            <field name="model">account.company.division</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_company_division" model="ir.actions.act_window">
+            <field name="name">División empresarial</field>
+            <field name="res_model">account.company.division</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_search_company_division"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Una división es un negocio, a veces llamada sector empresarial o escisión empresarial,
+                    es una de las partes en las que se divide un negocio, organización o empresa.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_company_division"
+                  action="action_company_division"
+                  parent="account.account_account_menu"
+                  sequence="25"/>
+
+        <!--Views-->
+        <!--Move-->
+        <record id="view_form_move_company_division" model="ir.ui.view">
+            <field name="name">view_form_move_company_division</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="company_division_id" required="1"
+                           context="{'default_company_id': company_id}"
+                           domain="[('company_id', '=', company_id)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_tree_company_division" model="ir.ui.view">
+            <field name="name">view_tree_company_division</field>
+            <field name="model">account.company.division</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_company_division" model="ir.ui.view">
+            <field name="name">view_form_company_division</field>
+            <field name="model">account.company.division</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="toggle_active" type="object" icon="fa-archive">
+                                <field name="active" widget="boolean_button"
+                                       options='{"terminology": "archive"}'/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" string="Nombre de división"/>
+                            <h1>
+                                <field name="name" placeholder="p.e Sistemas"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="code"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_account_voucher_cancel" model="ir.ui.view">
+            <field name="name">view_form_account_voucher_cancel</field>
+            <field name="model">account.voucher.cancel</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                    <footer>
+                        <button name="confirm_cancel"
+                                type="object"
+                                class="oe_highlight"
+                                string="Confirmar"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
+

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_search_bank_reconciliation" model="ir.ui.view">
+            <field name="name">view_search_bank_reconciliation</field>
+            <field name="model">account.bank.reconciliation</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="journal_id" domain="[('type','=', 'bank')]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Banco" name="groupby_journal_id"
+                                context="{'group_by': 'journal_id'}"/>
+                        <filter string="Compañía" name="groupby_company_id"
+                                groups="account.group_account_manager"
+                                context="{'group_by': 'company_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Actions-->
+        <record id="action_bank_reconciliation" model="ir.actions.act_window">
+            <field name="name">Conciliación bancaria</field>
+            <field name="res_model">account.bank.reconciliation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_search_bank_reconciliation"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Crear nueva conciliación bancaria.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem id="menu_bank_reconciliation"
+                  parent="eliterp_account.menu_bank_records"
+                  action="action_bank_reconciliation"
+                  sequence="25"/>
+        <!--Views-->
+        <record id="view_tree_bank_reconciliation" model="ir.ui.view">
+            <field name="name">view_tree_bank_reconciliation</field>
+            <field name="model">account.bank.reconciliation</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="state == 'posted'"
+                      decoration-muted="state == 'cancel'"
+                      decoration-bf="state == 'posted'"
+                >
+                    <field name="name"/>
+                    <field name="journal_id"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="account_balance"/>
+                     <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_bank_reconciliation" model="ir.ui.view">
+            <field name="name">view_form_bank_reconciliation</field>
+            <field name="model">account.bank.reconciliation</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="load_moves"
+                                type="object"
+                                states="draft"
+                                string="Cargar movimientos"/>
+                        <button name="posted_conciliation"
+                                type="object"
+                                class="oe_highlight"
+                                states="draft"
+                                string="Validar"/>
+                        <button name="print_conciliation"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir conciliación"/>
+                        <button name="action_button_cancel"
+                                type="object"
+                                groups="account.group_account_manager"
+                                states="posted"
+                                string="Anular"/>
+                        <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1" attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            </h1>
+                            <label for="journal_id" string="Banco" class="oe_edit_only"/>
+                            <h2>
+                                <field name="journal_id" widget="selection"
+                                       options="{'no_create': True, 'no_open': True}"
+                                       domain="[('type', '=', 'bank'), ('company_id', '=', company_id)]"/>
+                            </h2>
+                        </div>
+                        <group col="4">
+                            <label for="date_from" string="Período"/>
+                            <div class="o_row">
+                                <field name="date_from"/>
+                                <span> - </span>
+                                <field name="date_to"/>
+                            </div>
+                            <field name="beginning_balance"/>
+                            <field name="countable_balance"/>
+                            <field name="account_balance"/>
+                            <field name="concept" placeholder="p.e Colocar referencia de conciliación."/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group col="1" string="Líneas de movimiento bancarios">
+                            <field name="bank_reconciliation_line" nolabel="1">
+                                <tree editable="bottom"
+                                      decoration-info="check"
+                                      decoration-bf="check"
+                                      create="false">
+                                    <field name="check" string="&#x02611;"/>
+                                    <field name="date" readonly="1"/>
+                                    <field name="journal" readonly="1"/>
+                                    <field name="name" readonly="1"/>
+                                    <field name="concept" readonly="1"/>
+                                    <field name="amount" readonly="1"/>
+                                    <field name="move_line_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group string="Notas adicionales">
+                            <field name="comment" nolabel="1" placeholder="Notas..."/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Purchase Voucher-->
+        <record id="view_tree_voucher_purchase_bank_reconciliation" model="ir.ui.view">
+            <field name="name">view_tree_voucher_purchase_bank_reconciliation</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_tree_voucher_purchase"/>
+            <field name="arch" type="xml">
+                <field name="state" position="before">
+                    <field name="reconcile" attrs="{'invisible':['|', ('type_egress', '!=', 'bank'), ('state', '!=', 'posted')]}"/>
+                </field>
+            </field>
+        </record>
+
+        <!--Checks-->
+        <record id="view_tree_checks_issued_bank_reconciliation" model="ir.ui.view">
+            <field name="name">view_tree_checks_issued_bank_reconciliation</field>
+            <field name="model">account.checks</field>
+            <field name="inherit_id" ref="eliterp_account_checks.view_tree_checks_issued"/>
+            <field name="arch" type="xml">
+                <field name="state" position="before">
+                    <field name="reconcile"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
+

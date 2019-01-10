@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--TODO: Queda pendientes ver si eliminamos estos menus, Quitar menú Contabilidad/Asesor
+        <record id="account.menu_finance_entries" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>-->
+        <!--Quitar menú Contabilidad/Ventas/Documentos/Rectificativas de cliente
+        <record id="account.menu_action_invoice_out_refund" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>-->
+        <!--Desactivar menú Contabilidad/Ventas/Documentos/Pagos-->
+        <record id="account.menu_action_account_payments_receivable" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Quitar menú Contabilidad/Compras/Documentos/Rectificativas de proveedor
+        <record id="account.menu_action_invoice_in_refund" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>-->
+        <!--Desactivar menú Contabilidad/Compras/Documentos/Pagos-->
+        <record id="account.menu_action_account_payments_payable" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <!--Quitar menú Contabilidad/Configuración/Posiciones fiscales
+        <record id="account.menu_action_account_fiscal_position_form" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>-->
+        <!--Quitar menú Contabilidad/Configuración/Cuentas Bancarias
+        <record id="account.menu_action_account_bank_journal_form" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>-->
+    </data>
+</odoo>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="action_sale_shop" model="ir.actions.act_window">
+            <field name="name">Tiendas</field>
+            <field name="res_model">sale.shop</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Clic para añadir una nueva tienda.
+                </p>
+            </field>
+        </record>
+        <menuitem action="action_sale_shop" id="menu_sale_shop"
+                  parent="sale.menu_sale_config" sequence="40"/>
+
+        <record id="view_tree_sale_shop" model="ir.ui.view">
+            <field name="name">view_tree_sale_shop</field>
+            <field name="model">sale.shop</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="state_id"/>
+                    <field name="street"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_sale_shop" model="ir.ui.view">
+            <field name="name">view_form_sale_shop</field>
+            <field name="model">sale.shop</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" groups="account.group_account_manager"
+                                    class="oe_stat_button" icon="fa-check">
+                                <field name="active" widget="boolean_button"
+                                       options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                            </button>
+                        </div>
+                        <field name="logo" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="type" widget="radio" options="{'horizontal': true}"/>
+                            <label for="street" string="Dirección"/>
+                            <div class="o_address_format">
+                                <field name="state_id" class="o_address_state"
+                                       domain="[('country_id', '=', %(base.ec)d)]"
+                                       options='{"no_open": True, "no_create": True}'/>
+                                <field name="street" class="o_address_street" placeholder="Calle..."/>
+                            </div>
+                            <field name="company_id" groups="base.group_multi_company" required="1"/>
+                        </group>
+                        <notebook>
+                            <!--Libre para futuras páginas-->
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>
+

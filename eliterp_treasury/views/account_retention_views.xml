@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--Actions-->
+        <record id="action_retention_sale" model="ir.actions.act_window">
+            <field name="name">Retenciones de cliente</field>
+            <field name="res_model">account.retention</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'sale')]</field>
+            <field name="context">{'default_type': 'sale', 'type': 'sale'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Pulse para añadir una nueva retención en venta
+                    (La retención en venta se considera cómo pago a la factura elegida).
+                </p>
+            </field>
+        </record>
+        <record id="action_retention_purchase" model="ir.actions.act_window">
+            <field name="name">Retenciones de proveedor</field>
+            <field name="res_model">account.retention</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'purchase')]</field>
+            <field name="context">{'default_type': 'purchase', 'type': 'purchase'}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Pulse para añadir una nueva retención en compra.
+                </p>
+            </field>
+        </record>
+
+        <!--Menus-->
+        <menuitem action="action_retention_sale" id="menu_retention_sale"
+                  parent="eliterp_treasury.menu_accounts_receivable"
+                  sequence="10"/>
+
+        <menuitem id="menu_retention_purchase"
+                  action="action_retention_purchase"
+                  parent="eliterp_treasury.menu_accounts_payable"
+                  sequence="10"/>
+
+        <!--Views-->
+        <record id="view_form_retention_purchase_wizard" model="ir.ui.view">
+            <field name="name">view_form_retention_purchase_wizard</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"
+                               modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="date_retention"/>
+                                <field name="period_id"/>
+                                <field name="partner_id" readonly="1"/>
+                                <field name="invoice_id"
+                                       required="1"
+                                       options="{'no_create': True}"
+                                       domain="[('type', '=', 'in_invoice'), ('partner_id', '=', partner_id),
+                                       ('retention_id', '=', False), ('state', '=', 'draft')]"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="point_printing_id"
+                                       domain="[('company_id', '=', company_id)]"
+                                       required="1"
+                                       options="{'no_open': True, 'no_create': True}"
+                                />
+                                <field name="reference"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"
+                                />
+                                <field name="sri_authorization_id"
+                                       options="{'no_open': True, 'no_create': True}"
+                                       domain="[('point_printing_id', '=', point_printing_id), ('authorized_voucher_id.code', '=', '07')]"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"
+                                />
+                                <field name="retention_number" invisible="1"/>
+                                <field name="is_electronic" invisible="1"/>
+                                <field name="base_taxable" invisible="1"/>
+                                <field name="base_iva" invisible="1"/>
+                                <field name="is_sequential" invisible="1"/>
+                            </group>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="retention_lines" nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use', '=', 'purchase'),  ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Guardar" special="save" class="oe_highlight"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="view_form_retention_purchase" model="ir.ui.view">
+            <field name="name">view_form_retention_purchase</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <form duplicate="false">
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"
+                               modifiers="{'readonly': true}"/>
+                        <!--TODO: Pendiente de generar
+                        <button name="print"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir retención"/>
+                        -->
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                                <field name="type" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="date_retention"/>
+                                <field name="partner_id"
+                                       required="1"
+                                       options="{'no_create': True}"
+                                       domain="[('supplier', '=', True)]" string="Proveedor"/>
+                                <field name="invoice_id"
+                                       required="1"
+                                       options="{'no_create': True}"
+                                       domain="[('type', '=', 'in_invoice'), ('partner_id', '=', partner_id),
+                                       ('retention_id', '=', False), ('state', '=', 'draft')]"/>
+                                <field name="company_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <label for="reference" string="Nº Retención"/>
+                                <div>
+                                    <field name="point_printing_id"
+                                           domain="[('company_id', '=', company_id)]"
+                                           required="1"
+                                           class="oe_inline"
+                                           options="{'no_open': True, 'no_create': True}"/>
+                                    -
+                                    <field name="reference"
+                                           class="oe_inline"
+                                           attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False)]}"/>
+                                </div>
+                                <field name="sri_authorization_id"
+                                       attrs="{'invisible': [('is_electronic','=', True)], 'required': [('is_electronic','=', False)]}"
+                                       domain="[('point_printing_id', '=', point_printing_id), ('authorized_voucher_id.code', '=', '07')]"
+                                       options="{'no_open': True, 'no_create': True}"
+                                />
+                                <field name="is_electronic" invisible="1"/>
+                                <field name="retention_number" invisible="1"/>
+                                <field name="base_taxable" invisible="1"/>
+                                <field name="base_iva" invisible="1"/>
+                                <field name="is_sequential" invisible="1"/>
+                            </group>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="retention_lines" nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use', '=', 'purchase'), ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="view_tree_retention_purchase" model="ir.ui.view">
+            <field name="name">view_tree_retention_purchase</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <tree
+                        decoration-success="state == 'confirm'"
+                        decoration-bf="state == 'confirm'"
+                        decoration-muted="state=='cancel'">
+                    <field name="name"/>
+                    <field name="retention_number"/>
+                    <field name="date_retention"/>
+                    <field name="invoice_id"/>
+                    <field name="partner_id" string="Proveedor"/>
+                    <field name="total"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_form_retention_sale" model="ir.ui.view">
+            <field name="name">view_form_retention_sale</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <form duplicate="false">
+                    <header>
+                        <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
+                        <button name="confirm_retention"
+                                states="draft"
+                                string="Confirmar"
+                                class="oe_highlight"
+                                type="object"/>
+                        <button name="open_cancel_wizard"
+                                attrs="{'invisible': [('state', '=', 'cancel')]}"
+                                string="Cancelar retención"
+                                groups="account.group_account_manager"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Documento" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" readonly="1"/>
+                                <field name="type" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date_retention"/>
+                            <field name="period_id"/>
+                            <field name="partner_id"
+                                   string="Cliente"
+                                   required="1"
+                                   options="{'no_create': True}"
+                                   domain="[('customer','=',True)]"/>
+                            <field name="invoice_id"
+                                   required="1"
+                                   options="{'no_create': True}"
+                                   domain="[('type', '=', 'out_invoice'), ('partner_id', '=', partner_id), ('retention_id', '=', False), ('state', '=', 'open')]"/>
+                            <field name="retention_number"
+                                   placeholder="p.e 001-001-000000001"
+                                   required="1"/>
+                            <field name="move_id" readonly="1"
+                                   groups="account.group_account_user"
+                                   attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            <field name="journal_id" invisible="1"/>
+                            <field name="base_taxable" invisible="1"/>
+                            <field name="base_iva" invisible="1"/>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="retention_lines" nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use', '=', 'sale'),('tax_type', '=', 'retention'),('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="view_tree_retention_sale" model="ir.ui.view">
+            <field name="name">view_tree_retention_sale</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <tree
+                        decoration-success="state == 'confirm'"
+                        decoration-bf="state == 'confirm'"
+                        decoration-muted="state=='cancel'">
+                    <field name="name"/>
+                    <field name="retention_number"/>
+                    <field name="date_retention"/>
+                    <field name="partner_id" string="Cliente"/>
+                    <field name="invoice_id"/>
+                    <field name="total"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_view_tree_retention_sale">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_retention_sale"/>
+            <field name="act_window_id" ref="action_retention_sale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_retention_sale">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_retention_sale"/>
+            <field name="act_window_id" ref="action_retention_sale"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_view_tree_retention_purchase">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_tree_retention_purchase"/>
+            <field name="act_window_id" ref="action_retention_purchase"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_view_form_retention_purchase">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_form_retention_purchase"/>
+            <field name="act_window_id" ref="action_retention_purchase"/>
+        </record>
+
+        <record id="view_account_retention_cancel_wizard" model="ir.ui.view">
+            <field name="name">view_account_retention_cancel_wizard</field>
+            <field name="model">account.retention.cancel</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="confirm_cancel"
+                                type="object"
+                                class="oe_highlight"
+                                string="Confirmar"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!--Invoice-->
+        <record id="view_form_invoice_supplier_retention" model="ir.ui.view">
+            <field name="name">view_form_invoice_supplier_retention</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <button name="%(account.action_account_invoice_payment)d" position="after">
+                    <field name="retention_id" invisible="1"/>
+                    <button name="add_retention"
+                            string="Emitir retención"
+                            type="object"
+                            attrs="{'invisible': ['|','|', ('state', '!=', 'draft'), ('type', '=', 'in_refund'), ('retention_id', '!=', False)]}"
+                            class="oe_highlight"/>
+                </button>
+                <xpath expr="//sheet/div[1]" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_retention"
+                                string="Retención"
+                                type="object"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('retention_id', '=', False)]}"
+                                icon="fa-chain"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='amount_untaxed']" position="before"><!--Base imponible-->
+                    <field name="base_zero_iva" widget="monetary"/>
+                    <field name="base_taxed" widget="monetary"/>
+                </xpath>
+                <xpath expr="//field[@name='residual']" position="before"><!--Saldo-->
+                    <field name="amount_retention" attrs="{'invisible': [('retention_id', '=', False)]}"
+                           widget="monetary"/>
+                </xpath>
+
+            </field>
+        </record>
+        <record id="view_tree_invoice_supplier_retention" model="ir.ui.view">
+            <field name="name">view_tree_invoice_supplier_retention</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='reference']" position="replace">
+                    <field name="retention_number"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_form_invoice_retention" model="ir.ui.view">
+            <field name="name">view_form_invoice_retention</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <field name="retention_id" invisible="1"/>
+                    <button name="open_retention"
+                            string="Retención"
+                            type="object"
+                            class="oe_stat_button"
+                            attrs="{'invisible': [('retention_id', '=', False)]}"
+                            icon="fa-chain"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

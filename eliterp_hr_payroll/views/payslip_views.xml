@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Menus-->
+    <menuitem id="menu_role"
+              name="Rol individual"
+              parent="menu_hr_paysheet"
+              action="hr_payroll.action_view_hr_payslip_form"
+              sequence='2'/>
+
+    <menuitem id="menu_payroll_configuration"
+              name="Nómina"
+              parent="hr.menu_human_resources_configuration"
+              sequence='50'/>
+    <menuitem id="menu_salary_rules_category"
+              parent="menu_payroll_configuration"
+              action="hr_payroll.action_hr_salary_rule_category"
+              sequence='1'/>
+    <menuitem id="menu_payroll_structure"
+              parent="menu_payroll_configuration"
+              action="hr_payroll.action_view_hr_payroll_structure_list_form"
+              sequence='2'/>
+    <menuitem id="menu_hr_salary_rules"
+              parent="menu_payroll_configuration"
+              action="hr_payroll.action_salary_rule_form"
+              sequence="3"/>
+
+    <!--Views-->
+    <!--Contract-->
+    <record id="view_form_contract_payroll" model="ir.ui.view">
+        <field name="name">view_form_contract_payroll</field>
+        <field name="model">hr.contract</field>
+        <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="attributes"><!--Compañía-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='schedule_pay']" position="attributes"><!--Pago planificado-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <field name="struct_id" position="replace"/>
+            <xpath expr="//field[@name='wage']" position="after"><!--Sueldo TODO: attrs="{'readonly':[('state_customize', '!=', 'draft')]}"-->
+                <field name="struct_id"
+                       domain="[('company_id', '=', company_id)]"
+                       options="{'no_open': True, 'no_create': True}" required="1"/>
+            </xpath>
+            <!--TODO: Desactivar hr_payroll_account.hr_contract_form_inherit-->
+        </field>
+    </record>
+
+
+    <!--Employee-->
+    <record id="view_form_employee_payroll" model="ir.ui.view">
+        <field name="name">view_form_employee_payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='active_group']" position="after">
+                <group string="Nómina" col="4">
+                    <field name="accumulate_tenths" required="1"/>
+                    <field name="accumulate_reserve_funds" required="1"/>
+                    <field name="working_time" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Payroll Structure-->
+    <record id="view_tree_payroll_structure" model="ir.ui.view">
+        <field name="name">view_tree_payroll_structure</field>
+        <field name="model">hr.payroll.structure</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payroll_structure_list_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='rule_ids']" position="attributes"><!--Reglas salariales-->
+                <attribute name="widget">many2many_tags</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_form_payroll_structure" model="ir.ui.view">
+        <field name="name">view_form_payroll_structure</field>
+        <field name="model">hr.payroll.structure</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_employee_grade_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="attributes"><!--Padre-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes"><!--Compañía-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='code']" position="after"><!--Referencia-->
+                <field name="provisions"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!--Salary Rule-->
+    <record id="view_tree_salary_rule" model="ir.ui.view">
+        <field name="name">view_tree_salary_rule</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="hr_payroll.hr_salary_rule_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='register_id']" position="attributes"><!--Registro de contribución-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_form_salary_rule" model="ir.ui.view">
+        <field name="name">view_form_salary_rule</field>
+        <field name="model">hr.salary.rule</field>
+        <field name="inherit_id" ref="hr_payroll_account.hr_salary_rule_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='appears_on_payslip']" position="after"><!--Aparece en nómina-->
+                <field name="account_id" required="1"
+                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                       options='{"no_open": True, "no_create": True}'/>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="attributes"><!--Compañía-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[2]" position="attributes"><!--PAGE: Contabilidad-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[3]" position="attributes"><!--PAGE: Reglas hijas-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//notebook/page[4]" position="attributes"><!--PAGE: Entradas-->
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!--TODO: Colocar invisible separador Contribución compañía y otros campos-->
+        </field>
+    </record>
+
+    <!--Payslip-->
+    <record id="view_tree_payslip" model="ir.ui.view">
+        <field name="name">view_tree_payslip</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_tree"/>
+        <field name="arch" type="xml">
+            <field name="name" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-success">state == 'done'</attribute>
+                <attribute name="decoration-bf">state == 'done'</attribute>
+                <attribute name="decoration-muted">state == 'cancel'</attribute>
+            </xpath>
+            <field name="date_to" position="after">
+                <field name="net_receive"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_form_payslip" model="ir.ui.view">
+        <field name="name">view_form_payslip</field>
+        <field name="model">hr.payslip</field>
+        <field name="inherit_id" ref="hr_payroll.view_hr_payslip_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="replace">
+                <form>
+                    <header>
+                        <button name="print_role"
+                                string="Imprimir rol"
+                                class="oe_highlight"
+                                type="object"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirm"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="employee_id" class="oe_edit_only"/>
+                            <h1>
+                                <field name="employee_id" placeholder="Empleado"/>
+                            </h1>
+                        </div>
+                        <div attrs="{'invisible': [('state', '!=', 'draft')]}">
+                            <span class="oe_grey">
+                                <b>Poner atención:</b>
+                                Los campos en el formulario son importantes para el cálculo
+                                correcto de la nómina.
+                            </span>
+                        </div>
+                        <group col="4">
+                            <label for="date_from" string="Período"/>
+                            <div class="o_row">
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                            </div>
+                            <field name="struct_id" required="1"/>
+                            <field name="worked_days"/>
+                            <field name="number" invisible="1"/>
+                            <!--TODO: Revisar los contratos-->
+                            <field name="contract_id"
+                                   domain="[('employee_id','=',employee_id),('date_start','&lt;=',date_to),'|',('date_end','&gt;=',date_from),('date_end','=',False)]"
+                                   context="{'default_employee_id': employee_id}" invisible="1"/>
+                            <field name="name" invisible="1"/><!--Nombre-->
+                            <field name="credit_note" invisible="1"/><!--Nota de crédito-->
+                        </group>
+                        <group string="Notas y comentarios">
+                            <field name="comment" nolabel="1" placeholder="p.e Colocar notas del rol actual."/>
+                        </group>
+                        <notebook>
+                            <page string="Detalle">
+                                <group col="2">
+                                    <group string="Ingresos">
+                                        <field name="input_line_ids" colspan="4" nolabel="1">
+                                            <tree create="false" editable="bottom"
+                                                  default_order='amount desc'>
+                                                <field name="name" string="Regla salarial"/>
+                                                <field name="account_id" invisible="1"/>
+                                                <field name="code" invisible="1"/>
+                                                <field name="amount" string="Monto" sum="Total ingresos"/>
+                                                <field name="contract_id" invisible="1"/>
+                                                <field name="sequence" invisible="1"/>
+                                            </tree>
+                                            <form>
+                                                <group col="4">
+                                                    <field name="name" string="Regla salarial"/>
+                                                    <field name="code" invisible="1"/>
+                                                    <field name="amount" string="Monto"/>
+                                                    <field name="contract_id" invisible="1"/>
+                                                    <field name="sequence" invisible="1"/>
+                                                </group>
+                                            </form>
+                                        </field>
+                                    </group>
+                                    <group string="Egresos">
+                                        <field name="input_line_ids_2" colspan="4" nolabel="1">
+                                            <tree create="false" editable="bottom">
+                                                <field name="name" string="Regla salarial"/>
+                                                <field name="account_id" invisible="1"/>
+                                                <field name="code" invisible="1"/>
+                                                <field name="amount" string="Monto" sum="Total egresos"/>
+                                                <field name="contract_id" invisible="1"/>
+                                                <field name="sequence" invisible="1"/>
+                                            </tree>
+                                            <form>
+                                                <group col="4">
+                                                    <field name="name" string="Regla salarial"/>
+                                                    <field name="code" invisible="1"/>
+                                                    <field name="amount" string="Monto"/>
+                                                    <field name="contract_id" invisible="1"/>
+                                                    <field name="sequence" invisible="1"/>
+                                                </group>
+                                            </form>
+                                        </field>
+                                    </group>
+                                    <!--TODO: Cargar datos igualmente para efectos de HR-->
+                                    <group string="Provisión" invisible="1">
+                                        <field name="input_line_ids_3">
+                                            <tree>
+                                                <field name="name"/>
+                                                <field name="account_id"/>
+                                                <field name="code"/>
+                                                <field name="amount"/>
+                                                <field name="contract_id"/>
+                                                <field name="sequence"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                    <separator/>
+                                    <group>
+                                        <h1>
+                                            <label for="net_receive" string="Neto a recibir"/>
+                                            <field name="net_receive" readonly="1"/>
+                                        </h1>
+                                    </group>
+                                </group>
+                            </page>
+                            <page invisible="1">
+                                <field name="paid"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
+

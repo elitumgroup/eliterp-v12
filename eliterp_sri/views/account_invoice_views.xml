@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Invoice-->
+        <record id="view_tree_invoice_sri" model="ir.ui.view">
+            <field name="name">view_tree_invoice_sri</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-success">state=='paid'</attribute>
+                    <attribute name="decoration-bf">state=='paid'</attribute>
+                    <attribute name="decoration-muted">state=='cancel'</attribute>
+                </tree>
+                <xpath expr="//field[@name='number']" position="before">
+                    <field name="reference" string="No. Factura"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_tree_invoice_supplier_sri" model="ir.ui.view">
+            <field name="name">view_tree_invoice_supplier_sri</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_tree"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="decoration-success">state=='paid'</attribute>
+                    <attribute name="decoration-bf">state=='paid'</attribute>
+                    <attribute name="decoration-muted">state=='cancel'</attribute>
+                </tree>
+                <xpath expr="//field[@name='number']" position="before">
+                    <field name="reference" string="No. Factura (Proveedor)"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_form_invoice_sri" model="ir.ui.view">
+            <field name="name">view_form_invoice_sri</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='payment_term_id']" position="before"><!--Plazos de pago-->
+                    <field name="is_electronic" invisible="1"/>
+                    <field name="reference" invisible="1"/>
+                    <label for="invoice_number" string="Nº Factura"/>
+                    <div>
+                        <field name="point_printing_id"
+                               domain="[('company_id', '=', company_id)]"
+                               required="1"
+                               class="oe_inline"
+                               options="{'no_open': True, 'no_create': True}"/>
+                        -
+                        <field name="invoice_number"
+                               class="oe_inline"
+                               attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False)]}"/>
+                    </div>
+                    <field name="sri_authorization_id"
+                           required="1"
+                           options="{'no_open': True, 'no_create': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='date_due']" position="after"><!--Fecha vencimiento-->
+                    <field name="validate_payment_form" invisible="1"/>
+                    <field name="payment_form_id"
+                           widget="selection"
+                           string="Forma de cobro"
+                           attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False),
+                           ('validate_payment_form', '=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="view_form_invoice_supplier_sri" model="ir.ui.view">
+            <field name="name">view_form_invoice_supplier_sri</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="after"><!--Proveedor-->
+                    <field name="authorization" required="1"/>
+                    <label for="invoice_number" string="Nº Factura (Proveedor)"/>
+                    <div>
+                        <field name="serial_number" class="oe_inline" required="1"/>
+                        -
+                        <field name="invoice_number" class="oe_inline" required="1"/>
+                    </div>
+                    <field name="concept" required="1"
+                           placeholder="Descripción..."/>
+                </xpath>
+                <xpath expr="//field[@name='reference']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='date_due']" position="after"><!--Fecha de vencimiento-->
+                    <field name="validate_payment_form" invisible="1"/>
+                    <field name="payment_form_id"
+                           attrs="{'required':[('validate_payment_form', '=', True)]}"
+                           widget="selection" string="Forma de pago"
+                    />
+                    <field name="proof_support_id" widget="selection" required="1"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

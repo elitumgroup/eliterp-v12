@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Invoice-->
+        <record id="view_form_invoice_project" model="ir.ui.view">
+            <field name="name">view_form_invoice_project</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <field name="company_division_id" position="after">
+                    <field name="project_id"
+                           domain="[('company_division_id', '=', company_division_id)]"
+                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                </field>
+            </field>
+        </record>
+
+        <!--Purchase Invoice-->
+        <record id="view_form_purchase_invoice_project" model="ir.ui.view">
+            <field name="name">view_form_purchase_invoice_project</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <field name="company_division_id" position="after">
+                    <field name="project_id"
+                           domain="[('company_division_id', '=', company_division_id)]"
+                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

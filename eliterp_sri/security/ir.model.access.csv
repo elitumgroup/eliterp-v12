@@ -1,0 +1,21 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sri_payment_forms_manager,sri.payment.forms,model_sri_payment_forms,account.group_account_manager,1,1,1,1
+access_sri_payment_forms_user,sri.payment.forms user,model_sri_payment_forms,account.group_account_user,1,0,0,0
+access_sri_payment_forms_invoice,sri.payment.forms invoice,model_sri_payment_forms,account.group_account_invoice,1,0,0,0
+
+access_sri_proof_support_manager,sri.proof.support,model_sri_proof_support,account.group_account_manager,1,1,1,1
+access_sri_proof_support_user,sri.proof.support user,model_sri_proof_support,account.group_account_user,1,0,0,0
+access_sri_proof_support_invoice,sri.proof.support invoice,model_sri_proof_support,account.group_account_invoice,1,0,0,0
+
+access_sri_authorized_vouchers_manager,sri.authorized.vouchers,model_sri_authorized_vouchers,account.group_account_manager,1,1,1,1
+access_sri_authorized_vouchers_user,sri.authorized.vouchers user,model_sri_authorized_vouchers,account.group_account_user,1,0,0,0
+access_sri_authorized_vouchers_invoice,sri.authorized.vouchers invoice,model_sri_authorized_vouchers,account.group_account_invoice,1,0,0,0
+
+access_sri_point_printing_manager,sri.point.printing,model_sri_point_printing,account.group_account_manager,1,1,1,1
+access_sri_point_printing_user,sri.point.printing user,model_sri_point_printing,account.group_account_user,1,0,0,0
+access_sri_point_printing_invoice,sri.point.printing invoice,model_sri_point_printing,account.group_account_invoice,1,0,0,0
+
+access_sri_authorization_manager,sri.authorization,model_sri_authorization,account.group_account_manager,1,1,1,1
+access_sri_authorization_user,sri.authorization user,model_sri_authorization,account.group_account_user,1,0,0,0
+access_sri_authorization_invoice,sri.authorization invoice,model_sri_authorization,account.group_account_invoice,1,0,0,0
+
