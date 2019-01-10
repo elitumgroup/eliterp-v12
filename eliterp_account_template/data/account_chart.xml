@@ -15,6 +15,12 @@
         <field name="include_initial_balance" eval="False"/>
     </record>
 
+    <record model="account.account.type" id="data_account_type_other">
+        <field name="name">Otro</field>
+        <field name="type">other</field>
+        <field name="include_initial_balance" eval="False"/>
+    </record>
+
     <!--
         TODO: Crear aquí cuentas principales del plan, a la hora de
         importar el CSV revisar esté correctamente creado el plan de cuentas
@@ -24,7 +30,7 @@
 
     <record model="account.account.template" id="account_template_2111">
         <field name="name">CUENTAS Y DOCUMENTOS POR PAGAR LOCALES</field>
-        <field name="code">2.1.1.1</field>
+        <field name="code">2.1.1.1.1</field>
         <field name="user_type_id" ref="account.data_account_type_payable"/>
         <field name="reconcile" eval="True"/>
         <field name="chart_template_id" ref="eliterp_chart_template"/>
@@ -52,14 +58,14 @@
     </record>
     <record model="account.account.template" id="account_template_3321">
         <field name="name">(-) PÉRDIDA NETA DEL PERÍODO</field>
-        <field name="code">3.3.2.1</field>
+        <field name="code">3.3.2</field>
         <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="reconcile" eval="True"/>
         <field name="chart_template_id" ref="eliterp_chart_template"/>
     </record>
     <record model="account.account.template" id="account_template_3311">
         <field name="name">GANANCIA NETA DEL PERÍODO</field>
-        <field name="code">3.3.1.1</field>
+        <field name="code">3.3.1</field>
         <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="reconcile" eval="True"/>
         <field name="chart_template_id" ref="eliterp_chart_template"/>

@@ -114,6 +114,6 @@ class Partner(models.Model):
 
     _sql_constraints = [
         (
-            'documentation_number', 'unique(documentation_number)',
+            'documentation_number', 'unique(documentation_number,company_id)',
             _("Ya existe empresa con este nº de identificación.")),
     ]

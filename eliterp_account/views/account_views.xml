@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <!--Bank Records account_accountant.menu_accounting-->
+        <!--Bank Records-->
         <menuitem id="menu_bank_records"
-                  parent="account.menu_finance"
+                  parent="account_accountant.menu_accounting"
                   groups="account.group_account_user"
                   name="Registros bancarios"
                   sequence="3"/>
