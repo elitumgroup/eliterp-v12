@@ -11,9 +11,9 @@
                   web_icon="eliterp_core,static/description/settings.png"
                   sequence="500"/>
         <!--Resources-->
-        <template id="core_assets_backend" name="Estilos del núcleo" inherit_id="web.assets_backend">
+        <template id="core_assets_backend" name="Estilos del núcleo" inherit_id="web.assets_common">
             <xpath expr="." position="inside">
-                <link rel="stylesheet" href="/eliterp_core/static/src/less/report_styles.less"/>
+                <link rel="stylesheet" href="/eliterp_core/static/src/less/report_styles.scss"/>
             </xpath>
         </template>
     </data>

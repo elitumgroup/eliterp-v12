@@ -1,0 +1,120 @@
+/*
+TODO: Revisar si dejamos clases de otros módulos aquí.
+*/
+.o_boxed_footer, .o_boxed_header, .o_report_layout_boxed {
+    font-family: 'Lato';
+    font-size: 12px;
+}
+.o_boxed_header {
+    text-transform: uppercase;
+    color: gray('200');
+    img {
+        max-height: 100px;
+    }
+    h4 {
+        color: $o-we-color-text-normal;
+        font-weight: 700;
+    }
+}
+.o_boxed_footer {
+    padding-top: 50px;
+    color: gray('200');
+}
+
+.o_report_layout_boxed {
+    text-transform: uppercase;
+    #informations {
+        border: 1px solid gray('200');
+        padding-top: 10px;
+        margin: 0;
+    }
+
+    .table_payslip { /*Para rol individual*/
+        font-size: 9px;
+        border: 0px;
+        tr{ height:1px; }
+        tr:last-child { height:auto; }
+        td { vertical-align:top; }
+    }
+
+    .tr_sums { /*Para fila con totales al final de tablas (RRHH)*/
+        font-size: 9px;
+        border-top: 3px solid gray('200') !important;
+        td{
+            background-color: gray('200');
+            color: #fff;
+        }
+        td:last-child{
+            background-color: gray('200');
+            color: #fff;
+        }
+        td:first-child {
+            background-color: #fff;
+        }
+
+    }
+
+    /*Odoo*/
+    > h2 {
+        text-transform: uppercase;
+    }
+    table {
+        border: 1px solid gray('700');
+        thead {
+            border-bottom: 2px solid gray('700');
+            tr th {
+                text-transform: uppercase;
+                border: 1px solid gray('700');
+            }
+        }
+        tbody {
+            color: gray('700');
+            tr {
+                td {
+                    // remove border-top from standard layout
+                    border-top: none;
+                    border-right: 1px solid gray('700');
+                }
+                &.o_line_section td,
+                &.o_line_note td,
+                &.is-subtotal td {
+                    border-top: 1px solid gray('700');
+                    border-bottom: 1px solid gray('700');
+                }
+                &.o_line_section td {
+                    background-color: gray('700');
+                    color: #fff;
+                }
+                &.is-subtotal,
+                td.o_price_total {
+                    background-color: gray('200');
+                }
+            }
+        }
+    }
+
+    /*Total table*/
+    /* row div rule compat 12.0 */
+    .row > div > table,
+    div#total table {
+        tr {
+            &:first-child,
+            &.o_subtotal {
+                border-bottom: 1px solid gray('700');
+
+                td:first-child {
+                    border-right: none;
+                }
+            }
+            &:last-child td,
+            &.o_total td {
+                background-color: gray('700');
+                color: #fff;
+
+                &:first-child {
+                    border-right: none;
+                }
+            }
+        }
+    }
+}
