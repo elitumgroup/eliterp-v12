@@ -1,0 +1,17 @@
+.o_report_layout_boxed {
+    .table_financial_situation { /*Para ESF*/
+        border: 1px solid;
+        th{ height:1px; border: none !important;}
+        td{ vertical-align:top; border: none !important;}
+        tr{ height:1px; }
+        tr:last-child { height:auto; }
+    }
+
+    .table_general_ledger { /*Para libro mayor*/
+        &tbody {
+            font-size: 10px;
+            tr{ height:1px; }
+            td { vertical-align:top; }
+        }
+    }
+}

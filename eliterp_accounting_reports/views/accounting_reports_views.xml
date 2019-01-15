@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <!--Accouting-->
+        <!--Resources-->
+        <template id="accounting_reports_assets_backend" name="Estilos de reportes contables" inherit_id="web.assets_common">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/eliterp_accounting_reports/static/src/less/accounting_reports_styles.scss"/>
+            </xpath>
+        </template>
+
+        <!--Accouting account.menu_finance - account_accountant.menu_accounting-->
         <menuitem id="menu_accounting_reports"
                   name="Reportes"
                   parent="account.menu_finance"
                   sequence='30'/>
+
+        <record id="action_status_results_report" model="ir.actions.act_window">
+            <field name="name">Estado de resultados</field>
+            <field name="res_model">account.status.results</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_accounting_reports.view_form_status_results_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="financial_situation_report"
+                  parent="menu_accounting_reports"
+                  action="action_status_results_report"
+                  sequence="1"/>
 
         <record id="action_financial_situation_report" model="ir.actions.act_window">
             <field name="name">Estado de situación financiera</field>
@@ -19,7 +40,7 @@
         <menuitem id="menu_financial_situation_report"
                   parent="menu_accounting_reports"
                   action="action_financial_situation_report"
-                  sequence="1"/>
+                  sequence="5"/>
 
         <record id="action_general_ledger_report" model="ir.actions.act_window">
             <field name="name">Reporte de libro mayor</field>

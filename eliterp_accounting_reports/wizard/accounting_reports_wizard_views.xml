@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <!--Status Results-->
+        <record id="view_form_status_results_report_wizard" model="ir.ui.view">
+            <field name="name">view_form_status_results_report_wizard</field>
+            <field name="model">account.status.results</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="company_division_id"
+                               context="{'default_company_id': company_id}"
+                               domain="[('company_id', '=', company_id)]"/>
+                        <!--TODO: Revisar si colocar estos campos
+                        <field name="project_id"
+                               domain="[('company_division_id', '=', company_division_id)]"
+                               options="{'no_open': True, 'no_create': True}"/>
+                        <field name="account_analytic_id"
+                               options="{'no_open': True, 'no_create': True}"
+                               domain="[('company_division_id', '=', company_division_id)]"
+                               groups="analytic.group_analytic_accounting"/>
+                        -->
+                        <field name="company_id" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="print_report_pdf"
+                                type="object"
+                                class="oe_highlight"
+                                string="PDF"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
         <!--Financial Situation-->
         <record id="view_form_financial_situation_report_wizard" model="ir.ui.view">
             <field name="name">view_form_financial_situation_report_wizard</field>
