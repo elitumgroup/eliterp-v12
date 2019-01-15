@@ -3,8 +3,8 @@
     <!--Plantilla de reporte (Archivado)-->
     <template id="my_external_layout_boxed" inherit_id="web.external_layout_boxed">
         <!--
-        is_report = True
-        Si es reporte.
+        is_report
+        Si es reporte es true.
         flag:
         0 = Sin 'RECIBÍ COMFORME' en footer
         1 = Completo
@@ -12,18 +12,20 @@
         -->
         <xpath expr="//div[@class='header']" position="replace">
             <div class="header">
-                <div class="o_boxed_header">
-                    <div class="row">
-                        <div class="col-xs-6">
+                <t t-set="color" t-value="company.report_color"/>
+                <div class="o_boxed_header" t-att-style="'border-bottom: 3px solid ' + color" t-att-data-color="color">
+                    <div class="row mb8">
+                        <div class="col-6">
                             <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % to_text(company.logo)"/>
                         </div>
-                        <div class="col-xs-6 text-right">
+                        <div class="col-6 text-right mb4">
                             <h3 t-esc="report_title"/>
                             <t t-if="not is_report"><!--Si no es reporte imprimimos-->
                                 <!--Seteamos variables para reporte-->
                                 <h6 t-esc="name"/>
                                 <div class="mb4">
-                                    <span t-field="doc.state"/>
+                                    <span t-if="'state' in doc" t-field="doc.state"/>
+                                    <span t-if="'state' not in doc">*</span>
                                 </div>
                             </t>
                         </div>
@@ -33,9 +35,11 @@
         </xpath>
 
         <xpath expr="//div[@class='footer o_boxed_footer']" position="replace">
-            <div class="footer o_boxed_footer">
-                <div t-if="flag == '0'" class="row">
-                    <div class="col-xs-4 text-center">
+            <t t-set="color" t-value="company.report_color"/>
+            <div class="footer o_boxed_footer" t-att-style="'border-top: 3px solid ' + color"
+                 t-att-data-color="color">
+                <div t-if="flag == '0'" class="row mb8">
+                    <div class="col-4 mb4 text-center">
                         <p>
                             <span t-field="doc.create_uid"/>
                         </p>
@@ -43,16 +47,16 @@
                             <strong>ELABORADO</strong>
                         </p>
                     </div>
-                    <div class="col-xs-4 text-center">
+                    <div class="col-4 mb4 text-center">
                         <p>
                             <span t-if="'reviewed_user' in doc" t-field="doc.reviewed_user"/>
                             <span t-if="'reviewed_user' not in doc" t-field="doc.create_uid"/>
                         </p>
                         <p>
-                            <strong>REVISADO</strong>
+                            <strong>REVISADO</strong><!--TODO: Revisar si es necesario-->
                         </p>
                     </div>
-                    <div class="col-xs-4 text-center">
+                    <div class="col-4 mb4 text-center">
                         <p>
                             <span t-if="'approval_user' in doc" t-field="doc.approval_user"/>
                             <span t-if="'approval_user' not in doc">_______________</span>
@@ -62,8 +66,8 @@
                         </p>
                     </div>
                 </div>
-                <div t-if="flag == '1'" class="row">
-                    <div class="col-xs-3 text-center">
+                <div t-if="flag == '1'" class="row mb8">
+                    <div class="col-3 mb4 text-center">
                         <p>
                             <span t-field="doc.create_uid"/>
                         </p>
@@ -71,16 +75,16 @@
                             <strong>ELABORADO</strong>
                         </p>
                     </div>
-                    <div class="col-xs-3 text-center">
+                    <div class="col-3 mb4 text-center">
                         <p>
                             <span t-if="'reviewed_user' in doc" t-field="doc.reviewed_user"/>
                             <span t-if="'reviewed_user' not in doc" t-field="doc.create_uid"/>
                         </p>
                         <p>
-                            <strong>REVISADO</strong>
+                            <strong>REVISADO</strong><!--TODO: Revisar si es necesario-->
                         </p>
                     </div>
-                    <div class="col-xs-3 text-center">
+                    <div class="col-3 mb4 text-center">
                         <p>
                             <span t-if="'approval_user' in doc" t-field="doc.approval_user"/>
                             <span t-if="'approval_user' not in doc">_______________</span>
@@ -89,30 +93,30 @@
                             <strong>APROBADO</strong>
                         </p>
                     </div>
-                    <div class="col-xs-3 text-center">
+                    <div class="col-3 mb4 text-center">
                         <p>_______________</p>
                         <p>
                             <strong>RECIBÍ CONFORME</strong>
                         </p>
                     </div>
                 </div>
-                <div t-if="flag == '2'" class="row">
-                    <div class="col-xs-6 text-center">
+                <div t-if="flag == '2'" class="row mb8">
+                    <div class="col-6 mb4 text-center">
                         <p>_______________</p>
                         <p>
                             <strong>ENTREGADO POR</strong>
                         </p>
                     </div>
-                    <div class="col-xs-6 text-center">
+                    <div class="col-6 mb4 text-center">
                         <p>_______________</p>
                         <p>
                             <strong>RECIBIDO POR</strong>
                         </p>
                     </div>
                 </div>
-                <!--Footer personalizado-->
-                <div class="row">
-                    <div class="col-xs-8 text-left">
+
+                <div class="row mb8">
+                    <div class="col-8 text-left mb4">
                         <div>
                             <strong>Usuario:</strong>
                             <span t-esc="user.name"/>
@@ -128,8 +132,8 @@
                             <span class="topage"/>
                         </div>
                     </div>
-                    <div class="col-xs-4 text-right">
-                        <img src="/eliterp_core/static/src/img/logo_footer.png"/>
+                    <div class="col-4 text-right mb4">
+                        <img src="/eliterp_core/static/img/logo_footer_report.png"/>
                     </div>
                 </div>
             </div>
