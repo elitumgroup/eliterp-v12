@@ -15,6 +15,7 @@
         'data/sequences.xml',
         'security/hr_payroll_security.xml',
         'security/ir.model.access.csv',
+        'reports/payroll_reports.xml',
         'views/salary_advance_views.xml',
         'views/payslip_views.xml',
         'views/payslip_run_views.xml',

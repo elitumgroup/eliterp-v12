@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Payslip, TODO: Colocar en vista form-->
+        <template id="report_payslip">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">RRHH-001-ROL-V1</t>
+                    <t t-set="report_title">ROL DE PAGO</t>
+                    <t t-set="flag">1</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32 mb32" style="margin: 0; padding: 0; font-size: 9px;">
+                                <div class="col-6 bm-2">
+                                    <strong>Período:</strong>
+                                    <p t-esc="'Del %s hasta el %s' % (doc.date_from, doc.date_to)"/>
+                                </div>
+                                <div class="col-2 bm-2">
+                                    <strong>Fecha ingreso:</strong>
+                                    <p t-field="doc.employee_id.admission_date"/>
+                                </div>
+                                <div class="col-2 bm-2">
+                                    <strong>Identificación:</strong>
+                                    <p t-field="doc.employee_id.identification_id"/>
+                                </div>
+                                <div class="col-2 bm-2" t-if="doc.employee_id.job_id">
+                                    <strong>Cargo:</strong>
+                                    <p t-field="doc.employee_id.job_id.name"/>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin: 0; padding: 0;">
+                                <div class="col-6">
+                                    <table class="table table-condensed table_payslip">
+                                        <thead>
+                                            <tr style="border: none;">
+                                                <th colspan="2" class="text-center col-xs-12">
+                                                    <strong>INGRESOS</strong>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="doc.input_line_ids" t-as="line">
+                                                <tr style="border: none;">
+                                                    <td style="border-right: none;" class="text-left col-xs-9">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                    <td style="border-right: none;" class="text-right col-xs-3">
+                                                        <span t-esc='"%.2f" % line.amount'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <tr style="border: none;">
+                                                <td style="border-right: none;" class="text-right col-xs-9">
+                                                    <span>
+                                                        <b>TOTAL INGRESOS</b>
+                                                    </span>
+                                                </td>
+                                                <td style="border-right: none;" class="text-right col-xs-3">
+                                                    <b>
+                                                        <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids)'/>
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-6">
+                                    <table class="table table-condensed table_payslip">
+                                        <thead>
+                                            <tr style="border: none;">
+                                                <th colspan="2" style="border-bottom: none;"
+                                                    class="text-center col-xs-12">
+                                                    <strong>EGRESOS</strong>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="doc.input_line_ids_2" t-as="line">
+                                                <tr style="border: none;">
+                                                    <td style="border-right: none;" class="text-left col-xs-9">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                    <td style="border-right: none;" class="text-right col-xs-3">
+                                                        <span t-esc='"%.2f" % line.amount'/>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                            <tr style="border: none;">
+                                                <td style="border-right: none;" class="text-right col-xs-9">
+                                                    <span>
+                                                        <b>TOTAL EGRESOS</b>
+                                                    </span>
+                                                </td>
+                                                <td style="border-right: none;" class="text-right col-xs-3">
+                                                    <b>
+                                                        <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids_2)'/>
+                                                    </b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <h5 class="clearfix text-center">NETO A RECIBIR:&amp;nbsp;
+                                <strong>
+                                    <span t-esc='"%.2f" % doc.net_receive'/>
+                                </strong>
+                            </h5>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_payslip"
+                model="hr.payslip"
+                string="Rol individual"
+                report_type="qweb-pdf"
+                name="eliterp_hr_payroll.report_payslip"
+                file="eliterp_hr_payroll.report_payslip"
+                print_report_name="'Rol de %s' % (object.employee_id.name or '*')"
+                paperformat="eliterp_core.my_paperformat_a5_landscape"
+        />
+
+    </data>
+</odoo>
