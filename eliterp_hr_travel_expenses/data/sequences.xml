@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_travel_expenses_request">
+            <field name="name">Solicitud de viático</field>
+            <field name="code">travel.expenses.request</field>
+            <field name="prefix">VSL-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+        <record model="ir.sequence" id="sequence_travel_expenses_liquidation">
+            <field name="name">Liquidación de viático</field>
+            <field name="code">travel.expenses.liquidation</field>
+            <field name="prefix">VLQ-%(year)s-%(month)s-</field>
+            <field name="padding">5</field>
+        </record>
+
+        <!--Journals-->
+        <record model="account.journal" id="journal_travel_expenses_liquidation">
+            <field name="name">Liquidación de viático</field>
+            <field name="type">general</field>
+            <field name="code">VLQ</field>
+            <field name="show_on_dashboard">False</field>
+            <field name="sequence_id" ref="sequence_travel_expenses_liquidation"/>
+        </record>
+    </data>
+</odoo>

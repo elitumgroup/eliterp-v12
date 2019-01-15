@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Searchs-->
+    <record id="view_search_travel_expenses_request" model="ir.ui.view">
+        <field name="name">view_search_travel_expenses_request</field>
+        <field name="model">hr.travel.expenses.request</field>
+        <field name="arch" type="xml">
+            <search string="Buscar en...">
+                <field name="name"/>
+                <field name="employee_id"/>
+                <separator/>
+                <filter name="approve" string="Aprobadas" domain="[('state','=','approve')]"/>
+                <filter name="liquidated" string="Liquidadas" domain="[('state', '=', 'liquidated')]"/>
+                <separator/>
+                <filter name="month" string="Este mes"
+                        domain="[
+                                '&amp;',
+                                ('application_date', '>=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                ('application_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d')),
+                            ]"/>
+                <group expand="1" string="Agrupar por">
+                    <filter string="Beneficiario" name="groupby_employee_id" domain="[]"
+                            context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Actions-->
+    <record id="action_travel_destinations" model="ir.actions.act_window">
+        <field name="name">Destinos para viático</field>
+        <field name="res_model">hr.travel.destinations</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo destino para viático.
+            </p>
+            <p>
+                Aquí definimos los destinos a utilizar en viáticos de empleado
+                en compañía.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_travel_concepts" model="ir.actions.act_window">
+        <field name="name">Conceptos de viático</field>
+        <field name="res_model">hr.travel.concepts</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo concepto de viático.
+            </p>
+            <p>
+                Aquí definimos los gastos de empleado utilizados para viáticos.
+                Ej. Peaje, combustible, etc.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_start_travel_expenses_request" model="ir.actions.act_window">
+        <field name="name">Mis solicitudes de viático</field>
+        <field name="res_model">hr.travel.expenses.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('create_uid', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva solicitud de viático. Soló se mostrarán los creados por el usuario activo.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_travel_expenses_request" model="ir.actions.act_window">
+        <field name="name">Solicitud de viático</field>
+        <field name="res_model">hr.travel.expenses.request</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva solicitud de viático.
+            </p>
+        </field>
+        <field name="search_view_id" ref="view_search_travel_expenses_request"/>
+    </record>
+
+    <!--Menus Settings-->
+    <menuitem id="menu_travel_expenses_configuration"
+              name="Viáticos"
+              parent="eliterp_treasury.menu_treasury_settings"
+              sequence="10"/>
+
+    <menuitem id="menu_travel_destinations"
+              action="action_travel_destinations"
+              parent="menu_travel_expenses_configuration"
+              sequence="1"/>
+
+    <menuitem id="menu_travel_concepts"
+              action="action_travel_concepts"
+              parent="menu_travel_expenses_configuration"
+              sequence="2"/>
+
+    <!--Menus-->
+    <menuitem id="menu_travel_expenses"
+              name="Viáticos"
+              parent="eliterp_treasury.menu_transactions"
+              sequence="10"/>
+    <menuitem id="menu_travel_expenses_request"
+              action="action_travel_expenses_request"
+              parent="menu_travel_expenses"
+              sequence="1"/>
+
+    <!--Start-->
+    <menuitem id="menu_start_travel_expenses"
+              name="Viáticos"
+              parent="eliterp_start.menu_requirements"
+              sequence="10"/>
+    <menuitem id="menu_start_travel_expenses_request"
+              action="action_start_travel_expenses_request"
+              parent="menu_start_travel_expenses"
+              sequence="1"/>
+
+
+    <!--Views Settings-->
+    <record id="view_form_travel_destinations" model="ir.ui.view">
+        <field name="name">view_form_travel_destinations</field>
+        <field name="model">hr.travel.destinations</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="name"/>
+                    <field name="company_id" invisible="1"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_form_travel_concepts" model="ir.ui.view">
+        <field name="name">view_form_travel_concepts</field>
+        <field name="model">hr.travel.concepts</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="p.e Hospedaje, combustible, etc."/>
+                        </h1>
+                    </div>
+                    <group col="4">
+                        <field name="account_id"
+                               domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                               options="{'no_create': True, 'no_open': True}"/>
+                        <field name="amount"/>
+                        <field name="company_id" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!--Views-->
+    <!--Travel Expenses Request-->
+    <record id="view_tree_travel_expenses_request" model="ir.ui.view">
+        <field name="name">view_tree_travel_expenses_request</field>
+        <field name="model">hr.travel.expenses.request</field>
+        <field name="arch" type="xml">
+            <tree
+                    decoration-success="state == 'liquidated'"
+                    decoration-bf="state == 'liquidated'"
+                    decoration-muted="state == 'deny'">
+                <field name="name"/>
+                <field name="create_uid" string="Solicitado por"/>
+                <field name="application_date"/>
+                <field name="trip_date"/>
+                <field name="employee_id"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+                <button name="action_approve"
+                        string="Aprobar"
+                        type="object"
+                        class="oe_stat_button"
+                        states="to_approve"
+                        icon="fa-check text-success"/>
+                <button name="action_deny"
+                        string="Negar"
+                        type="object"
+                        class="oe_stat_button"
+                        states="to_approve"
+                        icon="fa-ban text-danger"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_form_travel_expenses_request" model="ir.ui.view">
+        <field name="name">view_form_travel_expenses_request</field>
+        <field name="model">hr.travel.expenses.request</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state"
+                           statusbar_visible="draft,approve,liquidated"
+                           widget="statusbar"
+                           modifiers="{'readonly': true}"/>
+                    <button name="print_request" type="object"
+                            class="oe_highlight" string="Imprimir solicitud"/>
+                    <button name="to_approve"
+                            states="draft"
+                            string="Solicitar aprobación"
+                            type="object"
+                            class="oe_highlight"/>
+                    <!--TODO: Crear en configuraciones usuario de aprobaciones-->
+                    <button name="action_approve"
+                            states="to_approve"
+                            string="Aprobar"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_deny"
+                            states="to_approve"
+                            string="Negar"
+                            type="object"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="application_date"/>
+                            <field name="employee_id"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="destination_id" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="reason" placeholder="Alguna referencia del viaje."/>
+                        </group>
+                        <group>
+                            <field name="trip_date"/>
+                            <field name="return_date"/>
+                            <field name="company_division_id"
+                                   options="{'no_open': True, 'no_create': True}"/>
+                            <field name="amount_total"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Líneas de conceptos" col="1">
+                        <field name="line_ids" nolabel="1">
+                            <tree editable="top/bottom">
+                                <field name="travel_concepts_id" options="{'no_open': True, 'no_create': True}"/>
+                                <field name="daily_value"/>
+                                <field name="days"/>
+                                <field name="number_people"/>
+                                <field name="amount_total"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+</odoo>
