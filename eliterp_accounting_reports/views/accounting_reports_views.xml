@@ -8,10 +8,10 @@
             </xpath>
         </template>
 
-        <!--Accouting account.menu_finance - account_accountant.menu_accounting-->
+        <!--Accouting-->
         <menuitem id="menu_accounting_reports"
                   name="Reportes"
-                  parent="account.menu_finance"
+                  parent="account_accountant.menu_accounting"
                   sequence='30'/>
 
         <record id="action_status_results_report" model="ir.actions.act_window">
