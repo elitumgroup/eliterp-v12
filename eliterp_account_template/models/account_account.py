@@ -212,5 +212,5 @@ class Tax(models.Model):
     ], string='Tipo de retención', default='rent')
 
     _sql_constraints = [
-        ('code_unique', 'unique (code, type_tax_use)', _("El código de retención debe ser único por tipo de impuesto."))
+        ('code_unique', 'unique (code, type_tax_use, company_id)', _("El código de retención debe ser único por tipo de impuesto."))
     ]
