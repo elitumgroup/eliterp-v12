@@ -283,7 +283,16 @@ class AccountVoucher(models.Model):
         else:
             return
 
+    @api.constrains('company_id', 'currency_id')
+    def _check_company_id(self):
+        """
+        MM
+        :return:
+        """
+        pass
+
     pay_order_id = fields.Many2one('account.pay.order', string='Orden de pago', readonly=True,
                                    domain=[('state', '=', 'draft')],
                                    states={'draft': [('readonly', False)]})
     type_pay_order = fields.Selection(related='pay_order_id.type', string="Tipo de origen", store=True)
+    company_id = fields.Many2one('res.company', 'Compañía', related='pay_order_id.company_id', store=True)
