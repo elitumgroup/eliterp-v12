@@ -23,7 +23,7 @@
             <field name="view_id" ref="eliterp_accounting_reports.view_form_status_results_report_wizard"/>
             <field name="target">new</field>
         </record>
-        <menuitem id="financial_situation_report"
+        <menuitem id="menu_status_results_report"
                   parent="menu_accounting_reports"
                   action="action_status_results_report"
                   sequence="1"/>

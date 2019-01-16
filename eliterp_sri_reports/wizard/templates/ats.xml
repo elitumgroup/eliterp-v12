@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<iva>
+    <TipoIDInformante>R</TipoIDInformante>
+    <IdInformante>{{ IdInformante }}</IdInformante>
+    <razonSocial>{{ razonSocial }}</razonSocial>
+    <Anio>{{ Anio }}</Anio>
+    <Mes>{{ Mes }}</Mes>
+    <numEstabRuc>{{ numEstabRuc }}</numEstabRuc>
+    <totalVentas>{{ totalVentas }}</totalVentas>
+    <codigoOperativo>{{ codigoOperativo }}</codigoOperativo>
+    <compras>{% for detalle_compras in compras %}
+        <detalleCompras>
+            <codSustento>{{ detalle_compras['codSustento'] }}</codSustento>
+            <tpIdProv>{{ detalle_compras['tpIdProv'] }}</tpIdProv>
+            <idProv>{{ detalle_compras['idProv'] }}</idProv>
+            <tipoComprobante>{{ detalle_compras['tipoComprobante'] }}</tipoComprobante>
+            <parteRel>{{ detalle_compras['parteRel'] }}</parteRel>
+            <fechaRegistro>{{ detalle_compras['fechaRegistro'] }}</fechaRegistro>
+            <establecimiento>{{ detalle_compras['establecimiento'] }}</establecimiento>
+            <puntoEmision>{{ detalle_compras['puntoEmision'] }}</puntoEmision>
+            <secuencial>{{ detalle_compras['secuencial'] }}</secuencial>
+            <fechaEmision>{{ detalle_compras['fechaEmision'] }}</fechaEmision>
+            <autorizacion>{{ detalle_compras['autorizacion'] }}</autorizacion>
+            <baseNoGraIva>{{ detalle_compras['baseNoGraIva'] }}</baseNoGraIva>
+            <baseImponible>{{ detalle_compras['baseImponible'] }}</baseImponible>
+            <baseImpGrav>{{ detalle_compras['baseImpGrav'] }}</baseImpGrav>
+            <baseImpExe>{{ detalle_compras['baseImpExe'] }}</baseImpExe>
+            <montoIce>{{ detalle_compras['montoIce'] }}</montoIce>
+            <montoIva>{{ detalle_compras['montoIva'] }}</montoIva>
+            <valRetBien10>{{ detalle_compras['valRetBien10'] }}</valRetBien10>
+            <valRetServ20>{{ detalle_compras['valRetServ20'] }}</valRetServ20>
+            <valorRetBienes>{{ detalle_compras['valorRetBienes'] }}</valorRetBienes>
+            <valRetServ50>0</valRetServ50>
+            <valorRetServicios>{{ detalle_compras['valorRetServicios'] }}</valorRetServicios>
+            <valRetServ100>{{ detalle_compras['valRetServ100'] }}</valRetServ100>
+            <totbasesImpReemb>{{ detalle_compras['totbasesImpReemb'] }}</totbasesImpReemb>
+            <pagoExterior>
+                <pagoLocExt>01</pagoLocExt>
+                <paisEfecPago>NA</paisEfecPago>
+                <aplicConvDobTrib>NA</aplicConvDobTrib>
+                <pagExtSujRetNorLeg>NA</pagExtSujRetNorLeg>
+            </pagoExterior>{% if detalle_compras['pay'] %}
+            <formasDePago>
+                <formaPago>{{ detalle_compras['formaPago'] }}</formaPago>
+            </formasDePago>{% endif %}
+            <air>
+                {% for detalle_air in detalle_compras['detalleAir'] %}
+                <detalleAir>
+                    <codRetAir>{{ detalle_air['codRetAir'] }}</codRetAir>
+                    <baseImpAir>{{ detalle_air['baseImpAir'] }}</baseImpAir>
+                    <porcentajeAir>{{ detalle_air['porcentajeAir'] }}</porcentajeAir>
+                    <valRetAir>{{ detalle_air['valRetAir'] }}</valRetAir>
+                </detalleAir>{% endfor %}
+            </air>{% if detalle_compras['retencion'] %}
+            <estabRetencion1>{{ detalle_compras['estabRetencion1'] }}</estabRetencion1>
+            <ptoEmiRetencion1>{{ detalle_compras['ptoEmiRetencion1'] }}</ptoEmiRetencion1>
+            <secRetencion1>{{ detalle_compras['secRetencion1'] }}</secRetencion1>
+            <autRetencion1>{{ detalle_compras['autRetencion1'] }}</autRetencion1>
+            <fechaEmiRet1>{{ detalle_compras['fechaEmiRet1'] }}</fechaEmiRet1>{% endif %}
+            {% if detalle_compras['es_nc'] %}
+            <docModificado>{{ detalle_compras['docModificado'] }}</docModificado>
+            <estabModificado>{{ detalle_compras['estabModificado'] }}</estabModificado>
+            <ptoEmiModificado>{{ detalle_compras['ptoEmiModificado'] }}</ptoEmiModificado>
+            <secModificado>{{ detalle_compras['secModificado'] }}</secModificado>
+            <autModificado>{{ detalle_compras['autModificado'] }}</autModificado>{% endif %}
+        </detalleCompras>{% endfor %}
+    </compras>
+    <ventas>{% for detalle_ventas in ventas %}
+        <detalleVentas>
+            <tpIdCliente>{{ detalle_ventas['tpIdCliente'] }}</tpIdCliente>
+            <idCliente>{{ detalle_ventas['idCliente'] }}</idCliente>
+            <parteRelVtas>{{ detalle_ventas['parteRel'] }}</parteRelVtas>
+            <tipoComprobante>{{ detalle_ventas['tipoComprobante'] }}</tipoComprobante>
+            <tipoEmision>{{ detalle_ventas['tipoEm'] }}</tipoEmision>
+            <numeroComprobantes>{{ detalle_ventas['numeroComprobantes'] }}</numeroComprobantes>
+            <baseNoGraIva>{{ detalle_ventas['baseNoGraIva'] }}</baseNoGraIva>
+            <baseImponible>{{ detalle_ventas['baseImponible'] }}</baseImponible>
+            <baseImpGrav>{{ detalle_ventas['baseImpGrav'] }}</baseImpGrav>
+            <montoIva>{{ detalle_ventas['montoIva'] }}</montoIva>
+            <montoIce>{{ detalle_ventas['montoIce'] }}</montoIce>
+            <valorRetIva>{{ detalle_ventas['valorRetIva'] }}</valorRetIva>
+            <valorRetRenta>{{ detalle_ventas['valorRetRenta'] }}</valorRetRenta>
+            <formasDePago>
+                <formaPago>{{ detalle_ventas['formaPago'] }}</formaPago>
+            </formasDePago>
+        </detalleVentas>{% endfor %}
+    </ventas>
+    <ventasEstablecimiento>
+        <ventaEst>
+            <codEstab>{{ codEstab }}</codEstab>
+            <ventasEstab>{{ ventasEstab }}</ventasEstab>
+            <ivaComp>{{ ivaComp }}</ivaComp>
+        </ventaEst>
+    </ventasEstablecimiento>
+    <anulados>{% for detalle_anulados in anulados %}
+        <detalleAnulados>
+            <tipoComprobante>{{ detalle_anulados['tipoComprobante'] }}</tipoComprobante>
+            <establecimiento>{{ detalle_anulados['establecimiento'] }}</establecimiento>
+            <puntoEmision>{{ detalle_anulados['puntoEmision'] }}</puntoEmision>
+            <secuencialInicio>{{ detalle_anulados['secuencialInicio'] }}</secuencialInicio>
+            <secuencialFin>{{ detalle_anulados['secuencialFin'] }}</secuencialFin>
+            <autorizacion>{{ detalle_anulados['autorizacion'] }}</autorizacion>
+        </detalleAnulados>{% endfor %}
+    </anulados>
+</iva>
