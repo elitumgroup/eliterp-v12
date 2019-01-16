@@ -39,7 +39,7 @@
                   parent="menu_accounts_payable"
                   sequence="1"/>
 
-        <!--TODO: Para futuras aplicaciones (Ej. Requerimientos de pago)-->
+        <!--Para futuras aplicaciones (Ej. Requerimientos de pago)-->
         <menuitem id="menu_transactions"
                   name="Transacciones"
                   parent="menu_treasury"
@@ -65,7 +65,7 @@
                   groups="account.group_account_manager"
                   parent="menu_treasury"
                   sequence='100'/>
-        <!--TODO: Pendiente para futuras ajustes-->
+        <!--Pendiente para futuras ajustes-->
         <menuitem id="menu_treasury_settings"
                   name="Ajustes"
                   groups="base.group_erp_manager"

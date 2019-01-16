@@ -35,7 +35,7 @@
     </record>
 
     <record id="action_start_payment_requirement" model="ir.actions.act_window">
-        <field name="name">Requerimiento de pago</field>
+        <field name="name">Mis requerimientos de pago</field>
         <field name="res_model">payment.requirement</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,form</field>
