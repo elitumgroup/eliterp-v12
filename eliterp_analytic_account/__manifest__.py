@@ -8,7 +8,7 @@
     'version': "1.0",
     'depends': [
         'analytic',
-        'eliterp_account_company_division'
+        'eliterp_account_project'
     ],
     'data': [
         'views/analytic_account_views.xml'

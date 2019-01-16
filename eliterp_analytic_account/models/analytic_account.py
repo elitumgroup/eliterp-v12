@@ -5,20 +5,12 @@ from odoo.exceptions import ValidationError
 from odoo import api, fields, models, _
 
 
-class CompanyDivision(models.Model):
-    _inherit = 'account.company.division'
+class Project(models.Model):
+    _inherit = 'account.project'
 
-    def _compute_analytic_account_count(self):
-        """
-        Calcular la cantidad de centros de costo por división
-        :return:
-        """
-        object_analytic_account = self.env['account.analytic.account']
-        for division in self:
-            analytic_account_count = len(object_analytic_account.search([('company_division_id', '=', division.id)]))
-            division.analytic_account_count = analytic_account_count
-
-    analytic_account_count = fields.Integer('# Centros de costo', compute='_compute_analytic_account_count')
+    analytic_account_ids = fields.Many2many('account.analytic.account', 'project_analytic_account_rel', 'project_id',
+                                            'analytic_account_id',
+                                            string='Centros de costo')
 
 
 class AnalyticAccount(models.Model):
@@ -43,4 +35,4 @@ class AnalyticAccount(models.Model):
         return self.create({'name': name}).name_get()[0]
 
     complete_name = fields.Char('Nombre completo', compute='_compute_complete_name', store=True)
-    company_division_id = fields.Many2one('account.company.division', string='División', required=True)
+    project_id = fields.Many2one('account.project', string='Proyecto', required=True)

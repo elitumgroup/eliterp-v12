@@ -199,7 +199,7 @@
                         <field name="account_analytic_id"
                                attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
                                options="{'no_open': True, 'no_create': True}"
-                               domain="[('company_division_id', '=', company_division_id)]"
+                               domain="[('project_id', '=', project_id)]"
                                groups="analytic.group_analytic_accounting"/>
                     </group>
                 </xpath>
