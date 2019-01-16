@@ -57,7 +57,7 @@
                                        options='{"no_open": True, "no_create": True}'/>
                                 <field name="street" class="o_address_street" placeholder="Calle..."/>
                             </div>
-                            <field name="company_id" groups="base.group_multi_company" required="1"/>
+                            <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                         </group>
                         <notebook>
                             <!--Libre para futuras páginas-->
