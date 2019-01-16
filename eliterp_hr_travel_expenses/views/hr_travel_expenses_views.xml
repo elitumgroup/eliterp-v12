@@ -88,7 +88,7 @@
     <!--Menus Settings-->
     <menuitem id="menu_travel_expenses_configuration"
               name="Viáticos"
-              parent="eliterp_treasury.menu_treasury_settings"
+              parent="eliterp_treasury.menu_treasury_configuration"
               sequence="10"/>
 
     <menuitem id="menu_travel_destinations"
