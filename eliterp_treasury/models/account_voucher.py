@@ -424,7 +424,6 @@ class Voucher(models.Model):
         self.out_invoice_line.unlink()  # Limpiamos líneas anteriores
         invoices = self.env['account.invoice'].search([
             ('partner_id', '=', self.partner_id.id),
-            ('company_id', '=', self.company_id.id),
             ('state', '=', 'open')
         ])
         list_invoices = []

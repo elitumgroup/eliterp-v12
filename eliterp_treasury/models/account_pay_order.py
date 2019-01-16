@@ -295,4 +295,5 @@ class AccountVoucher(models.Model):
                                    domain=[('state', '=', 'draft')],
                                    states={'draft': [('readonly', False)]})
     type_pay_order = fields.Selection(related='pay_order_id.type', string="Tipo de origen", store=True)
-    company_id = fields.Many2one('res.company', 'Compañía', related='pay_order_id.company_id', store=True)
+    company_id = fields.Many2one('res.company', 'Compañía', related=False,
+                                 default=lambda self: self.env.user.company_id)
