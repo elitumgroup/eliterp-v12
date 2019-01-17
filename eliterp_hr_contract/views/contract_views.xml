@@ -22,9 +22,6 @@
             </tree>
         </field>
     </record>
-
-    <!--TODO: Cambiar acción (Quitar vista kanban) y el campo state por state_cutomize en búsquedas.-->
-
     <record id="view_form_contract" model="ir.ui.view">
         <field name="name">view_form_contract</field>
         <field name="model">hr.contract</field>
@@ -113,7 +110,8 @@
                                             </div>
                                         </group>
                                     </group>
-                                    <group name='duration_group' invisible="1"><!--TODO: Módulo hr_payroll_account no funciona-->
+                                    <group name='duration_group'
+                                           invisible="1"><!--TODO: Módulo hr_payroll_account no funciona-->
                                     </group>
                                     <group>
                                         <field name="notes" nolabel="1" placeholder="Notas..."/>
@@ -133,7 +131,9 @@
                                                     string="Finalizar"
                                                     class="oe_link"/>
                                         </div>
-                                        <span class="text-muted">(Si se finaliza el contrato colocar fecha y dar clic.)</span>
+                                        <span class="text-muted">(Si se finaliza el contrato colocar fecha y dar
+                                            clic.)
+                                        </span>
                                     </group>
                                 </page>
                             </notebook>

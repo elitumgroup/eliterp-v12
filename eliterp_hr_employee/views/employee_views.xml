@@ -64,7 +64,6 @@
                             <group string="Datos bancarios" col="4">
                                 <field name="bank_id" options='{"no_open": True, "no_create": True}'/>
                                 <field name="bank_account" attrs="{'required': [('bank_id', '!=', False)]}"/>
-                                <field name="bank_account_id" invisible="1"/><!--Número de cuenta bancaria-->
                             </group>
                             <group string="Otros datos personales" col="4">
                                 <field name="birthday"/>

@@ -63,6 +63,11 @@ class SalaryAdvanceLine(models.Model):
                 self.amount_payable, self.residual, self.employee_id.name
             ))
 
+    @api.onchange('selected')
+    def _onchange_selected(self):
+        if self.selected:
+            self.amount_payable = self.residual
+
     employee_id = fields.Many2one('hr.employee', string='Empleado')
     job_id = fields.Many2one('hr.job', string='Cargo de trabajo', related='employee_id.job_id', store=True)
     admission_date = fields.Date(related='employee_id.admission_date', store=True, string='Fecha ingreso')
@@ -104,16 +109,14 @@ class SalaryAdvance(models.Model):
         line_ids = []
         if self.line_ids:
             self.line_ids.unlink()  # Borramos líneas anteriores, no montar
-        for employee in self.env['hr.employee'].search([
-            ('active', '=', True),
-            ('contract_id', '!=', False)
-        ]):
+        for employee in self.env['hr.employee'].search([]):
             contract_id = employee.contract_id
-            amount_advance = round(float((contract_id.wage * 40) / 100), 2)
-            line_ids.append([0, 0, {
-                'employee_id': employee.id,
-                'amount_advance': amount_advance,
-            }])
+            if contract_id:
+                amount_advance = round(float((contract_id.wage * 40) / 100), 2)
+                line_ids.append([0, 0, {
+                    'employee_id': employee.id,
+                    'amount_advance': amount_advance,
+                }])
         return self.write({'line_ids': line_ids})
 
     @api.one
