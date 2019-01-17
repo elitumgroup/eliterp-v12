@@ -8,6 +8,24 @@ from odoo.exceptions import UserError
 class Order(models.Model):
     _inherit = 'sale.order'
 
+    def _validate_name(self, company_id):
+        company = self.env['res.company'].browse(company_id)
+        sequence = self.env['ir.sequence'].search([('code', '=', 'sale.order'), ('company_id', '=', company_id)])
+        if not sequence:
+            raise UserError(
+                _("No está definida la secuencia con código 'sale.order' para compañía: %s") % company.name)
+        return
+
+    @api.model
+    def create(self, vals):
+        """
+        ME: Le colamos el nombre con la secuencia de la empresa
+        :param vals:
+        :return:
+        """
+        self._validate_name(vals['company_id'])
+        return super(Order, self).create(vals)
+
     @api.multi
     def _prepare_invoice(self):
         """
