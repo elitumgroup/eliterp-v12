@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from . import product
 from . import account_period
 from . import account_journal
 from . import account_move

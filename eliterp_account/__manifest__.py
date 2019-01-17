@@ -8,6 +8,7 @@
     'license': "LGPL-3",
     'version': "1.0",
     'depends': [
+        'product',
         'eliterp_core',
         'eliterp_account_template',
         'account_accountant',
@@ -15,7 +16,9 @@
     ],
     'data': [
         'data/sequences.xml',
+        'security/account_security.xml',
         'security/ir.model.access.csv',
+        'views/product_views.xml',
         'views/account_views.xml',
         'views/account_bank_records_views.xml',
         'views/account_period_views.xml',

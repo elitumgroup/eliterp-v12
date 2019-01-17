@@ -105,6 +105,5 @@
                 </xpath>
             </field>
         </record>
-        <!--TODO: Falta cambiar en vista de inventario account.product_template_form_view-->
     </data>
 </odoo>
