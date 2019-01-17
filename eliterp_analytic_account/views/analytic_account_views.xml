@@ -10,7 +10,6 @@
                 <xpath expr="//notebook" position="inside">
                     <page string="Centros de costo" name="analytic_account">
                         <field name="analytic_account_ids"
-                               context="{'default_project_id': active_id}"
                                domain="[('company_id','=', company_id)]">
                             <tree>
                                 <field name="complete_name"/>
@@ -18,20 +17,6 @@
                             </tree>
                         </field>
                     </page>
-                </xpath>
-            </field>
-        </record>
-        <record id="view_search_analytic_account_project" model="ir.ui.view">
-            <field name="name">view_search_analytic_account_project</field>
-            <field name="model">account.analytic.account</field>
-            <field name="inherit_id" ref="analytic.view_account_analytic_account_search"/>
-            <field name="arch" type="xml">
-                <field name="partner_id" position="after">
-                    <field name="project_id"/>
-                </field>
-                <xpath expr="//group/filter[@name='associatedpartner']" position="after">
-                    <filter string="Proyectos" name="project" domain="[]"
-                            context="{'group_by':'project_id'}"/>
                 </xpath>
             </field>
         </record>
@@ -43,7 +28,6 @@
             <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='name']" position="replace">
-                    <field name="project_id"/>
                     <field name="complete_name"/>
                 </xpath>
             </field>
@@ -61,9 +45,6 @@
                 </xpath>
                 <xpath expr="//field[@name='company_id']" position="replace">
                     <field name="company_id" invisible="1"/>
-                    <field name="project_id"
-                           options="{'no_open':True,'no_create':True}"
-                           domain="[('company_id', '=', company_id)]"/>
                 </xpath>
             </field>
         </record>
