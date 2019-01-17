@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <!--Menus-->
+    <record id="hr_contract.hr_menu_contract" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <menuitem id="menu_hr_contract"
+              parent="eliterp_hr_employee.menu_hr_employee"
+              action='hr_contract.action_hr_contract'
+              sequence="10"/>
+
     <record id="view_tree_contract" model="ir.ui.view">
         <field name="name">view_tree_contract</field>
         <field name="model">hr.contract</field>

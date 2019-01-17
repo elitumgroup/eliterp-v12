@@ -134,5 +134,28 @@
                 </xpath>
             </field>
         </record>
+
+        <!--Menus-->
+        <record id="hr.menu_hr_department_tree" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        <record id="hr.menu_open_view_employee_list_my" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+
+        <menuitem id="menu_hr_employee"
+                  name="Empleados"
+                  parent="hr.menu_hr_root"
+                  sequence="1"/>
+
+        <menuitem id="menu_hr_departament"
+                  parent="menu_hr_employee"
+                  action='hr.open_module_tree_department'
+                  sequence="1"/>
+
+        <menuitem id="menu_hr_register"
+                  parent="menu_hr_employee"
+                  action='hr.open_view_employee_list_my'
+                  sequence="2"/>
     </data>
 </odoo>
