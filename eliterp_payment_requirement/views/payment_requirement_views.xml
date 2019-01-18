@@ -115,10 +115,12 @@
                         type="object"
                         class="oe_stat_button"
                         states="to_approve"
+                        groups="eliterp_payment_requirement.group_payment_requirement"
                         icon="fa-check text-success"/>
                 <button name="action_button_deny"
                         string="Negar"
                         type="object"
+                        groups="eliterp_payment_requirement.group_payment_requirement"
                         class="oe_stat_button"
                         states="to_approve"
                         icon="fa-ban text-danger"/>

@@ -180,11 +180,13 @@
                         string="Aprobar"
                         type="object"
                         class="oe_stat_button"
+                        groups="eliterp_hr_travel_expenses.group_travel_expenses_request"
                         states="to_approve"
                         icon="fa-check text-success"/>
                 <button name="action_deny"
                         string="Negar"
                         type="object"
+                        groups="eliterp_hr_travel_expenses.group_travel_expenses_request"
                         class="oe_stat_button"
                         states="to_approve"
                         icon="fa-ban text-danger"/>
@@ -208,15 +210,16 @@
                             string="Solicitar aprobación"
                             type="object"
                             class="oe_highlight"/>
-                    <!--TODO: Crear en configuraciones usuario de aprobaciones-->
                     <button name="action_approve"
                             states="to_approve"
                             string="Aprobar"
+                            groups="eliterp_hr_travel_expenses.group_travel_expenses_request"
                             type="object"
                             class="oe_highlight"/>
                     <button name="action_deny"
                             states="to_approve"
                             string="Negar"
+                            groups="eliterp_hr_travel_expenses.group_travel_expenses_request"
                             type="object"/>
                 </header>
                 <sheet>
