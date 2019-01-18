@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_account_retention_invoice,account.retention invoice,model_account_retention,account.group_account_invoice,1,1,1,0
-access_account_retention_line_invoice,account.retention.line invoice,model_account_retention_line,account.group_account_invoice,1,1,1,0
+access_account_retention_invoice,account.retention invoice,model_account_retention,account.group_account_invoice,1,1,1,1
+access_account_retention_line_invoice,account.retention.line invoice,model_account_retention_line,account.group_account_invoice,1,1,1,1
 
 access_account_pay_order_invoice,account.pay.order invoice,model_account_pay_order,base.group_user,1,1,1,1
 

@@ -24,8 +24,7 @@ class Invoice(models.Model):
             for pay in pays:  # Soló contabilizadas
                 total += round(pay.amount, 3)
             self.improved_pay_order = total
-            payments = self.residual + total
-            self.residual_pay_order = round(payments - self.improved_pay_order, 3)
+            self.residual_pay_order = round(self.residual + self.improved_pay_order - self.improved_pay_order, 3)
             if float_is_zero(self.residual_pay_order, precision_rounding=0.01) or self.reconciled:
                 self.state_pay_order = 'paid'
             else:

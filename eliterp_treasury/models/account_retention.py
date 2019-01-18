@@ -175,6 +175,18 @@ class Invoice(models.Model):
         self.base_zero_iva = total_base_zero_iva
         self.base_taxed = total_base_taxed
 
+    @api.multi
+    def copy(self, default=None):
+        """
+        Al duplicar eliminamos impuestos de retención de la antigua
+        :param default:
+        :return:
+        """
+        record = super(Invoice, self).copy(default=default)
+        for tax in record.tax_line_ids.filtered(lambda x: x.tax_id.tax_type == 'retention'):
+            tax.unlink()
+        return record
+
     retention_id = fields.Many2one('account.retention', string='Retención', copy=False, ondelete="set null")
     retention_number = fields.Char('Nº Retención', related='retention_id.retention_number')
     amount_retention = fields.Float('(-) Total a retener', store=True,
@@ -379,17 +391,29 @@ class Retention(models.Model):
             if not re.match("\d{3,}-\d{3,}-\d{9,}", self.retention_number):
                 raise ValidationError("Nº Retención debe ser en formato 001-001-000000001.")
 
+    def _get_name(self, code):
+        company = self.company_id
+        sequence = self.env['ir.sequence'].with_context(force_company=company.id).next_by_code(code)
+        if not sequence:
+            raise UserError(
+                _("No está definida la secuencia con código '%s' para compañía: %s") % code, company.name)
+        return sequence
+
     @api.multi
     def confirm(self):
         """
         Confirmamos retención a proveedor desde factura
         :return:
         """
-        name = self.env['ir.sequence'].with_context(force_company=self.company_id.id).next_by_code('retention.supplier')
-        self.write({
+        name = self._get_name('retention.supplier')
+        vals = {
             'state': 'confirm',
             'name': name
-        })
+        }
+        if not self.is_sequential:
+            new_number = self._get_name('internal.process')
+            vals.update({'retention_number': new_number})
+        self.write(vals)
 
     @api.multi
     def unlink(self):
@@ -427,7 +451,7 @@ class Retention(models.Model):
                                       states={'draft': [('readonly', False)]})
     total = fields.Float(compute='_compute_total', string='Total', store=True, track_visibility='onchange')
     is_sequential = fields.Boolean('Es secuencial?',
-                                   help="Si no se marca, la compañía está asumiendo está retención.", readonly=True,
+                                   help="Si no se marca, la compañía genera un secuencial interno.", readonly=True,
                                    states={'draft': [('readonly', False)]}, default=True)
     journal_id = fields.Many2one('account.journal', string='Diario', readonly=True)
     move_id = fields.Many2one('account.move', string='Asiento contable')
