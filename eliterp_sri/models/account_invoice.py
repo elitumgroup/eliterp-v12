@@ -132,6 +132,7 @@ class Invoice(models.Model):
             if invoice.type in ('in_invoice', 'in_refund') and invoice.reference:
                 if self.search([('type', '=', invoice.type), ('reference', '=', invoice.reference),
                                 ('commercial_partner_id', '=', invoice.commercial_partner_id.id),
+                                ('state', 'in', ['open', 'paid']),
                                 ('id', '!=', invoice.id)]):
                     raise UserError(_(
                         "Duplicated vendor reference detected. You probably encoded twice the same vendor bill/credit note."))
