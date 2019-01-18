@@ -61,12 +61,13 @@ class StatusResultsPdf(models.AbstractModel):
         :param doc:
         :return:
         """
-        beginning_balance = account._get_beginning_balance(context.start_date)
-        moves = self.env['account.move.line'].search([
+        args = [
             ('account_id', '=', account.id),
             ('date', '>=', context.start_date),
             ('date', '<=', context.end_date)
-        ])
+        ]
+        beginning_balance = account._get_beginning_balance(context.start_date)
+        moves = self.env['account.move.line'].search(args)
         credit = 0.00
         debit = 0.00
         for line in moves:
@@ -180,8 +181,8 @@ class StatusResults(models.TransientModel):
     end_date = fields.Date('Fecha fin', required=True)
     # Análisis de gastos
     company_division_id = fields.Many2one('account.company.division', string='División', required=True)
-    # project_id = fields.Many2one('account.project', string='Proyecto')
-    # account_analytic_id = fields.Many2one('account.analytic.account', 'Centro de costo')
+    project_id = fields.Many2one('account.project', string='Proyecto')
+    account_analytic_id = fields.Many2one('account.analytic.account', 'Centro de costo')
     company_id = fields.Many2one('res.company', string="Compañía", default=lambda self: self.env.user.company_id)
 
 

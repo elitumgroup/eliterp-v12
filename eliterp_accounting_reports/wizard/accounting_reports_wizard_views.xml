@@ -13,15 +13,13 @@
                         <field name="company_division_id"
                                context="{'default_company_id': company_id}"
                                domain="[('company_id', '=', company_id)]"/>
-                        <!--TODO: Revisar si colocar estos campos
                         <field name="project_id"
                                domain="[('company_division_id', '=', company_division_id)]"
                                options="{'no_open': True, 'no_create': True}"/>
                         <field name="account_analytic_id"
                                options="{'no_open': True, 'no_create': True}"
-                               domain="[('company_division_id', '=', company_division_id)]"
+                               domain="[('project_ids','in', [project_id])]"
                                groups="analytic.group_analytic_accounting"/>
-                        -->
                         <field name="company_id" invisible="1"/>
                     </group>
                     <footer>
