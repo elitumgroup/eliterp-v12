@@ -446,11 +446,11 @@ class Retention(models.Model):
             self.period_id = False
         else:
             date = self.date_retention
-            period = self.env['account.period'].search([('name', '=', date.year)])
+            period = self.env['account.fiscal.year'].search([('name', '=', date.year)])
             if not period:
                 err_msg = _("Debes definir algún período contable para comenzar a transaccionar.")
                 redir_msg = _("Ir a período contable")
-                raise RedirectWarning(err_msg, self.env.ref('eliterp_account.action_account_period').id, redir_msg)
+                raise RedirectWarning(err_msg, self.env.ref('account.actions_account_fiscal_year').id, redir_msg)
             else:
                 period_id = period.period_lines.filtered(lambda x: x.code == date.month)
                 self.period_id = period_id.id

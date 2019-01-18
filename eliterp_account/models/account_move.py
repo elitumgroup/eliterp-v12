@@ -24,7 +24,7 @@ class Move(models.Model):
         :return:
         """
         if 'date' in vals:
-            self.env['account.period'].valid_period(vals['date'])
+            self.env['account.fiscal.year'].valid_period(vals['date'])
         res = super(Move, self).create(vals)
         return res
 

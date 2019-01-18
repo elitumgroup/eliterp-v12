@@ -65,7 +65,7 @@ class Payment(models.Model):
         :return: object
         """
         if 'date_payment' in vals:
-            self.env['account.period'].valid_period(vals['date_payment'])
+            self.env['account.fiscal.year'].valid_period(vals['date_payment'])
         res = super(Payment, self).create(vals)
         return res
 

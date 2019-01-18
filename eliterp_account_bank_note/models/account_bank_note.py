@@ -23,7 +23,7 @@ class BankNote(models.Model):
         :return: object
         """
         if 'note_date' in vals:
-            self.env['account.period'].valid_period(vals['note_date'])
+            self.env['account.fiscal.year'].valid_period(vals['note_date'])
         res = super(BankNote, self).create(vals)
         return res
 

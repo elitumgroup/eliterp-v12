@@ -28,6 +28,7 @@
                 <tree position="attributes">
                     <attribute name="decoration-bf">internal_type=='view'</attribute>
                     <attribute name="decoration-danger">internal_type=='view' and balance&lt;0</attribute>
+                    <attribute name="default_order">code</attribute><!--TODO-->
                 </tree>
                 <field name="user_type_id" position="after">
                     <field name="internal_type" invisible="1"/>

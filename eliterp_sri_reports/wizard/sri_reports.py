@@ -469,7 +469,7 @@ class Ats(models.TransientModel):
     file_name = fields.Char('Nombre de archivo', size=50, readonly=True)
     error_file_name = fields.Char('Nombre del archivo de error', size=50, readonly=True)
     year_accounting = fields.Many2one(
-        'account.period',
+        'account.fiscal.year',
         'Año contable',
         required=True
     )

@@ -24,20 +24,16 @@ class PeriodLine(models.Model):
         """
         self.state = self.closing_date > datetime.today().date()
 
-    # TODO: Pendiente de revisar, si colocamos por compañía período contable
     name = fields.Char('Referencia de período')
     code = fields.Integer('Código')
     start_date = fields.Date('Fecha inicio')
     closing_date = fields.Date('Fecha cierre')
     state = fields.Boolean('Estado', compute='_compute_state', store=True)
-    period_id = fields.Many2one('account.period', 'Año contable', ondelete="cascade")
+    period_id = fields.Many2one('account.fiscal.year', 'Año contable', ondelete="cascade")
 
 
-class AccountPeriod(models.Model):
-    _name = 'account.period'
-    _description = _("Período contable")
-
-    _order = "name desc"
+class FiscalYear(models.Model):
+    _inherit = 'account.fiscal.year'
 
     @api.multi
     def valid_period(self, date):
@@ -48,7 +44,7 @@ class AccountPeriod(models.Model):
         """
         if isinstance(date, str):  # Por si acaso venga como string
             date = datetime.strptime(date, "%Y-%m-%d")
-        year_accounting = self.env['account.period'].search([('name', '=', date.year)])
+        year_accounting = self.env['account.fiscal.year'].search([('name', '=', date.year)])
         if not year_accounting:
             raise UserError(_("No hay ningún período contable creado en el sistema."))
         period_id = year_accounting.period_lines.filtered(lambda x: x.code == date.month)
@@ -91,13 +87,11 @@ class AccountPeriod(models.Model):
         if not (self.name >= 2010 and self.name <= 2100):
             raise ValidationError(_("Año contable incorrecto, fuera de rango válido."))
 
-    name = fields.Integer(string='Año contable', required=True, size=4, default=date.today().year)
-    start_date = fields.Date('Fecha inicio', required=True)
-    closing_date = fields.Date('Fecha cierre', required=True)
+    name = fields.Integer(string='Año contable', required=True, size=4, default=date.today().year)  # CM
     period_lines = fields.One2many('account.period.line', 'period_id', string='Líneas de período contable')
 
-    _sql_constraints = [
-        ('name_unique', 'unique (name)', _("El año contable debe ser único."))
+    sql_constraints = [
+        ('name_unique', 'unique (company_id, name)', _("El año debe ser único por compañía!"))
     ]
 
 
@@ -112,12 +106,12 @@ class Invoice(models.Model):
         :return:
         """
         date = self.date_invoice
-        period = self.env['account.period'].search([('name', '=', date.year)])
+        period = self.env['account.fiscal.year'].search([('name', '=', date.year)])
         # Si no existe rederiguimos a crear un período contable
         if not period:
             err_msg = _("Debes definir algún período contable para comenzar a transaccionar.")
             redir_msg = _("Ir a período contable")
-            raise RedirectWarning(err_msg, self.env.ref('eliterp_account.action_account_period').id, redir_msg)
+            raise RedirectWarning(err_msg, self.env.ref('account.actions_account_fiscal_year').id, redir_msg)
         else:
             period_id = period.period_lines.filtered(lambda x: x.code == date.month)
             self.period_id = period_id.id
@@ -131,7 +125,7 @@ class Invoice(models.Model):
         """
         if 'date_invoice' not in values:
             values.update({'date_invoice': date.today().strftime("%Y-%m-%d")})
-        self.env['account.period'].valid_period(values['date_invoice'])
+        self.env['account.fiscal.year'].valid_period(values['date_invoice'])
         return super(Invoice, self).create(values)
 
     date_invoice = fields.Date('Fecha de factura',
