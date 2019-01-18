@@ -5,10 +5,10 @@ from odoo.exceptions import UserError
 
 # mapping invoice type to refund type
 TYPE2REFUND = {
-    'out_invoice': 'out_refund',        # Customer Invoice
-    'in_invoice': 'in_refund',          # Vendor Bill
-    'out_refund': 'out_invoice',        # Customer Credit Note
-    'in_refund': 'in_invoice',          # Vendor Credit Note
+    'out_invoice': 'out_refund',  # Customer Invoice
+    'in_invoice': 'in_refund',  # Vendor Bill
+    'out_refund': 'out_invoice',  # Customer Credit Note
+    'in_refund': 'in_invoice',  # Vendor Credit Note
 }
 
 
@@ -73,6 +73,27 @@ class Invoice(models.Model):
             result = {'type': 'ir.actions.act_window_close'}
         return result
 
+    def _get_journal(self, type):
+        """
+        Obtenemos el diario de la nota de crédito
+        out_invoice = Nota de crédito de cliente
+        in_invoice = Nota de crédito de proveedor
+        :return:
+        """
+        TYPE = {
+            'out_invoice': 'Nota de crédito de cliente',
+            'in_invoice': 'Nota de crédito de proveedor'
+        }
+        company = self.company_id
+        domain = [
+            ('name', '=', TYPE[type]),
+            ('company_id', '=', company.id)
+        ]
+        journal = self.env['account.journal'].search(domain, limit=1)
+        if not journal:
+            raise UserError(_("No está definido el diario Nota de crédito para compañía: %s") % company.name)
+        return journal
+
     @api.model
     def _prepare_refund(self, invoice, date_invoice=None, date=None, description=None, journal_id=None):
         """ MM: Prepare the dict of values to create the new credit note from the invoice.
@@ -99,13 +120,10 @@ class Invoice(models.Model):
         tax_lines = invoice.tax_line_ids
         values['tax_line_ids'] = self._refund_cleanup_lines(tax_lines)
 
-        # TODO: Revisar diarios por compañía, Diarios de nota de crédito
         if journal_id:
             journal = self.env['account.journal'].browse(journal_id)
-        elif self.type == 'in_invoice':
-            journal = self.env.ref('eliterp_sri.journal_refund_purchase')
         else:
-            journal = self.env.ref('eliterp_sri.journal_refund_customer')
+            journal = self._get_journal(self.type)
 
         values['journal_id'] = journal.id
         values['type'] = TYPE2REFUND[invoice['type']]
