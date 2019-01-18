@@ -7,6 +7,7 @@
             <field name="arch" type="xml">
                 <search>
                     <field name="name" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
+                    <field name="company_division_id"/>
                     <group expand="0" string="Group By">
                         <filter string="Divisiones" name="companydivision" domain="[]"
                                 context="{'group_by':'company_division_id'}"/>
@@ -61,7 +62,7 @@
                             name="%(action_project)d"
                             icon="fa-th-list"
                             type="action"
-                            context="{'search_default_company_division_id': active_id}">
+                            context="{'search_default_company_division_id': active_id, 'default_company_division_id': active_id}">
                         <div class="o_field_widget o_stat_info">
                             <span class="o_stat_value">
                                 <field name="project_count"/>
