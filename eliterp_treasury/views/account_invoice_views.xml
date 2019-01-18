@@ -5,7 +5,7 @@
         <field name="model">account.invoice</field>
         <field name="inherit_id" ref="account.invoice_supplier_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@class='oe_button_box']" position="inside">
+            <xpath expr="//button[@name='action_view_refund']" position="after">
                 <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
                     <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
                 </button>

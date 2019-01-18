@@ -356,15 +356,13 @@
                             attrs="{'invisible': ['|','|', ('state', '!=', 'draft'), ('type', '=', 'in_refund'), ('retention_id', '!=', False)]}"
                             class="oe_highlight"/>
                 </button>
-                <xpath expr="//sheet/div[1]" position="before">
-                    <div class="oe_button_box" name="button_box">
-                        <button name="open_retention"
-                                string="Retención"
-                                type="object"
-                                class="oe_stat_button"
-                                attrs="{'invisible': [('retention_id', '=', False)]}"
-                                icon="fa-chain"/>
-                    </div>
+                <xpath expr="//button[@name='action_view_refund']" position="after">
+                    <button name="open_retention"
+                            string="Retención"
+                            type="object"
+                            class="oe_stat_button"
+                            attrs="{'invisible': [('retention_id', '=', False)]}"
+                            icon="fa-chain"/>
                 </xpath>
                 <xpath expr="//field[@name='amount_untaxed']" position="before"><!--Base imponible-->
                     <field name="base_zero_iva" widget="monetary"/>
