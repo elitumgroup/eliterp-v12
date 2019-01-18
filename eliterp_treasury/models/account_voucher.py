@@ -128,7 +128,7 @@ class Voucher(models.Model):
         """
         Verificamos la fecha del banco no sea menor a la de emisión
         """
-        if self.bank_date < self.date:
+        if self.type_egress != 'cash' and self.bank_date < self.date:
             raise ValidationError("Fecha del banco no puede ser menor a la del comprobante.")
 
     def _set_amount(self, invoices, total):
@@ -267,6 +267,9 @@ class Voucher(models.Model):
         if self.type_egress == 'cash':
             sequence = self.env['ir.sequence'].with_context(force_company=self.company_id.id).next_by_code(
                 'account.voucher.purchase.cash')
+            if not sequence:
+                raise ValidationError(
+                    _("No existe secuencia 'account.voucher.purchase.cash' para compañía %s.") % self.company_id.name)
             move_name = prefix + "EFC-" + year + "-" + sequence
         else:
             bank_sequence = self.bank_journal_id.bank_sequence_id
@@ -304,7 +307,9 @@ class Voucher(models.Model):
             })
             # Línea de débito (Banco o efectivo)
             self.env['account.move.line'].with_context(check_move_validity=False).create({
-                'name': self.reference if self.type_egress == 'cash' else '{0}-[{1}]'.format(self.bank_journal_id.name, self.reference),
+                'name': self.reference if self.type_egress == 'cash' else '{0} - [{1}]'.format(
+                    self.bank_journal_id.name,
+                    self.reference),
                 'move_id': move_id.id,
                 'journal_id': journal_id.id,
                 'partner_id': self.partner_id.id if self.partner_id else False,

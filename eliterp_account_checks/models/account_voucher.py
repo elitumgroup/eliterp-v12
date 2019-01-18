@@ -88,6 +88,8 @@ class Voucher(models.Model):
         if self.voucher_type == 'purchase':
             if self.type_egress == 'check':
                 self._create_check()
+                new_ref = self.move_id.ref + " - Cheque: " + self.check_number
+                self.move_id.update({'ref': new_ref})
         return result
 
     @api.onchange('check_number')
