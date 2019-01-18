@@ -35,3 +35,6 @@ class AnalyticAccount(models.Model):
         return self.create({'name': name}).name_get()[0]
 
     complete_name = fields.Char('Nombre completo', compute='_compute_complete_name', store=True)
+    project_ids = fields.Many2many('account.project', 'project_analytic_account_rel', 'analytic_account_id',
+                                   'project_id',
+                                   string='Proyectos')

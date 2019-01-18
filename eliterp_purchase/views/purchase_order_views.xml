@@ -25,7 +25,7 @@
                        position="replace">
                     <field name="account_analytic_id"
                            options="{'no_open': True, 'no_create': True}"
-                           domain="[('project_id', '=', parent.project_id)]"
+                           domain="[('project_ids','in', [parent.project_id])]"
                            groups="analytic.group_analytic_accounting"/>
                 </xpath>
             </field>
