@@ -92,13 +92,10 @@ class Voucher(models.Model):
     @api.multi
     def print_voucher(self):
         """
-        TODO: Imprimimos comprobante, dependiendo del tipo
+        Imprimimos comprobante
         """
         self.ensure_one()
-        if self.voucher_type == 'purchase':
-            return self.env.ref('eliterp_treasury.action_report_account_voucher_purchase').report_action(self)
-        else:
-            return self.env.ref('eliterp_treasury.action_report_account_voucher_sale').report_action(self)
+        return self.env.ref('eliterp_treasury.action_report_voucher').report_action(self)
 
     @api.model
     def _default_journal(self):

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--TODO: Agregar datos de facturas en comprobantes-->
+        <template id="report_voucher_purchase">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">TESO-001-COEG-V1</t>
+                    <t t-set="report_title">COMPROBANTE DE EGRESO</t>
+                    <t t-set="flag">1</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32">
+                                <div class="col-3" t-if="doc.date">
+                                    <strong>Fecha emisión:</strong>
+                                    <p t-field="doc.date"/>
+                                </div>
+                                <div class="col-3" t-if="doc.beneficiary">
+                                    <strong>Beneficiario:</strong>
+                                    <p t-field="doc.beneficiary"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Orden de pago:</strong>
+                                    <p t-field="doc.pay_order_id"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Origen:</strong>
+                                    <p t-field="doc.pay_order_id.origin"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row">
+                                <div class="col-3">
+                                    <strong>Monto:</strong>
+                                    <p t-esc="&quot;%.2f&quot; %doc.amount_cancel"/>
+                                </div>
+                                <div class="col-3" t-if="doc.type_egress">
+                                    <strong>Forma de pago:</strong>
+                                    <p t-field="doc.type_egress"/>
+                                </div>
+                                <div class="col-6" t-if="doc.reference">
+                                    <strong>Concepto:</strong>
+                                    <p t-field="doc.reference"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-3" t-if="doc.type_egress != 'cash'">
+                                    <strong>Fecha de banco:</strong>
+                                    <p t-field="doc.bank_date"/>
+                                </div>
+                                <div class="col-3" t-if="doc.bank_journal_id">
+                                    <strong>Banco:</strong>
+                                    <p t-field="doc.bank_journal_id.name"/>
+                                </div>
+                                <div class="col-3" t-if="doc.check_number">
+                                    <strong>No. cheque:</strong>
+                                    <p t-field="doc.check_number"/>
+                                </div>
+                                <div class="col-3" t-if="doc.transfer_code">
+                                    <strong>C. Transferencia:</strong>
+                                    <p t-field="doc.transfer_code"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Código cuenta</th>
+                                        <th class="text-center">Nombre cuenta</th>
+                                        <th class="text-right">Debe</th>
+                                        <th class="text-right">Haber</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.move_id.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.account_id.code"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.account_id.name"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.debit"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.credit"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div t-if="doc.pay_order_id.comment">
+                                <h4 class="text-center">Notas y comentarios</h4>
+                                <div class="mb4">
+                                    <span t-field="doc.pay_order_id.comment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <template id="report_voucher_sale">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">TESO-002-CDI-V1</t>
+                    <t t-set="report_title">COMPROBANTE DE INGRESO</t>
+                    <t t-set="flag">0</t><!--Sin RECIBÍ CONFORME en footer-->
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32">
+                                <div class="col-3" t-if="doc.date">
+                                    <strong>Fecha emisión:</strong>
+                                    <p t-field="doc.date"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Cliente:</strong>
+                                    <p t-field="doc.partner_id.name"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Monto:</strong>
+                                    <p t-esc='"%.2f" % sum(line.amount for line in doc.collection_line)'/>
+                                </div>
+                            </div>
+                            <div id="informations" class="row mb32">
+                                <div class="col-12">
+                                    <strong>Concepto:</strong>
+                                    <p t-field="doc.reference"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">DOCUMENTO</th>
+                                        <th class="text-center">REFERENCIA</th>
+                                        <th class="text-center">FECHA COBRO</th>
+                                        <th class="text-right">MONTO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.collection_line" t-as="line">
+                                        <td>
+                                            <span t-field="line.type_payment"/>
+                                        </td>
+                                        <td>
+                                            <span t-if="line.type_payment == 'check'"
+                                                  t-esc="'%s - %s' % (line.bank_id.name, line.check_number)"/>
+                                            <span t-if="line.type_payment == 'cash'">/</span>
+                                            <span t-if="line.type_payment == 'transfer'"
+                                                  t-esc="'%s' % line.bank_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.date_due"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.amount"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="name" t-value="o.name"/>
+                    <t t-if="o.voucher_type == 'purchase'">
+                        <t t-call="eliterp_treasury.report_voucher_purchase"/>
+                    </t>
+                    <t t-else="">
+                        <t t-call="eliterp_treasury.report_voucher_sale"/>
+
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_voucher"
+                model="account.voucher"
+                string="Comprobante"
+                report_type="qweb-pdf"
+                name="eliterp_treasury.report_voucher"
+                file="eliterp_treasury.report_voucher"
+                print_report_name="(object._get_report_filename())"
+                paperformat="eliterp_core.my_paperformat_a4_portrait"
+        />
+
+    </data>
+</odoo>

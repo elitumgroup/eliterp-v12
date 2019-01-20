@@ -13,7 +13,7 @@
     'data': [
         'wizard/accounting_reports_wizard_views.xml',
         'views/accounting_reports_views.xml',
-        'reports/accounting_reports.xml'
+        'report/accounting_reports.xml'
     ],
     'init_xml': [],
     'update_xml': [],

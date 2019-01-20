@@ -14,6 +14,7 @@
         'data/sequences.xml',
         'security/treasury_security.xml',
         'security/ir.model.access.csv',
+        'report/voucher_reports.xml',
         'views/treasury_views.xml',
         'views/account_retention_views.xml',
         'views/account_voucher_views.xml',

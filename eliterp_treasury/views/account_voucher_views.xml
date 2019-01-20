@@ -100,7 +100,7 @@
                         <button name="print_voucher"
                                 type="object"
                                 class="oe_highlight"
-                                string="Imprimir comprobante"/>
+                                string="Imprimir cobro"/>
                         <button name="action_button_cancel" string="Anular" states="posted"
                                 type="object"/>
                     </header>
@@ -205,7 +205,7 @@
                         <button name="print_voucher"
                                 type="object"
                                 class="oe_highlight"
-                                string="Imprimir comprobante"/>
+                                string="Imprimir pago"/>
                         <button name="action_button_cancel" string="Anular" states="posted"
                                 type="object"/>
                     </header>
