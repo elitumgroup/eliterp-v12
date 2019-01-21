@@ -396,7 +396,7 @@ class Retention(models.Model):
         sequence = self.env['ir.sequence'].with_context(force_company=company.id).next_by_code(code)
         if not sequence:
             raise UserError(
-                _("No está definida la secuencia con código '%s' para compañía: %s") % code, company.name)
+                _("No está definida la secuencia con código '%s' para compañía: %s") % (code, company.name))
         return sequence
 
     @api.multi
@@ -456,9 +456,7 @@ class Retention(models.Model):
     journal_id = fields.Many2one('account.journal', string='Diario', readonly=True)
     move_id = fields.Many2one('account.move', string='Asiento contable')
     modified_bill = fields.Boolean('Factura modificada?', default=False)  # TODO: Revisar para que sirve esto
-    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.user.company_id,
-                                 readonly=True,
-                                 states={'draft': [('readonly', False)]})
+    company_id = fields.Many2one('res.company', string='Compañía', related='invoice_id.company_id', store=True)
 
     @api.depends('date_retention')
     def _compute_period(self):
