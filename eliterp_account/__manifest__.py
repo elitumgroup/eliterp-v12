@@ -18,6 +18,7 @@
         'data/sequences.xml',
         'security/account_security.xml',
         'security/ir.model.access.csv',
+        'report/account_bank_records_reports.xml',
         'views/product_views.xml',
         'views/account_views.xml',
         'views/account_bank_records_views.xml',

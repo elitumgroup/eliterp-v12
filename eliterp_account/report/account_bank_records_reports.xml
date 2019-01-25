@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="report_bank_records_transfer">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">CONT-004-TRAB-V1</t>
+                    <t t-set="report_title">COMPROBANTE DE TRANSFERENCIA BANCARIA</t>
+                    <t t-set="flag">0</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32">
+                                <div class="col-4">
+                                    <strong>Fecha documento:</strong>
+                                    <p t-field="doc.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha transferencia:</strong>
+                                    <p t-field="doc.payment_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Monto:</strong>
+                                    <p t-field="doc.amount"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-6">
+                                    <strong>Banco:</strong>
+                                    <p t-field="doc.destination_journal_id"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Concepto:</strong>
+                                    <p t-field="doc.communication"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Código cuenta</th>
+                                        <th class="text-center">Nombre cuenta</th>
+                                        <th class="text-right">Debe</th>
+                                        <th class="text-right">Haber</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.move_id.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.account_id.code"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.account_id.name"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.debit"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.credit"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <template id="report_bank_records_inbound">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">CONT-005-DEPB-V1</t>
+                    <t t-set="report_title">COMPROBANTE DE DEPÓSITO BANCARIO</t>
+                    <t t-set="flag">0</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32">
+                                <div class="col-3">
+                                    <strong>Fecha documento:</strong>
+                                    <p t-field="doc.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Fecha depósito:</strong>
+                                    <p t-field="doc.payment_date"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Tipo de depósito:</strong>
+                                    <p t-field="doc.type_deposit"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Monto:</strong>
+                                    <p t-field="doc.amount"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-xs-6">
+                                    <strong>Banco:</strong>
+                                    <p t-field="doc.journal_id"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Concepto:</strong>
+                                    <p t-field="doc.communication"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nombre cuenta</th>
+                                        <th class="text-center">Referencia</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!--TODO: Revisar reporte para, diferentes tipos de depósito-->
+                                    <tr t-foreach="doc.deposit_line_cash" t-as="line">
+                                        <td>
+                                            <span t-field="line.account_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.reference"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.amount"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_bank_records">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="name" t-value="o.name"/>
+                    <t t-if="o.payment_type == 'transfer'">
+                        <t t-call="eliterp_account.report_bank_records_transfer"/>
+                    </t>
+                    <t t-else="">
+                        <t t-call="eliterp_account.report_bank_records_inbound"/>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_bank_records"
+                model="account.payment"
+                string="Registro bancario"
+                report_type="qweb-pdf"
+                name="eliterp_account.report_bank_records"
+                file="eliterp_account.report_bank_records"
+                print_report_name="(object._get_report_filename())"
+                paperformat="eliterp_core.my_paperformat_a5_landscape"
+        />
+    </data>
+</odoo>

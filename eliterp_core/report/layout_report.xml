@@ -19,7 +19,7 @@
                             <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % to_text(company.logo)"/>
                         </div>
                         <div class="col-6 text-right mb4">
-                            <h3 t-esc="report_title"/>
+                            <h5 t-esc="report_title"/>
                             <t t-if="not is_report"><!--Si no es reporte imprimimos-->
                                 <!--Seteamos variables para reporte-->
                                 <h6 t-esc="name"/>
