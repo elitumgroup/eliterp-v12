@@ -29,7 +29,7 @@
                                     <strong>Banco:</strong>
                                     <p t-field="doc.destination_journal_id"/>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-6" t-if="doc.communication">
                                     <strong>Concepto:</strong>
                                     <p t-field="doc.communication"/>
                                 </div>
@@ -94,11 +94,11 @@
                             </div>
 
                             <div id="informations" class="row mb32">
-                                <div class="col-xs-6">
+                                <div class="col-6">
                                     <strong>Banco:</strong>
                                     <p t-field="doc.journal_id"/>
                                 </div>
-                                <div class="col-6">
+                                <div class="col-6" t-if="doc.communication">
                                     <strong>Concepto:</strong>
                                     <p t-field="doc.communication"/>
                                 </div>
