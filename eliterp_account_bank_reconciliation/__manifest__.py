@@ -13,8 +13,8 @@
         'data/sequences.xml',
         'security/account_bank_reconciliation_security.xml',
         'security/ir.model.access.csv',
-        'views/account_bank_reconciliation_views.xml',
-        'report/account_bank_reconciliation_report.xml'
+        'report/account_bank_reconciliation_report.xml',
+        'views/account_bank_reconciliation_views.xml'
     ],
     'init_xml': [],
     'update_xml': [],

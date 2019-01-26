@@ -1,6 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <template id="report_bank_reconciliation">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">CONT-005-CBC-V1</t>
+                    <t t-set="report_title">CONCILIACIÓN BANCARIA</t>
+                    <t t-set="flag">0</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
 
+                            <div id="informations" class="row mt32">
+                                <div class="col-4">
+                                    <strong>Fecha Documento:</strong>
+                                    <p t-field="doc.create_uid"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha Inicio:</strong>
+                                    <p t-field="doc.date_from"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha Fin:</strong>
+                                    <p t-field="doc.date_to"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-4">
+                                    <strong>Banco:</strong>
+                                    <p t-field="doc.journal_id"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Saldo Banco:</strong>
+                                    <p t-field="doc.account_balance"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Saldo Contable:</strong>
+                                    <p t-field="doc.countable_balance"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">FECHA</th>
+                                        <th class="text-center">TIPO DOCUMENTO</th>
+                                        <th class="text-center">REFERENCIA</th>
+                                        <th class="text-center">CONCEPTO</th>
+                                        <th class="text-right">MONTO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.bank_reconciliation_line" t-as="line">
+                                        <tr t-if="line.check==True">
+                                            <td>
+                                                <span t-field="line.date"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.journal.name"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-field="line.concept"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="line.amount"/>
+                                            </td>
+                                        </tr>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td class="text-right" colspan="4">
+                                            <span>TOTAL</span>
+                                        </td>
+                                        <td class="text-right col-xs-1">
+                                            <span t-esc='"%.2f" % doc.countable_balance'/>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <h4 class="text-center">RESUMEN DE CONCILACIÓN</h4>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <th class="text-center col-1">
+                                        <strong>Saldo inicial</strong>
+                                    </th>
+                                    <t t-foreach="doc._get_data_journal()" t-as="line">
+                                        <th class="text-center col-1" colspan="2">
+                                            <strong>
+                                                <span t-esc="line['name']"/>
+                                            </strong>
+                                        </th>
+                                    </t>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center" style="border: 1px solid black">
+                                            <p t-field="doc.beginning_balance"/>
+                                        </td>
+                                        <t t-foreach="doc._get_data_journal()" t-as="line">
+                                            <td class="text-center" style="border: 1px solid black">
+                                                <span t-esc="line['quantity']"/>
+                                            </td>
+                                            <td class="text-center" style="border: 1px solid black">
+                                                <span t-esc='"$%.2f" %line["amount"]'/>
+                                            </td>
+                                        </t>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h4 class="text-center">VALORES GIRADOS NO CONSIDERADOS EN ESTA CONCILACIÓN</h4>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">FECHA</th>
+                                        <th class="text-center">TIPO DOCUMENTO</th>
+                                        <th class="text-center">REFERENCIA</th>
+                                        <th class="text-center">CONCEPTO</th>
+                                        <th class="text-right">MONTO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.bank_reconciliation_line" t-as="line">
+                                        <tr t-if="line.check==false">
+                                            <td>
+                                                <span t-field="line.date"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="line.journal.name"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td class="text-center">
+                                                <span t-field="line.concept"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-field="line.amount"/>
+                                            </td>
+                                        </tr>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div t-if="doc.comment">
+                                <h4 class="text-center">NOTAS Y COMENTARIOS</h4>
+                                <div class="mb4">
+                                    <span t-field="doc.comment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_bank_reconciliation"
+                model="account.bank.reconciliation"
+                string="Conciliación bancaria"
+                report_type="qweb-pdf"
+                name="eliterp_account_bank_reconciliation.report_bank_reconciliation"
+                file="eliterp_account_bank_reconciliation.report_bank_reconciliation"
+                print_report_name="'Conciliación bancaria %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a4_portrait"
+        />
     </data>
 </odoo>
