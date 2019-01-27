@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_payment_requirement">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">INIC-001-RPG-V1</t>
+                    <t t-set="report_title">REQUERIMIENTO DE PAGO</t>
+                    <t t-set="flag">0</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            
+                           <div id="informations" class="row mt32 mb32">
+                                <div class="col-2">
+                                    <strong>Fecha requerimiento:</strong>
+                                    <p t-field="doc.request_date"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Fecha de pago:</strong>
+                                    <p t-field="doc.payment_date"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Total:</strong>
+                                    <p t-esc='"%.2f" %doc.amount_total'/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Beneficiario:</strong>
+                                    <p t-field="doc.beneficiary"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Detalle</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <p t-esc='"%.2f" %line.amount'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div t-if="doc.comment">
+                                <h6 class="text-center">Notas y comentarios</h6>
+                                <div class="mb4">
+                                    <span t-field="doc.comment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_payment_requirement"
+                model="payment.requirement"
+                string="Requerimiento de pago"
+                report_type="qweb-pdf"
+                name="eliterp_payment_requirement.report_payment_requirement"
+                file="eliterp_payment_requirement.report_payment_requirement"
+                print_report_name="'Requerimiento de pago %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a5_landscape"
+        />
+    </data>
+</odoo>

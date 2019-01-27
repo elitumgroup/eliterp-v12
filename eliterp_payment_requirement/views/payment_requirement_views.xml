@@ -144,7 +144,7 @@
                            statusbar_visible="draft,approve"
                            widget="statusbar"
                            modifiers="{'readonly': true}"/>
-                    <button name="print_request" type="object"
+                    <button name="print_requirement" type="object"
                             attrs="{'invisible':[('state', '==', 'draft')]}"
                             class="oe_highlight" string="Imprimir requerimiento"/>
                     <button name="to_approve"
