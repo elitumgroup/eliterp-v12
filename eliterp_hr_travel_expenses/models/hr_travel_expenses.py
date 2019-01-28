@@ -53,8 +53,8 @@ class TravelConceptsLine(models.Model):
     travel_concepts_id = fields.Many2one('hr.travel.concepts', string="Concepto", required=True)
     travel_expenses_request_id = fields.Many2one('hr.travel.expenses.request', string="Solicitud de viático",
                                                  ondelete="cascade")
-    daily_value = fields.Float('Monto diario')
-    days = fields.Integer('Días', default=1)
+    daily_value = fields.Float('Monto diario', required=True)
+    days = fields.Integer('Días', default=1, required=True)
     number_people = fields.Integer('No. personas', default=1)
     amount_total = fields.Float('Monto total', compute='_compute_amount_total')
 
@@ -83,7 +83,7 @@ class TravelExpensesRequest(models.Model):
         :return:
         """
         self.ensure_one()
-        return self.env.ref('eliterp_hr_travel_expenses.action_report_travel_allowance_request').report_action(self)
+        return self.env.ref('eliterp_hr_travel_expenses.action_report_travel_expenses_request').report_action(self)
 
     @api.one
     @api.depends('line_ids')
@@ -168,7 +168,7 @@ class TravelExpensesRequest(models.Model):
     approval_user = fields.Many2one('res.users', 'Aprobado por')
     line_ids = fields.One2many('hr.travel.concepts.line', 'travel_expenses_request_id',
                                string='Línea de conceptos', readonly=True,
-                                          states={'draft': [('readonly', False)]})
+                               states={'draft': [('readonly', False)]})
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('to_approve', 'Por aprobar'),

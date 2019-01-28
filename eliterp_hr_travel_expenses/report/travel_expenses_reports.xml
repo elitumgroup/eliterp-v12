@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Travel Expenses Request-->
+        <template id="report_travel_expenses_request">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">INIC-002-VSL-V1</t>
+                    <t t-set="report_title">SOLICITUD DE VIÁTICO</t>
+                    <t t-set="flag">0</t>
+                    <t t-set="name" t-value="doc.name"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32">
+                                <div class="col-3">
+                                    <strong>Fecha de solicitud:</strong>
+                                    <p t-field="doc.application_date"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Fecha de viaje:</strong>
+                                    <p t-field="doc.trip_date"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Beneficiario:</strong>
+                                    <p t-field="doc.employee_id"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Motivo:</strong>
+                                    <p t-field="doc.reason"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-3">
+                                    <strong>Destino:</strong>
+                                    <p t-field="doc.destination_id"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Monto total:</strong>
+                                    <p t-esc='"%.2f" %doc.amount_total'/>
+                                </div>
+                                <div class="col-3" t-if="doc.company_division_id">
+                                    <strong>División:</strong>
+                                    <p t-field="doc.company_division_id"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Concepto</th>
+                                        <th class="text-right">Monto diario</th>
+                                        <th class="text-right">Días</th>
+                                        <th class="text-right">No. personas</th>
+                                        <th class="text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.travel_concepts_id.name"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.daily_value"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.days"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.number_people"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_travel_expenses_request"
+                model="hr.travel.expenses.request"
+                string="Solicitud de viático"
+                report_type="qweb-pdf"
+                name="eliterp_hr_travel_expenses.report_travel_expenses_request"
+                file="eliterp_hr_travel_expenses.report_travel_expenses_request"
+                print_report_name="'Solicitud de viático %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a5_landscape"
+        />
+    </data>
+</odoo>

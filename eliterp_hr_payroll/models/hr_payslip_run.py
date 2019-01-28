@@ -53,6 +53,11 @@ class PayslipRunLine(models.Model):
                 self.amount_payable, self.residual, self.name
             ))
 
+    @api.onchange('selected')
+    def _onchange_selected(self):
+        if self.selected:
+            self.amount_payable = self.residual
+
     name = fields.Char('Empleado')
     departament = fields.Char('Departamento')
     admission_date = fields.Date('Fecha de ingreso')

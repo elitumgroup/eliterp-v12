@@ -16,6 +16,7 @@
         'data/sequences.xml',
         'security/hr_travel_expenses_security.xml',
         'security/ir.model.access.csv',
+        'report/travel_expenses_reports.xml',
         'views/hr_travel_expenses_views.xml'
     ],
     'init_xml': [],
