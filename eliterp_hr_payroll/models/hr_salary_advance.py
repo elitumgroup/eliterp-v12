@@ -256,7 +256,7 @@ class SalaryAdvance(models.Model):
         ('deny', 'Negado')], string="Estado", default='draft', track_visibility='onchange')
     approval_user = fields.Many2one('res.users', string='Aprobado por', group="hr_payroll.group_hr_payroll_manager")
     count_lines = fields.Integer('Nº empleados', compute='_compute_count_lines')
-    comment = fields.Text('Notas y comentarios', readonly=True, states={'draft': [('readonly', False)]})
+    comment = fields.Text('Notas y comentarios', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string="Compañía", default=lambda self: self.env.user.company_id)
 
     # Ordenes de pago

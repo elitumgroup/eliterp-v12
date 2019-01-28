@@ -15,7 +15,7 @@
             <field name="padding">5</field>
         </record>
         <!--Journals-->
-        <!--TODO: Al crear colocar las cuentas por defecto para mejora del proceso-->
+        <!--TODO: Al crear colocar las cuentas por defecto para mejorar del proceso-->
         <record model="account.journal" id="journal_salary_advance">
             <field name="name">Anticipo de quincena</field>
             <field name="type">general</field>

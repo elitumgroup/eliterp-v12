@@ -1,6 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <!--Salary Advance-->
+        <template id="report_salary_advance">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">RRHH-001-ADQ-V1</t>
+                    <t t-set="report_title">ANTICIPO DE QUINCENA</t>
+                    <t t-set="flag">0</t>
+                    <t t-set="name" t-value="doc.name"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-6">
+                                    <strong>Fecha documento:</strong>
+                                    <p t-field="doc.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Período:</strong>
+                                    <p t-field="doc.period"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Empleado</th>
+                                        <th class="text-center">Nº identificación</th>
+                                        <th class="text-center">Cargo</th>
+                                        <th class="text-center">Fecha ingreso</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.employee_id.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.employee_id.identification_id"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.job_id"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.admission_date"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.amount_advance"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="clearfix">
+                                <div id="total" class="row">
+                                    <div class="col-4 ml-auto">
+                                        <table class="table table-sm">
+                                            <tr class="border-black o_total">
+                                                <td>
+                                                    <strong>Total</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-esc="'%.2f' % doc.amount_total"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div t-if="doc.comment">
+                                <h4 class="text-center">Notas y comentarios</h4>
+                                <div class="mb4">
+                                    <span t-field="doc.comment"/>
+                                </div>
+                            </div>
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_salary_advance"
+                model="hr.salary.advance"
+                string="Anticipo de quincena"
+                report_type="qweb-pdf"
+                name="eliterp_hr_payroll.report_salary_advance"
+                file="eliterp_hr_payroll.report_salary_advance"
+                print_report_name="'Anticipo de quincena %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a4_portrait"
+        />
+
         <!--Payslip, TODO: Colocar en vista form-->
         <template id="report_payslip">
             <t t-call="web.html_container">
@@ -35,7 +127,7 @@
                                     <table class="table table-condensed table_payslip">
                                         <thead>
                                             <tr style="border: none;">
-                                                <th colspan="2" class="text-center col-xs-12">
+                                                <th colspan="2" class="text-center col-12">
                                                     <strong>INGRESOS</strong>
                                                 </th>
                                             </tr>
@@ -43,21 +135,21 @@
                                         <tbody>
                                             <t t-foreach="doc.input_line_ids" t-as="line">
                                                 <tr style="border: none;">
-                                                    <td style="border-right: none;" class="text-left col-xs-9">
+                                                    <td style="border-right: none;" class="text-left col-9">
                                                         <span t-field="line.name"/>
                                                     </td>
-                                                    <td style="border-right: none;" class="text-right col-xs-3">
+                                                    <td style="border-right: none;" class="text-right col-3">
                                                         <span t-esc='"%.2f" % line.amount'/>
                                                     </td>
                                                 </tr>
                                             </t>
                                             <tr style="border: none;">
-                                                <td style="border-right: none;" class="text-right col-xs-9">
+                                                <td style="border-right: none;" class="text-right col-9">
                                                     <span>
                                                         <b>TOTAL INGRESOS</b>
                                                     </span>
                                                 </td>
-                                                <td style="border-right: none;" class="text-right col-xs-3">
+                                                <td style="border-right: none;" class="text-right col-3">
                                                     <b>
                                                         <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids)'/>
                                                     </b>
@@ -71,7 +163,7 @@
                                         <thead>
                                             <tr style="border: none;">
                                                 <th colspan="2" style="border-bottom: none;"
-                                                    class="text-center col-xs-12">
+                                                    class="text-center col-12">
                                                     <strong>EGRESOS</strong>
                                                 </th>
                                             </tr>
@@ -79,21 +171,21 @@
                                         <tbody>
                                             <t t-foreach="doc.input_line_ids_2" t-as="line">
                                                 <tr style="border: none;">
-                                                    <td style="border-right: none;" class="text-left col-xs-9">
+                                                    <td style="border-right: none;" class="text-left col-9">
                                                         <span t-field="line.name"/>
                                                     </td>
-                                                    <td style="border-right: none;" class="text-right col-xs-3">
+                                                    <td style="border-right: none;" class="text-right col-3">
                                                         <span t-esc='"%.2f" % line.amount'/>
                                                     </td>
                                                 </tr>
                                             </t>
                                             <tr style="border: none;">
-                                                <td style="border-right: none;" class="text-right col-xs-9">
+                                                <td style="border-right: none;" class="text-right col-9">
                                                     <span>
                                                         <b>TOTAL EGRESOS</b>
                                                     </span>
                                                 </td>
-                                                <td style="border-right: none;" class="text-right col-xs-3">
+                                                <td style="border-right: none;" class="text-right col-3">
                                                     <b>
                                                         <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids_2)'/>
                                                     </b>
@@ -125,5 +217,211 @@
                 paperformat="eliterp_core.my_paperformat_a5_landscape"
         />
 
+        <!--Paysip Run-->
+        <template id="report_payslip_run">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">RRHH-002-ROL-V1</t>
+                    <t t-set="report_title">NÓMINA CONSOLIDADA</t>
+                    <t t-set="flag">0</t>
+                    <t t-set="name" t-value="doc.name"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-3">
+                                    <strong>Compañía</strong>
+                                    <p t-field="user.company_id.name"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Fecha documento:</strong>
+                                    <p t-field="doc.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Período:</strong>
+                                    <p t-esc="'Del %s hasta el %s' % (doc.date_start, doc.date_end)"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed" style="font-size:9px">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">NOMBRE</th>
+                                        <th class="text-center">C.I.</th>
+                                        <th class="text-center">DÍAS</th>
+                                        <th class="text-center">S</th>
+                                        <th class="text-center">H.E.</th>
+                                        <th class="text-center">FR</th>
+                                        <th class="text-center">13º</th>
+                                        <th class="text-center">14º</th>
+                                        <th class="text-center">O.ING.</th>
+                                        <th class="text-center">T.ING.</th>
+                                        <th class="text-center">AQ</th>
+                                        <th class="text-center">9.45%</th>
+                                        <th class="text-center">17.60%</th>
+                                        <th class="text-right">PAS</th>
+                                        <th class="text-right">PQ</th>
+                                        <th class="text-right">PH</th>
+                                        <th class="text-right">MUL</th>
+                                        <th class="text-right">F/A</th>
+                                        <th class="text-right">CEL.</th>
+                                        <th class="text-right">O.EGR.</th>
+                                        <th class="text-right">T.EGR.</th>
+                                        <th class="text-right">NETO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.identification_id"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.worked_days"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="'%.2f' % line.wage"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="'%.2f' % line.additional_hours"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="'%.2f' % line.reserve_funds"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.tenth_3"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.tenth_4"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.other_income"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.total_income"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.payment_advance"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.iess_personal"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.iess_patronal"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.loan_payment_advance"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.loan_unsecured"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.loan_mortgage"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.penalty"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.absence"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.cellular_plan"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.other_expenses"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.total_expenses"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc="'%.2f' % line.net_receive"/>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="tr_sums">
+                                        <td colspan="3" class="text-right">Totales</td>
+                                        <td class="text-center">
+                                            <span t-esc='"%.2f" % sum(line.wage for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc='"%.2f" % sum(line.additional_hours for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc='"%.2f" % sum(line.reserve_funds for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.tenth_3 for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.tenth_4 for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.other_income for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.total_income for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.payment_advance for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.iess_personal for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.iess_patronal for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.loan_payment_advance for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.loan_unsecured for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.loan_mortgage for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.penalty for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.absence for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.cellular_plan for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.other_expenses for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.total_expenses for line in doc.line_ids)'/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-esc='"%.2f" % sum(line.net_receive for line in doc.line_ids)'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div t-if="doc.comment">
+                                <h6 class="text-center">Notas y comentarios</h6>
+                                <div class="mb4">
+                                    <span t-field="doc.comment"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_payslip_run"
+                model="hr.payslip.run"
+                string="Rol consolidado"
+                report_type="qweb-pdf"
+                name="eliterp_hr_payroll.report_payslip_run"
+                file="eliterp_hr_payroll.report_payslip_run"
+                print_report_name="'Rol consolidado %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
     </data>
 </odoo>

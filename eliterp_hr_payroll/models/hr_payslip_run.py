@@ -107,7 +107,7 @@ class PayslipRun(models.Model):
         :return:
         """
         self.ensure_one()
-        return self.env.ref('eliterp_hr_payroll.action_report_hr_payslip_run').report_action(self)
+        return self.env.ref('eliterp_hr_payroll.action_report_payslip_run').report_action(self)
 
     @api.multi
     def to_approve(self):
