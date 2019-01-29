@@ -91,14 +91,15 @@ class PayslipRunLine(models.Model):
     parent_state = fields.Char(compute="_compute_parent_state", string="Estado de rol")
     # Órdenes de pago
     selected = fields.Boolean('Seleccionar?', default=False)
-    reconciled = fields.Boolean('Conciliado?', compute="_compute_amount", store=True)
+    reconciled = fields.Boolean('Conciliado?', compute='_compute_amount', store=True)
     paid_amount = fields.Float('Pagado', compute='_compute_amount', store=True)
     residual = fields.Float('Saldo', compute='_compute_amount', store=True)
     amount_payable = fields.Float('A pagar')
-    pay_order_ids = fields.One2many('account.employee.order.line', 'pay_order_salary_advance_line_id',
+    pay_order_ids = fields.One2many('account.employee.order.line', 'pay_order_payslip_run_line_id',
                                     string="Líneas de ordenes de pago",
                                     readonly=True,
                                     copy=False)
+
 
 class PayslipRun(models.Model):
     _name = 'hr.payslip.run'
@@ -502,12 +503,12 @@ class PayslipRun(models.Model):
     @api.depends('pay_order_line')
     def _compute_pay_orders(self):
         """
-        Calculamos la ordenes de pago relacionadas a el rpg y su cantidad
+        Calculamos la ordenes de pago relacionadas a el rol y su cantidad
         :return:
         """
         object = self.env['account.pay.order']
         for record in self:
-            pays = object.search([('salary_advance_id', '=', record.id)])
+            pays = object.search([('payslip_run_id', '=', record.id)])
             record.pay_order_line = pays
             record.pay_orders_count = len(pays)
 
@@ -560,6 +561,6 @@ class PayslipRun(models.Model):
         store=True)
     improved_pay_order = fields.Float('(-) Abonado', compute='_compute_customize_amount', store=True)
     residual_pay_order = fields.Float('Saldo', compute='_compute_customize_amount', store=True)
-    pay_order_line = fields.One2many('account.pay.order', 'salary_advance_id', string='Órdenes de pago')
+    pay_order_line = fields.One2many('account.pay.order', 'payslip_run_id', string='Órdenes de pago')
     pay_orders_count = fields.Integer('# Ordenes de pago', compute='_compute_pay_orders', store=True)
     total_pay_order = fields.Float('Total a pagar', compute='_compute_total_pay_order')

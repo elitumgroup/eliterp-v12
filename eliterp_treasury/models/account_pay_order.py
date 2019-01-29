@@ -145,8 +145,7 @@ class PayOrder(models.Model):
     name = fields.Char('Referencia de orden', index=True)
     date = fields.Date(track_visibility='onchange')
     amount = fields.Float(track_visibility='onchange')
-    # Dependiendo del origen, TODO: Por el momento soló dejamos estás dos, si se crean nuevas fuentes (Ej. Requerimientos de pago)
-    # TODO: Colocar en vista readonly=True, states={'draft': [('readonly', False)]},
+    # Dependiendo del origen (Ej. Requerimientos de pago)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('paid', 'Pagado'),
@@ -156,7 +155,7 @@ class PayOrder(models.Model):
     # Formas de pago
     type_egress = fields.Selection(track_visibility='onchange')
     voucher_id = fields.Many2one('account.voucher', string='Comprobante de egreso', readonly=True)
-
+    comment = fields.Text(track_visibility='onchange')
 
 class AccountVoucher(models.Model):
     _inherit = 'account.voucher'
@@ -192,7 +191,7 @@ class AccountVoucher(models.Model):
         values['type_egress'] = record.type_egress
         values['bank_journal_id'] = record.journal_id.id if record.journal_id else False
         voucher = self.create(values)
-        voucher._onchange_pay_order_id()  # TODO: Al cambiar realizar transacciones dependiendo del tipo
+        voucher._onchange_pay_order_id()  # Al cambiar realizar transacciones dependiendo del tipo
         return voucher
 
     def _get_concept(self, invoices):
@@ -237,7 +236,7 @@ class AccountVoucher(models.Model):
     @api.onchange('pay_order_id')
     def _onchange_pay_order_id(self):
         """
-        TODO: Al cambiar la Orden de pago cargamos la data por defecto
+        Al cambiar la Orden de pago cargamos la data por defecto
         """
         if self.type_pay_order == 'invoice':
             self.data_invoice_purchase()
@@ -245,7 +244,7 @@ class AccountVoucher(models.Model):
 
     def _update_type(self, move_id=None):
         """
-        TODO: Creamos líneas dependiendo del tipo de origen, este método querda abierto para otras
+        Creamos líneas dependiendo del tipo de origen, este método querda abierto para otras
         aplicaciones
         :param journal:
         :return:

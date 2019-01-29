@@ -89,7 +89,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='purchase_order_id']" position="after">
                 <field name="payment_requirement_id"
-                       attrs="{'invisible': [('payment_requirement_id', '=', False)]}"/>
+                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible': [('payment_requirement_id', '=', False)]}"/>
             </xpath>
         </field>
     </record>

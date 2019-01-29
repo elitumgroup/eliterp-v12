@@ -314,8 +314,7 @@ class Voucher(models.Model):
                 'move_id': move_id.id,
                 'debit': 0.0,
                 'credit': self.amount_cancel,
-                'date': self.date,
-                'analytic_account_id': self.account_analytic_id.id  # Soló en está línea le mandamos centro de costo
+                'date': self.date
             })
             number_accounts = len(self.account_line)
             number_invoices = len(self.in_invoice_line)
@@ -331,7 +330,8 @@ class Voucher(models.Model):
                         'move_id': move_id.id,
                         'credit': 0.0,
                         'debit': line.amount,
-                        'date': self.date
+                        'date': self.date,
+                        'analytic_account_id': self.account_analytic_id.id # Soló en está línea le mandamos centro de costo
                     })
                 for line in self.in_invoice_line:
                     number_invoices -= 1
@@ -372,7 +372,8 @@ class Voucher(models.Model):
                             'move_id': move_id.id,
                             'credit': 0.0,
                             'debit': line.amount,
-                            'date': self.date
+                            'date': self.date,
+                            'analytic_account_id': self.account_analytic_id.id
                         })
                     else:
                         self.env['account.move.line'].with_context(check_move_validity=False).create({
@@ -384,6 +385,7 @@ class Voucher(models.Model):
                             'credit': 0.0,
                             'debit': line.amount,
                             'date': self.date,
+                            'analytic_account_id': self.account_analytic_id.id
                         })
             self._update_type(move_id)  # Dependiendo del tipo hacemos las transacciones de asientos contables
             move_id.with_context(my_moves=True, move_name=self._get_move_name()).post()

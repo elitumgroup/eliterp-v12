@@ -30,7 +30,7 @@ class EmployeeOrderLine(models.Model):
                                                        ondelete="cascade",
                                                        index=True,
                                                        readonly=True)
-    pay_order_payslip_run_line_id = fields.Many2one('hr.payslip.run', 'Línea de empleado',
+    pay_order_payslip_run_line_id = fields.Many2one('hr.payslip.run.line', 'Línea de empleado',
                                                     ondelete="cascade",
                                                     index=True,
                                                     readonly=True)
@@ -38,6 +38,49 @@ class EmployeeOrderLine(models.Model):
 
 class PayOrder(models.Model):
     _inherit = 'account.pay.order'
+
+    def _get_vals_document(self, active_model, active_ids):
+        """
+        :return dict:
+        """
+        vals = super(PayOrder, self)._get_vals_document(active_model, active_ids)
+        if active_model == 'hr.salary.advance':
+            salary_advance = self.env['hr.salary.advance'].browse(active_ids)[0]
+            vals.update({
+                'date': salary_advance.date,
+                'default_date': salary_advance.date,
+                'type': 'salary advance',
+                'amount': salary_advance.total_pay_order,
+                'default_amount': salary_advance.total_pay_order,
+                'origin': salary_advance.name,
+                'salary_advance_id': salary_advance.id,
+                'company_id': self.env.user.company_id.id,
+                'beneficiary': '*'
+            })
+        if active_model == 'hr.payslip.run':
+            payslip_run = self.env['hr.payslip.run'].browse(active_ids)[0]
+            vals.update({
+                'date': payslip_run.date_end,
+                'default_date': payslip_run.date_end,
+                'type': 'payslip run',
+                'amount': payslip_run.total_pay_order,
+                'default_amount': payslip_run.total_pay_order,
+                'origin': payslip_run.move_id.name,
+                'payslip_run_id': payslip_run.id,
+                'company_id': self.env.user.company_id.id,
+                'beneficiary': '*'
+            })
+        return vals
+
+    @api.model
+    def create(self, vals):
+        res = super(PayOrder, self).create(vals)
+        if res.type in ['salary advance', 'payslip run']:
+            if res.salary_advance_id:
+                res['employee_ids'] = self._salary_advance_employee_ids(res.salary_advance_id)
+            else:
+                res['employee_ids'] = self._pasylip_run_employee_ids(res.payslip_run_id)
+        return res
 
     def _salary_advance_employee_ids(self, salary_advance):
         employees = []
@@ -56,58 +99,16 @@ class PayOrder(models.Model):
             if line.selected and not line.reconciled:
                 employees.append([0, 0, {'name': line.role_id.employee_id.id,
                                          'amount': line.amount_payable,
-                                         'pay_order_pasylip_run_line_id': line.id}])
+                                         'pay_order_payslip_run_line_id': line.id}])
                 line.update(
                     {'selected': False, 'amount_payable': 0})  # Le quitamos la selección y colocamos monto a pagar en 0
         return employees
-
-    def _get_vals_document(self, active_model, active_ids):
-        """
-        :return dict:
-        """
-        vals = super(PayOrder, self)._get_vals_document(active_model, active_ids)
-        if active_model == 'hr.salary.advance':
-            salary_advance = self.env['hr.salary.advance'].browse(active_ids)[0]
-            vals.update({
-                'date': salary_advance.date,
-                'default_date': salary_advance.date,
-                'type': 'salary advance',
-                'amount': salary_advance.total_pay_order,
-                'default_amount': salary_advance.total_pay_order,
-                'origin': salary_advance.name,
-                'employee_ids': self._salary_advance_employee_ids(salary_advance),
-                'salary_advance_id': salary_advance.id,
-                'company_id': self.env.user.company_id.id,
-                'beneficiary': '*'
-            })
-        if active_model == 'hr.payslip.run':
-            payslip_run = self.env['hr.payslip.run'].browse(active_ids)[0]
-            vals.update({
-                'date': payslip_run.date_end,
-                'default_date': payslip_run.date_end,
-                'type': 'salary advance',
-                'amount': payslip_run.total_pay_order,
-                'default_amount': payslip_run.total_pay_order,
-                'origin': payslip_run.move_id.name,
-                'employee_ids': self._pasylip_run_employee_ids(payslip_run),
-                'payslip_run_id': payslip_run.id,
-                'company_id': self.env.user.company_id.id,
-                'beneficiary': '*'
-            })
-        return vals
-
-    @api.model
-    def create(self, vals):
-        # TODO: Pendiente crear líneas de empleados en account.pay.order
-        res = super(PayOrder, self).create(vals)
-        return res
 
     type = fields.Selection(
         selection_add=[('salary advance', 'Anticipo de quincena'), ('payslip run', 'Rol consolidado')])
     salary_advance_id = fields.Many2one('hr.salary.advance', 'Anticipo de quincena')
     payslip_run_id = fields.Many2one('hr.payslip.run', 'Rol consolidado')
-    employee_ids = fields.One2many('account.employee.order.line', 'pay_order_id', string='Empleados', readonly=True,
-                                   states={'draft': [('readonly', False)]})
+    employee_ids = fields.One2many('account.employee.order.line', 'pay_order_id', string='Empleados')
 
 
 class Voucher(models.Model):
@@ -125,8 +126,22 @@ class Voucher(models.Model):
             'reference': salary_advance.name
         })
 
+    @api.multi
+    def data_payslip_run(self):
+        """
+        Cargamos la información del rol consolidado
+        :return:
+        """
+        payslip_run_id = self.pay_order_id.payslip_run_id
+        return self.update({
+            'beneficiary': '*',
+            'reference': payslip_run_id.move_id.name
+        })
+
     @api.onchange('pay_order_id')
     def _onchange_pay_order_id(self):
         if self.type_pay_order == 'salary advance':
             self.data_salary_advance()
+        if self.type_pay_order == 'payslip run':
+            self.data_payslip_run()
         return super(Voucher, self)._onchange_pay_order_id()

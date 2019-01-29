@@ -41,7 +41,7 @@
         <field name="target">new</field>
     </record>
 
-    <!--Menus: TODO: Creamos este menú para agrupar Anticipos, Roles, etc.-->
+    <!--Menus: Creamos este menú para agrupar Anticipos, Roles, etc.-->
     <menuitem id="menu_hr_paysheet"
               name="Nómina"
               parent="hr.menu_hr_root"
@@ -72,11 +72,11 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='purchase_order_id']" position="after">
                 <field name="salary_advance_id"
-                       attrs="{'invisible': [('salary_advance_id', '=', False)]}"/>
+                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible': [('salary_advance_id', '=', False)]}"/>
             </xpath>
             <xpath expr="//group[@name='information']" position="after">
                 <group string="Lista de empleados"
-                       attrs="{'invisible':[('type', 'not in', ('salary advance', 'payslip run'))]}">
+                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible':[('type', 'not in', ('salary advance', 'payslip run'))]}">
                     <field name="employee_ids"
                            nolabel="1">
                         <tree editable="bottom" create="false" delete="false">
@@ -197,7 +197,7 @@
                         </group>
                         <field name="line_ids" nolabel="1">
                             <tree create="false"
-                                  decoration-bg="reconciled == True"
+                                  decoration-bf="reconciled == True"
                                   decoration-success="reconciled == True"
                                   editable="bottom">
                                 <field name="parent_state" invisible="1"/>

@@ -125,8 +125,7 @@
                         <field name="state"
                                widget="statusbar"
                                modifiers="{'readonly': true}"/>
-                        <!--TODO: context="{'default_voucher_type': 'purchase'}"
-                        Colocar grupo para qué soló los usuarios de
+                        <!--TODO: Colocar grupo para qué soló los usuarios de
                         aquí puedan generar el pago-->
                         <button name="generate_payment"
                                 string="Generar pago"
@@ -144,19 +143,21 @@
                         <group name="information">
                             <group>
                                 <field name="create_uid" string="Creado por" readonly="1"/>
-                                <field name="date"/>
+                                <field name="date" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                                 <field name="type" readonly="1"/>
-                                <field name="amount"/>
-                                <!--TODO: Documentos relacionados, colocar aquí los de otras aplicaciones-->
+                                <field name="amount" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                                <!--Documentos relacionados, colocar aquí los de otras aplicaciones-->
                                 <field name="purchase_order_id"
-                                       attrs="{'invisible': [('purchase_order_id', '=', False)]}"/>
+                                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible': [('purchase_order_id', '=', False)]}"/>
                             </group>
                             <group>
-                                <field name="type_egress"/>
+                                <field name="beneficiary" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
+                                <field name="type_egress" attrs="{'readonly':[('state', '!=', 'draft')]}"/>
                                 <field name="journal_id"
+
                                        domain="[('company_id', '=', company_id), ('type', '=', 'bank')]"
                                        options="{'no_open': True, 'no_create': True}"
-                                       attrs="{'invisible': [('type_egress', '=', 'cash')], 'required': [('type_egress', '!=', 'cash')]}"/>
+                                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible': [('type_egress', '=', 'cash')], 'required': [('type_egress', '!=', 'cash')]}"/>
                                 <field name="voucher_id"
                                        attrs="{'invisible': [('voucher_id', '=', False)]}"
                                        context="{'form_view_ref': 'eliterp_treasury.view_form_voucher_purchase'}"

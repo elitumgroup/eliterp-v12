@@ -10,15 +10,9 @@ class Voucher(models.Model):
     @api.multi
     def action_button_cancel(self):
         """
-        TODO: Abrimos ventana emergente para cancelar comprobante
+        Abrimos ventana emergente para cancelar comprobante
         :return: dict
         """
-        context = dict(self._context or {})
-        if 'voucher_type' not in context:
-            del context['form_view_ref']
-            context['voucher_type'] = 'purchase'
-            context['default_voucher_type'] = 'purchase'
-            context['params']['action'] = 517
         return {
             'name': _("Explique la razón"),
             'view_mode': 'form',
