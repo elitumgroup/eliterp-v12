@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <!--Invoice-->
+        <record id="mail_template_electronic_invoice" model="mail.template">
+            <field name="name">Mail para factura electrónica</field>
+            <field name="email_from">${('noreplay@gmail.com')|safe}</field>
+            <field name="subject">Factura electrónica: ${object.company_id.name}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="account.model_account_invoice"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="report_template" ref="account.account_invoices"/>
+            <field name="report_name">Factura No. ${(object.reference or '').replace('/','_')}</field>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html">
+                <![CDATA[
+                    Estimad@ ${ object.partner_id.name }, adjunto encontrará su factura electrónica con número
+                    ${ object.reference }, con fecha de emisión ${ object.date_invoice } por un total de
+                    ${ object.amount_total }.
+                ]]>
+            </field>
+        </record>
+        <!--Refund-->
+        <!--Retention-->
+    </data>
+</openerp>

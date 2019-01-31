@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--Sequences-->
+        <record model="ir.sequence" id="sequence_electronic_invoice">
+            <field name="name">Secuencia factura electrónica</field>
+            <field name="code">electronic.invoice</field>
+        </record>
+    </data>
+</odoo>

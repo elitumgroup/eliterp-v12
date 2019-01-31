@@ -50,11 +50,10 @@
                                options="{'no_open': True, 'no_create': True}"/>
                         -
                         <field name="invoice_number"
-                               class="oe_inline"
-                               attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False)]}"/>
+                               class="oe_inline" required="1"/>
                     </div>
                     <field name="sri_authorization_id"
-                           required="1"
+                           attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False)]}"
                            options="{'no_open': True, 'no_create': True}"/>
                 </xpath>
                 <xpath expr="//field[@name='date_due']" position="after"><!--Fecha vencimiento-->
@@ -62,8 +61,7 @@
                     <field name="payment_form_id"
                            widget="selection"
                            string="Forma de cobro"
-                           attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False),
-                           ('validate_payment_form', '=', True)]}"/>
+                           required="1"/>
                 </xpath>
             </field>
         </record>

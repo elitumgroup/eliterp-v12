@@ -89,18 +89,20 @@
                                 <field name="base_iva" invisible="1"/>
                             </group>
                         </group>
-                        <group string="Líneas de retención">
-                            <field name="retention_lines" nolabel="1">
-                                <tree editable="top/bottom">
-                                    <field name="retention_type"/>
-                                    <field name="tax_id"
-                                           domain="[('type_tax_use', '=', 'purchase'),  ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
-                                           options="{'no_create': True}"/>
-                                    <field name="base_taxable"/>
-                                    <field name="amount" sum="Total"/>
-                                </tree>
-                            </field>
-                        </group>
+                        <notebook>
+                            <page string="Líneas de retención" name="retention_lines_wizard">
+                                <field name="retention_lines" nolabel="1">
+                                    <tree editable="top/bottom">
+                                        <field name="retention_type"/>
+                                        <field name="tax_id"
+                                               domain="[('type_tax_use', '=', 'purchase'),  ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                               options="{'no_create': True}"/>
+                                        <field name="base_taxable"/>
+                                        <field name="amount" sum="Total"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                     <footer>
                         <button string="Guardar" special="save" class="oe_highlight"/>
@@ -175,18 +177,20 @@
                                 <field name="base_iva" invisible="1"/>
                             </group>
                         </group>
-                        <group string="Líneas de retención">
-                            <field name="retention_lines" nolabel="1">
-                                <tree editable="top/bottom">
-                                    <field name="retention_type"/>
-                                    <field name="tax_id"
-                                           domain="[('type_tax_use', '=', 'purchase'), ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
-                                           options="{'no_create': True}"/>
-                                    <field name="base_taxable"/>
-                                    <field name="amount" sum="Total"/>
-                                </tree>
-                            </field>
-                        </group>
+                        <notebook>
+                            <page string="Líneas de retención" name="retention_lines">
+                                <field name="retention_lines" nolabel="1">
+                                    <tree editable="top/bottom">
+                                        <field name="retention_type"/>
+                                        <field name="tax_id"
+                                               domain="[('type_tax_use', '=', 'purchase'),  ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                               options="{'no_create': True}"/>
+                                        <field name="base_taxable"/>
+                                        <field name="amount" sum="Total"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>

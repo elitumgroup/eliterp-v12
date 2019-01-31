@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_form_point_printing_sri_electronic" model="ir.ui.view">
+            <field name="name">view_form_point_printing_sri_electronic</field>
+            <field name="model">sri.point.printing</field>
+            <field name="inherit_id" ref="eliterp_sri.view_form_point_printing"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="Autorización electrónica" name="authorized_electronic">
+                        <group col="4">
+                            <field name="allow_electronic_invoices"/>
+                            <field name="allow_electronic_credit_note"/>
+                            <field name="allow_electronic_debit_note"/>
+                            <field name="allow_electronic_waybill"/>
+                            <field name="allow_electronic_withhold"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

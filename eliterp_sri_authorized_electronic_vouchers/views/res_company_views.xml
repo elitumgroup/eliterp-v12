@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Company-->
+        <record id="view_form_company_sri_electronic" model="ir.ui.view">
+            <field name="name">view_form_company_sri_electronic</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Documentos electrónicos">
+                        <groups>
+                            <group col="4">
+                                <field name="electronic_signature"
+                                       filename="electronic_signature_name"
+                                       widget="binary"/>
+                                <field name="password_electronic_signature" password="1" required="1"/>
+                                <field name="type_emission"/>
+                                <field name="environment"/>
+                                <field name="electronic_signature_name" invisible="1"/>
+                            </group>
+                            <group string="Claves de contingencia" col="1">
+                                <field name="contingency_key_ids" nolabel="1">
+                                    <tree editable="top">
+                                        <field name="name"/>
+                                        <field name="used"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </groups>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+    </data>
+</odoo>

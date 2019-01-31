@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--Company-->
+        <record id="view_tree_contingency_keys" model="ir.ui.view">
+            <field name="name">view_tree_contingency_keys</field>
+            <field name="model">sri.contingency.keys</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="name"/>
+                    <field name="used"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_form_contingency_keys" model="ir.ui.view">
+            <field name="name">view_form_contingency_keys</field>
+            <field name="model">sri.contingency.keys</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="name" required="1"/>
+                        <field name="used"/>
+                        <field name="company_id" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_contingency_keys" model="ir.actions.act_window">
+            <field name="name">Claves de contingencia</field>
+            <field name="res_model">sri.contingency.keys</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!--TODO: Ocultar, no es necesario soló se generará Off-line
+        <menuitem action="action_contingency_keys" id="menu_contingency_keys" parent="eliterp_sri.menu_account_sri" sequence="15"/>
+        -->
+
+        <!--Invoice-->
+        <record id="view_form_invoice_sri_electronic" model="ir.ui.view">
+            <field name="name">view_form_invoice_sri_electronic</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <!--
+                <xpath expr="//button[@name='action_invoice_sent']" position="replace"/>
+                <xpath expr="//button[@name='action_invoice_sent']" position="replace">
+                    <button name="action_electronic_voucher" type="object"
+                            attrs="{'invisible':['|', '|',('authorization_status','=','aut'), ('state','!=','open'), ('is_electronic', '=', False)]}"
+                            string="Generar documento electrónico" class="oe_highlight"/>
+                </xpath>
+                -->
+                <!--Nueva página-->
+                <xpath expr="//page[@name='other_info']" position="after">
+                    <page string="Autorización electrónica"
+                          name="authorization_electronic"
+                          attrs="{'invisible':[('is_electronic', '=', False)]}">
+                        <group>
+                            <group>
+                                <field name="password"/>
+                                <field name="authorization"/>
+                                <field name="authorization_date"/>
+                            </group>
+                            <group>
+                                <field name="authorization_status"/>
+                                <field name="type_emission" groups="base.group_erp_manager"/>
+                                <field name="environment" groups="base.group_erp_manager"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_filter_invoice_sri_electronic" model="ir.ui.view">
+            <field name="name">view_filter_invoice_sri_electronic</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='unpaid']" position="after">
+                    <filter name="authorized_invoice" string="Documentos electrónicos autorizados"
+                            domain="[('authorization_status', '=', 'aut')]"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

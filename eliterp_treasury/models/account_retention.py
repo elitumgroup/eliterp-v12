@@ -451,7 +451,7 @@ class Retention(models.Model):
                                       states={'draft': [('readonly', False)]})
     total = fields.Float(compute='_compute_total', string='Total', store=True, track_visibility='onchange')
     is_sequential = fields.Boolean('Es secuencial?',
-                                   help="Si no se marca, la compañía genera un secuencial interno.", readonly=True,
+                                   help="Si no se marca, la compañía asume la retención.", readonly=True,
                                    states={'draft': [('readonly', False)]}, default=True)
     journal_id = fields.Many2one('account.journal', string='Diario', readonly=True)
     move_id = fields.Many2one('account.move', string='Asiento contable')
@@ -589,7 +589,7 @@ class Retention(models.Model):
                 self.retention_number = '{0}-{1}-{2}'.format(
                     self.point_printing_id.shop_id.establishment,
                     self.point_printing_id.emission_point,
-                    self.reference
+                    self.reference if self.reference else '*'
                 )
 
     @api.constrains('reference')
@@ -618,6 +618,6 @@ class Retention(models.Model):
     sri_authorization_id = fields.Many2one('sri.authorization', string='Autorización del SRI', readonly=True,
                                            states={'draft': [('readonly', False)]})
     reference = fields.Char('Secuencial', readonly=True, states={'draft': [('readonly', False)]}, size=9)
-    is_electronic = fields.Boolean(related='sri_authorization_id.is_electronic', string='Es electrónica?')
+    is_electronic = fields.Boolean(string='Es electrónica?', default=False)
     period_id = fields.Many2one('account.period.line', string='Período', store=True, readonly=True,
                                 compute='_compute_period')

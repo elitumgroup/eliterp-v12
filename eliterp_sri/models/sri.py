@@ -74,6 +74,8 @@ class AuthorizedVouchers(models.Model):
 
     name = fields.Char('Nombre', required=True)
     code = fields.Char('Código', size=2, required=True)
+    preprinted = fields.Boolean('Pre-impreso', default=False,
+                                help="Campo para generación de autorizaciones físicas del SRI.")
     # TODO: Poner por defecto los sustentos de cada comprobante
     proof_support_ids = fields.Many2many('sri.proof.support', string='Sustentos del comprobante')
 
@@ -88,7 +90,8 @@ class Shop(models.Model):
     establishment = fields.Char('Nº Establecimiento', size=3, required=True)
 
     _sql_constraints = [
-        ('establishment_unique', 'unique (establishment, company_id)', 'El nº de establecimiento debe ser único por compañía!'),
+        ('establishment_unique', 'unique (establishment, company_id)',
+         'El nº de establecimiento debe ser único por compañía!'),
     ]
 
 
@@ -117,7 +120,7 @@ class SriPointPrinting(models.Model):
         ], limit=1)
         if not sri_authorization:
             raise UserError(_(
-                'No ha configurado la autorización del SRI (NC) para este punto de impresión (%s). O la misma puede estar vencida.' %
+                'No ha configurado la autorización del SRI para este punto de impresión (%s). O la misma puede estar vencida.' %
                 self.name_get()[0][1]))
         else:
             return sri_authorization
@@ -136,6 +139,7 @@ class SriPointPrinting(models.Model):
     shop_id = fields.Many2one('sale.shop', 'Establecimiento', required=True)
     emission_point = fields.Char('Punto emisión', size=3, default='001', required=True)
     company_id = fields.Many2one('res.company', string='Compañía')
+
 
     _sql_constraints = [
         ('point_printing_unique', 'unique(shop_id, emission_point, company_id)',
@@ -158,18 +162,12 @@ class SriAuthorization(models.Model):
         """
         res = []
         for data in self:
-            if not data.is_electronic:
-                res.append((data.id, "{0} [{1}] de {2} a {3}".format(
-                    data.authorization,
-                    data.authorized_voucher_id.code,
-                    data.initial_number,
-                    data.final_number
-                )))
-            else:
-                res.append((data.id, "{0} [{1}] Electrónica".format(
-                    data.authorized_voucher_id.name,
-                    data.point_printing_id.name
-                )))
+            res.append((data.id, "{0} [{1}] de {2} a {3}".format(
+                data.authorization,
+                data.authorized_voucher_id.code,
+                data.initial_number,
+                data.final_number
+            )))
         return res
 
     def _check_authorization(self, values):
@@ -181,8 +179,7 @@ class SriAuthorization(models.Model):
             ('company_id', '=', values['company_id']),
             ('point_printing_id', '=', values['point_printing_id']),
             ('authorized_voucher_id', '=', values['authorized_voucher_id']),
-            ('is_valid', '=', True),
-            ('is_electronic', '=', False)
+            ('is_valid', '=', True)
         ]):
             raise ValidationError(_("Ya existe una Autorización válida del SRI para estos parámetros."))
 
@@ -233,7 +230,7 @@ class SriAuthorization(models.Model):
         Verificamos número final si no es factura electrónica
         :return:
         """
-        if self.final_number < self.initial_number and not self.is_electronic:
+        if self.final_number < self.initial_number:
             raise ValidationError(_("Número final no puede ser menor al inicial."))
 
     @api.one
@@ -243,15 +240,13 @@ class SriAuthorization(models.Model):
         Calculamos sea una autorización válida (No se muestra en documentos, soló es para físicas)
         :return:
         """
-        if not self.is_electronic:
-            self.is_valid = datetime.today().date() < self.expiration_date
+        self.is_valid = datetime.today().date() < self.expiration_date
 
     initial_number = fields.Integer('Nº Inicial', default=1, required=True)
-    final_number = fields.Integer('Nº Final', default=50, size=9)
-    authorization = fields.Char('Nº Autorización', size=10)
+    final_number = fields.Integer('Nº Final', default=50, size=9, required=True)
+    authorization = fields.Char('Nº Autorización', size=10, required=True)
     authorized_voucher_id = fields.Many2one('sri.authorized.vouchers', 'Comprobante autorizado', required=True)
     is_valid = fields.Boolean('Es válida?', compute='_compute_is_valid', store=True)
-    expiration_date = fields.Date('Fecha de expiración')
+    expiration_date = fields.Date('Fecha de expiración', required=True)
     company_id = fields.Many2one('res.company', string='Compañía', required=True, default=_default_company)
     point_printing_id = fields.Many2one('sri.point.printing', string='Punto de impresión', required=True)
-    is_electronic = fields.Boolean('Es electrónica?', default=False)

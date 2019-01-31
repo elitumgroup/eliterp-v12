@@ -138,9 +138,7 @@ class Invoice(models.Model):
         # Validamos qué exista N/C para punto de impresión
         values['reference'] = False
         if invoice['type'] == 'out_invoice':
-            authorization = invoice.point_printing_id._get_authorization('out_refund')
             values['point_printing_id'] = invoice.point_printing_id.id
-            values['sri_authorization_id'] = authorization.id
 
         if date:
             values['date'] = date

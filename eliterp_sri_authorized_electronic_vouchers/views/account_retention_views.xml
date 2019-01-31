@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!--Retention Wizard-->
+        <record id="view_form_retention_sri_electronic_wizard" model="ir.ui.view">
+            <field name="name">view_form_retention_sri_electronic_wizard</field>
+            <field name="model">account.retention</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_form_retention_purchase_wizard"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='retention_lines_wizard']" position="after">
+                    <page string="Autorización electrónica"
+                          attrs="{'invisible':[('is_electronic', '=', False)]}">
+                        <group>
+                            <group>
+                                <field name="password"/>
+                                <field name="authorization"/>
+                                <field name="authorization_date"/>
+                            </group>
+                            <group>
+                                <field name="authorization_status"/>
+                                <field name="type_emission" groups="base.group_erp_manager"/>
+                                <field name="environment" groups="base.group_erp_manager"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <!--Retention-->
+        <record id="view_form_retention_sri_electronic" model="ir.ui.view">
+            <field name="name">view_form_retention_sri_electronic</field>
+            <field name="model">account.retention</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_form_retention_purchase"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='retention_lines']" position="after">
+                    <page string="Autorización electrónica"
+                          attrs="{'invisible':[('is_electronic', '=', False)]}">
+                        <group>
+                            <group>
+                                <field name="password"/>
+                                <field name="authorization"/>
+                                <field name="authorization_date"/>
+                            </group>
+                            <group>
+                                <field name="authorization_status"/>
+                                <field name="type_emission" groups="base.group_erp_manager"/>
+                                <field name="environment" groups="base.group_erp_manager"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

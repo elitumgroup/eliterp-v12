@@ -27,7 +27,7 @@ class Invoice(models.Model):
         }
         result = []
         for inv in self:
-            result.append((inv.id, "%s [%s]" % (TYPES[inv.type], inv.reference or '/')))
+            result.append((inv.id, "%s [%s]" % (TYPES[inv.type], inv.reference or '*')))
         return result
 
     @api.one
@@ -41,7 +41,7 @@ class Invoice(models.Model):
             self.reference = '{0}-{1}-{2}'.format(
                 self.point_printing_id.shop_id.establishment,
                 self.point_printing_id.emission_point,
-                self.invoice_number
+                self.invoice_number if self.invoice_number else '*'
             )
         else:
             self.reference = '{0}-{1}'.format(
@@ -144,7 +144,7 @@ class Invoice(models.Model):
         :return:
         """
         for invoice in self:
-            if invoice.type in ('out_invoice', 'out_refund') and invoice.reference:
+            if invoice.type in ('out_invoice', 'out_refund') and invoice.reference and not invoice.is_electronic:
                 if self.search([('type', '=', invoice.type), ('reference', '=', invoice.reference),
                                 ('id', '!=', invoice.id), ('company_id', '=', invoice.company_id.id)]):
                     raise UserError(_(
@@ -163,13 +163,23 @@ class Invoice(models.Model):
         record = super(Invoice, self).copy(default=default)
         return record
 
+    @api.model
+    def _default_point_printing(self):
+        """
+        Defecto de punto de impresión
+        :return:
+        """
+        company = self.env.user.company_id.id
+        point_printing_ids = self.env['sri.point.printing'].search([('company_id', '=', company)], limit=1)
+        return point_printing_ids
+
     invoice_number = fields.Char('Secuencial', readonly=True, states={'draft': [('readonly', False)]},
                                  help="Número de factura de la compañía según el tipo.", copy=False, size=9)  # CM
     validate_payment_form = fields.Boolean('Validación forma de pago', compute='_compute_validate_payment_form')
     payment_form_id = fields.Many2one('sri.payment.forms', string='Forma de pago', readonly=True,
                                       states={'draft': [('readonly', False)]})
     point_printing_id = fields.Many2one('sri.point.printing', string='Punto de impresión', readonly=True,
-                                        states={'draft': [('readonly', False)]})
+                                        states={'draft': [('readonly', False)]}, default=_default_point_printing)
     sri_authorization_id = fields.Many2one('sri.authorization', string='Autorización SRI', readonly=True,
                                            domain="[('authorized_voucher_id.code', '=', {'out_invoice': ['18'], 'out_refund': ['04']}.get(type, [])), ('point_printing_id', '=', point_printing_id)]",
                                            states={'draft': [('readonly', False)]})
@@ -181,5 +191,6 @@ class Invoice(models.Model):
                                        states={'draft': [('readonly', False)]})
     serial_number = fields.Char(string='Nº Serie', default='001-001', size=7,
                                 readonly=True, states={'draft': [('readonly', False)]})
-    is_electronic = fields.Boolean(related='sri_authorization_id.is_electronic', string='Es electrónica?')
+    is_electronic = fields.Boolean(string='Es electrónica?',
+                                   default=False)  # Dejar para futuras implementaciones de F.E.
     concept = fields.Char('Concepto', readonly=True, states={'draft': [('readonly', False)]})
