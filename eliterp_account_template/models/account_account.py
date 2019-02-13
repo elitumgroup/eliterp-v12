@@ -156,8 +156,7 @@ class Account(models.Model):
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
         """
-        MM: Agregamos ala búsqueda el código alterno de la cuenta contable y soló cuentas tipo vista
-        cuando estemos en el menú del mismo
+        MM: Buscar soló tipo vistas
         :param name:
         :param args:
         :param operator:
@@ -166,9 +165,15 @@ class Account(models.Model):
         :return:
         """
         args = args or []
+        domain = []
         if not self._context.get('show_parent_account', False):
             args += [('internal_type', '!=', 'view')]
-        return self._name_search(name=name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+        if name:
+            domain = ['|', ('code', '=ilike', name.split(' ')[0] + '%'), ('name', operator, name)]
+            if operator in expression.NEGATIVE_TERM_OPERATORS:
+                domain = ['&', '!'] + domain[1:]
+        account_ids = self._search(domain + args, limit=limit, access_rights_uid=name_get_uid)
+        return self.browse(account_ids).name_get()
 
     accounting_lines = fields.One2many('account.move.line', 'account_id', string='Líneas contables')
     parent_id = fields.Many2one('account.account', 'Cuenta padre', ondelete="set null")

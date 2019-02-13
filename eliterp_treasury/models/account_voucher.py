@@ -270,7 +270,7 @@ class Voucher(models.Model):
             move_name = prefix + "EFC-" + year + "-" + sequence
         else:
             bank_sequence = self.bank_journal_id.sequence_id.next_by_id()
-            move_name = prefix + code + "-" + year + "-" + bank_sequence.next_by_id()
+            move_name = prefix + code + "-" + year + "-" + bank_sequence
         return move_name
 
     @api.multi
