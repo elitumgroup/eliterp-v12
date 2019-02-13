@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Vista de Factura de proveedores-->
+        <record id="eliterp_view_form_account_invoice_withhold" model="ir.ui.view">
+            <field name="name">eliterp_view_form_account_invoice_withhold</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <button name="%(account.action_account_invoice_payment)d" position="after">
+                    <button name="add_withhold"
+                            string="Añadir retención"
+                            type="object"
+                            groups="eliterp_treasury.eliterp_group_treasury_user,eliterp_treasury.eliterp_group_treasury_manager"
+                            attrs="{'invisible': ['|','|', '|', '|',
+                            ('have_withhold', '=', True), ('state', '=', 'cancel'),
+                            ('type', '=', 'in_refund'), ('takes_hold', '=', False), ('is_sale_note', '=', True)]}"
+                            class="oe_highlight"/>
+                    <button name="add_credit_note"
+                            string="Añadir nota de crédito"
+                            type="object"
+                            attrs="{'invisible': ['|', '|', '|', '|', ('type', '=', 'in_refund'), ('state', '!=', 'open'), ('is_sale_note', '=', True), ('viaticum', '=', True), ('small_box', '=', True)]}"
+                            class="oe_highlight"/>
+                </button>
+                <xpath expr="//sheet/div[1]" position="before">
+                    <field name="have_withhold" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="open_withhold"
+                                string="Retención"
+                                type="object"
+                                groups="eliterp_treasury.eliterp_group_treasury_user,eliterp_treasury.eliterp_group_treasury_manager"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('have_withhold', '=', False)]}"
+                                icon="fa-chain"/>
+                        <button name="open_credit_note"
+                                string="Notas de crédito"
+                                type="object"
+                                class="oe_stat_button"
+                                attrs="{'invisible': [('have_credit_note', '=', False)]}"
+                                icon="fa-archive"/>
+                    </div>
+                </xpath>
+                <xpath expr="//field[@name='residual']" position="before"><!--Saldo pendiente-->
+                    <field name="amount_retention" attrs="{'invisible': [('have_withhold', '=', False)]}"
+                           widget="monetary"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="eliterp_view_tree_account_invoice_supplier" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_account_invoice_supplier</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="eliterp_accounting.eliterp_view_tree_account_invoice_supplier"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='total_credit_note']" position="before">
+                    <field name="withhold_number"/>
+                    <field name="amount_retention"/>
+                </xpath>
+            </field>
+        </record>
+        <!--Vista de Factura de clientes-->
+        <record id="eliterp_view_form_account_invoice_withhold_sale" model="ir.ui.view">
+            <field name="name">eliterp_view_form_account_invoice_withhold_sale</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                    <button name="open_withhold"
+                            string="Retención"
+                            type="object"
+                            class="oe_stat_button"
+                            attrs="{'invisible': [('have_withhold', '=', False)]}"
+                            icon="fa-chain"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_total']" position="after"><!--Total-->
+                    <field name="have_withhold" invisible="1"/>
+                    <field name="amount_retention" attrs="{'invisible': [('have_withhold', '=', False)]}"
+                           widget="monetary"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

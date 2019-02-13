@@ -37,7 +37,7 @@ class Invoice(models.Model):
         :return:
         """
         for record in self:
-            pays = self.env['account.pay.order'].search([('invoice_ids', 'in', self.id)])
+            pays = self.env['account.pay.order'].search([('invoice_ids', 'in', record.id)])
             record.pay_order_line = pays
             record.pay_orders_count = len(pays)
 

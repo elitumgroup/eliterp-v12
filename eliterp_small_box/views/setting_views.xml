@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Vistas del menú Ajustes de tesorería-->
+        <record id="eliterp_view_form_treasury_settings" model="ir.ui.view">
+            <field name="name">eliterp_view_form_treasury_settings</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="priority" eval="101"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="Tesorería" string="Tesorería" data-key="treasury"
+                         groups="eliterp_treasury.eliterp_group_treasury_manager">
+                        <h2>Configuración Tesorería</h2>
+                        <div class="row mt16 o_settings_container">
+                            <div class="col-xs-12 col-md-6 o_setting_box">
+                                <div class="o_setting_right_pane">
+                                    <label for="default_expenses_pay"/>
+                                    <div class="row">
+                                        <div class="text-muted col-md-8">
+                                            Establecer cuenta para pago de solicitudes de viático.
+                                        </div>
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="mt16">
+                                            <field name="default_expenses_pay" class="o_light_label"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
+

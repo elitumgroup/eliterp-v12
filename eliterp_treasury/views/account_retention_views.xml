@@ -75,13 +75,13 @@
                                 />
                                 <field name="point_printing_id"
                                        domain="[('company_id', '=', company_id)]"
-                                       attrs="{'invisible': ['|', ('is_electronic','=', True), ('is_sequential','=', False)],
-                                       'required': [('is_electronic','=', False), ('is_sequential','=', True)]}"
+                                       attrs="{'invisible': [('is_sequential','=', False)],
+                                       'required': [('is_sequential','=', True)]}"
                                        options="{'no_open': True, 'no_create': True}"
                                 />
                                 <field name="reference"
-                                       attrs="{'invisible': ['|', ('is_electronic','=', True), ('is_sequential','=', False)],
-                                       'required': [('is_electronic','=', False), ('is_sequential','=', True)]}"
+                                       attrs="{'invisible': [ ('is_sequential','=', False)],
+                                       'required': [('is_sequential','=', True)]}"
                                 />
                                 <field name="retention_number" invisible="1"/>
                                 <field name="is_electronic" invisible="1"/>
@@ -152,18 +152,18 @@
                                 <field name="period_id"/>
                                 <field name="is_sequential"/>
                                 <label for="reference" string="Nº Retención"
-                                       attrs="{'invisible': ['|', ('is_electronic','=', True), ('is_sequential','=', False)]}"/>
-                                <div attrs="{'invisible': ['|', ('is_electronic','=', True), ('is_sequential','=', False)]}">
+                                       attrs="{'invisible': [('is_sequential','=', False)]}"/>
+                                <div attrs="{'invisible': [('is_sequential','=', False)]}">
                                     <field name="point_printing_id"
                                            domain="[('company_id', '=', company_id)]"
                                            required="1"
                                            class="oe_inline"
-                                           attrs="{'required': [('is_electronic','=', False), ('is_sequential','=', True)]}"
+                                           attrs="{'required': [('is_sequential','=', True)]}"
                                            options="{'no_open': True, 'no_create': True}"/>
                                     -
                                     <field name="reference"
                                            class="oe_inline"
-                                           attrs="{'required': [('is_electronic','=', False), ('is_sequential','=', True)]}"/>
+                                           attrs="{'required': [('is_sequential','=', True)]}"/>
                                 </div>
                                 <field name="sri_authorization_id"
                                        attrs="{'invisible': ['|', ('is_electronic','=', True), ('is_sequential','=', False)],
@@ -394,6 +394,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='reference']" position="replace">
                     <field name="retention_number"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_total_signed']" position="after">
+                    <field name="amount_retention"/>
                 </xpath>
             </field>
         </record>

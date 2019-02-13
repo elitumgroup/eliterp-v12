@@ -53,7 +53,8 @@ class BankNote(models.Model):
     @api.multi
     def action_button_print(self):
         """
-        TODO: Imprimimos nota bancaria
+        Imprimimos nota bancaria
+        :return:
         """
         self.ensure_one()
         return self.env.ref('eliterp_account_bank_note.action_report_bank_note').report_action(self)
@@ -84,7 +85,14 @@ class BankNote(models.Model):
             self._create_account_move_line(self.concept, self.amount, 0.00, self.journal_id.default_debit_account_id,
                                            True,
                                            journal, move_id.id, self.note_date)
-        move_id.post()
+        if self.type == "debit":
+            move_name = 'NDBA-{0}-{1}'.format(
+                self.company_id.name[:3],
+                self.journal_id.sequence_id.next_by_id()
+            )
+            move_id.with_context(my_moves=True, move_name=move_name).post()
+        else:
+            move_id.post()
         return self.write({
             'state': 'posted',
             'name': move_id.name,

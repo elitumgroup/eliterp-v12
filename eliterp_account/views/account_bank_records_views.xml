@@ -54,8 +54,8 @@
                       decoration-bf="state == 'posted'"
                 >
                     <field name="name" string="Referencia"/>
-                    <field name="type_deposit" string='Banco a depositar'/>
-                    <field name="journal_id"/>
+                    <field name="type_deposit"/>
+                    <field name="journal_id" string='Banco a depositar'/>
                     <field name="payment_date" string="Fecha de depósito"/>
                     <field name="amount" string="Monto"/>
                     <field name="company_id" groups="base.group_multi_company"/>
@@ -171,10 +171,12 @@
                 </p>
             </field>
         </record>
+        <!--TODO: Desactivado el menú, no se usa en AF
         <menuitem id="menu_bank_transfer"
                   parent="menu_bank_records"
                   action="action_bank_transfer"
                   sequence="10"/>
+        -->
 
         <record id="view_tree_bank_transfer" model="ir.ui.view">
             <field name="name">view_tree_bank_transfer</field>

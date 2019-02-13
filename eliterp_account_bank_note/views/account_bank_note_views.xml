@@ -115,7 +115,7 @@
                                 <field name="note_date"/>
                                 <field name="amount"/>
                                 <field name="account_id"
-                                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                                       domain="[('company_id', '=', company_id)]"
                                        options='{"no_open": True, "no_create": True}'/>
                             </group>
                         </group>
@@ -124,7 +124,7 @@
                                 <field name="note_date"/>
                                 <field name="amount"/>
                                 <field name="account_id"
-                                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                                       domain="[('company_id', '=', company_id)]"
                                        options='{"no_open": True, "no_create": True}'/>
                             </group>
                             <group string="Haber">

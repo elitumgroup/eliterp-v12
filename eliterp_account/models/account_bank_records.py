@@ -231,7 +231,7 @@ class DepositLineCash(models.Model):
 
     _description = _('Lineas de depósito directo')
 
-    account_id = fields.Many2one('account.account', 'Cuenta', domain=[('internal_type', '!=', 'view')], required=True)
+    account_id = fields.Many2one('account.account', 'Cuenta', required=True)
     reference = fields.Char('Referencia')
     amount = fields.Float('Monto', required=True)
     payment_id = fields.Many2one('account.payment', string="Depósito", ondelete="cascade")
@@ -247,6 +247,6 @@ class DepositLineExternalChecks(models.Model):
     check_account = fields.Char('No. Cuenta', required=True)
     check_number = fields.Char('No. Cheque', required=True)
     drawer = fields.Char('Girador', required=True)
-    account_id = fields.Many2one('account.account', 'Cuenta', domain=[('internal_type', '!=', 'view')], required=True)
+    account_id = fields.Many2one('account.account', 'Cuenta', required=True)
     amount = fields.Float('Monto', required=True)
     payment_id = fields.Many2one('account.payment', string="Depósito", ondelete="cascade")

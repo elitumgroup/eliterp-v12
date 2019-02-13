@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Vistas del menú Solicitud de viáticos-->
+        <record id="eliterp_view_tree_travel_allowance_request" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_travel_allowance_request</field>
+            <field name="model">eliterp.travel.allowance.request</field>
+            <field name="arch" type="xml">
+                <tree
+                        decoration-info="state == 'draft'"
+                        decoration-success="state == 'liquidated'"
+                        decoration-bf="state == 'liquidated'"
+                        decoration-muted="state == 'deny'"
+                        default_order='application_date desc'>
+                    <field name="name"/>
+                    <field name="application_date"/>
+                    <field name="trip_date"/>
+                    <field name="beneficiary"/>
+                    <field name="create_uid" string="Solicitado por"/>
+                    <field name="amount_total"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="eliterp_view_form_travel_allowance_request" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_travel_allowance_request</field>
+            <field name="model">eliterp.travel.allowance.request</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state"
+                               statusbar_visible="draft,approve,liquidated"
+                               widget="statusbar"
+                               modifiers="{'readonly': true}"/>
+                        <button name="print_request" type="object"
+                                class="oe_highlight" string="Imprimir solicitud"/>
+                        <button name="to_approve"
+                                states="draft"
+                                string="Solicitar aprobación"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button name="approve"
+                                states="to_approve"
+                                string="Aprobar"
+                                groups="eliterp_treasury.eliterp_group_approve_travel_allowance_request"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button name="open_reason_deny_solicitud"
+                                states="to_approve"
+                                string="Negar"
+                                groups="eliterp_treasury.eliterp_group_deny_travel_allowance_request"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="application_date"/>
+                                <field name="beneficiary"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                                <field name="destination"/>
+                                <field name="reason"/>
+                            </group>
+                            <group>
+                                <field name="trip_date"/>
+                                <field name="return_date"/>
+                                <field name="account_analytic_id"
+                                       options="{'no_open': True, 'no_create': True}"/>
+                                <field name="amount_total"/>
+                            </group>
+                        </group>
+                        <group string="Negado por" states="deny">
+                            <field style="color:red;" name="reason_deny" nolabel="1"/>
+                        </group>
+                        <group string="Líneas de conceptos" col="1">
+                            <field name="application_lines"
+                                   attrs="{'readonly':[('state','!=', 'draft')]}"
+                                   nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="viatical_concepts_id" options="{'no_open': True, 'no_create': True}"/>
+                                    <field name="daily_value"/>
+                                    <field name="days"/>
+                                    <field name="number_of_people"/>
+                                    <field name="total" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread" options='{"thread_level": 1}'/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!--Vistas del menú Liquidación de viático-->
+        <record id="eliterp_view_tree_liquidation_settlement" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_liquidation_settlement</field>
+            <field name="model">eliterp.liquidation.settlement</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="state=='liquidated'"
+                      decoration-bf="state=='liquidated'"
+                      decoration-info="state=='draft'"
+                      decoration-muted="state == 'deny'"
+                      default_order='date desc'>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="beneficiary"/>
+                    <field name="travel_allowance_request_id"/>
+                    <field name="application_date"/>
+                    <field name="amount_total"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="eliterp_view_form_liquidation_settlement" model="ir.ui.view">
+            <field name="name">eliterp_view_form_liquidation_settlement</field>
+            <field name="model">eliterp.liquidation.settlement</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state"
+                               statusbar_visible="draft,approve,liquidated"
+                               widget="statusbar"
+                               modifiers="{'readonly': true}"/>
+                        <button name="print_liquidation" type="object"
+                                class="oe_highlight" string="Imprimir liquidación"/>
+                        <button name="to_approve"
+                                states="draft"
+                                string="Solicitar aprobación"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button name="approve"
+                                states="to_approve"
+                                string="Aprobar"
+                                groups="eliterp_treasury.eliterp_group_approve_liquidation_settlement"
+                                type="object"
+                                class="oe_highlight"/>
+                        <button name="open_reason_deny_liquidation"
+                                states="to_approve"
+                                string="Negar"
+                                groups="eliterp_treasury.eliterp_group_deny_liquidation_settlement"
+                                type="object"/>
+                        <button name="liquidate"
+                                string="Liquidar"
+                                type="object"
+                                states="approve"
+                                groups="eliterp_treasury.eliterp_group_liquidate_settlement"
+                                class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date"/>
+                            <field name="with_request"/>
+                            <field name="travel_allowance_request_id"
+                                   options="{'no_create': True}"
+                                   attrs="{'invisible': [('with_request','=', False)], 'required': [('with_request','=', True)]}"
+                            />
+                        </group>
+                        <group string="Información" col="4">
+                            <field name="application_date"/>
+                            <field name="trip_date"/>
+                            <field name="return_date"/>
+                            <field name="beneficiary"/>
+                            <field name="destination"/>
+                            <field name="reason"/>
+                            <field name="amount_total"/>
+                            <field name="move_id" readonly="1" attrs="{'invisible':[('state', '!=', 'liquidated')]}"/>
+                            <field name="number_days" attrs="{'invisible': [('with_request','=', True)]}"/>
+                            <field name="number_of_people" attrs="{'invisible': [('with_request','=', True)]}"/>
+                        </group>
+                        <group string="Negado por" states="deny">
+                            <field style="color:red;" name="reason_deny" nolabel="1"/>
+                        </group>
+                        <!--Documentos-->
+                        <group string="Líneas de comprobante" col="1">
+                            <field name="document_lines_without"
+                                   attrs="{'readonly':[('state', '==', 'liquidated')]}"
+                                   nolabel="1">
+                                <tree editable="bottom" decoration-muted="type_validation_without == 'charge'">
+                                    <field name="type_voucher"/>
+                                    <field name="invoice_id"
+                                           attrs="{'required':[('type_voucher', '=', 'invoice')], 'readonly':[('type_voucher', '=', 'vale')]}"
+                                           context="{
+                                           'default_type': 'in_invoice',
+                                           'type': 'in_invoice',
+                                           'journal_type': 'purchase',
+                                    'form_view_ref': 'account.invoice_supplier_form',
+                                    'default_viaticum': True, 'default_takes_hold': False
+                                    }"/>
+                                    <field name="sale_note_id"
+                                           attrs="{'required':[('type_voucher', '=', 'note')], 'readonly':[('type_voucher', '=', 'vale')]}"
+                                           context="{
+                                           'default_type': 'in_invoice',
+                                           'default_is_sale_note': True,
+                                           'type': 'in_invoice',
+                                            'form_view_ref': 'account.invoice_supplier_form',
+                                            'default_viaticum': True
+                                    }"/>
+                                    <field name="viatical_concepts_id" required="1"  options="{'no_open':True,'no_create':True}"/>
+                                    <field name="date"
+                                           string="Fecha de documento" required="1"/>
+                                    <field name="name"
+                                           placeholder="p.e Referencia del documento"/>
+                                    <field name="amount_total" sum="Total" required="1"/>
+                                    <field name="type_validation_without" required="1"/>
+                                    <field name="account_id"/><!--Al momento de liquidar se debe seleccionar esto-->
+                                </tree>
+                            </field>
+                        </group>
+                        <h1 attrs="{'invisible': [('with_request','=', False)]}">
+                            <label for="difference" string="Diferencia:"/>
+                            <field name="difference" readonly="1"/>
+                        </h1>
+                        <group string="Notas y comentarios">
+                            <field name="comment" nolabel="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

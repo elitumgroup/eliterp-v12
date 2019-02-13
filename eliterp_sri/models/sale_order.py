@@ -10,13 +10,12 @@ class Order(models.Model):
     def _prepare_invoice(self):
         """
         ME: Extendemos el método par añadir el punto de impresión y autorización
+        # TODO: Revisar está opción
         :return:
         """
         self.ensure_one()
-        authorization = self.point_printing_id._get_authorization('out_invoice')
         invoice_vals = super(Order, self)._prepare_invoice()
         invoice_vals['point_printing_id'] = self.point_printing_id.id
-        invoice_vals['sri_authorization_id'] = authorization.id
         return invoice_vals
 
     @api.model

@@ -18,6 +18,19 @@
         </record>
         <menuitem action="action_sri_payment_forms" id="menu_sri_payment_forms" parent="menu_account_sri" sequence="1"/>
 
+
+        <record id="view_tree_payment_forms" model="ir.ui.view">
+            <field name="name">view_tree_payment_forms</field>
+            <field name="model">sri.payment.forms</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name='priority' widget='handle'/>
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
         <record id="action_sri_proof_support" model="ir.actions.act_window">
             <field name="name">Sustentos del comprobante</field>
             <field name="res_model">sri.proof.support</field>

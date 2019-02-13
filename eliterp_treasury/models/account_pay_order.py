@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class PayOrderAbstract(models.AbstractModel):
@@ -18,14 +18,12 @@ class PayOrderAbstract(models.AbstractModel):
             raise ValidationError(
                 _("Monto mayor al del saldo por pagar del documento (%.2f)." % self.default_amount))
 
-    @api.one
-    @api.constrains('date')
-    def _check_date(self):
-        """
-        Verificamos la fecha de la orden de pago no sea menor a la del documento
-        """
-        if self.date < self.default_date:
-            raise ValidationError(_("Fecha de la orden de pago no puede ser menor a la del documento."))
+    @api.model
+    def _compute_amount(self, invoice_ids):
+        total = 0
+        for inv in invoice_ids:
+            total += inv.residual_pay_order
+        return total
 
     def _get_vals_document(self, active_model, active_ids):
         """
@@ -36,17 +34,26 @@ class PayOrderAbstract(models.AbstractModel):
         """
         vals = {}
         if active_model == 'account.invoice':
-            invoices = self.env['account.invoice'].browse(active_ids)[0]
+            invoice_ids = self.env['account.invoice'].browse(active_ids)
+            if len(invoice_ids) > 1:
+                # Revisar empresas y cuentas de facturas
+                if any(invoice.state != 'open' for invoice in invoice_ids):
+                    raise UserError("Soló se puede generar orden de pago de facturas por pagar.")
+                if any(inv.partner_id != invoice_ids[0].partner_id for inv in invoice_ids):
+                    raise UserError("Soló se puede generar orden de pago de facturas del mismo proveedor.")
+                if any(inv.account_id != invoice_ids[0].account_id for inv in invoice_ids):
+                    raise UserError("Soló se puede generar orden de pago de facturas con la misma cuenta por pagar.")
             vals.update({
-                'date': invoices.date_invoice,
-                'default_date': invoices.date_invoice,
+                # Fecha del día
+                'date': fields.Date.today(),
+                'default_date': fields.Date.today(),
                 'type': 'invoice',
-                'amount': invoices.residual_pay_order,
-                'default_amount': invoices.residual_pay_order,
-                'origin': invoices.number,
-                'invoice_ids': [(6, 0, invoices.ids)],
+                'amount': self._compute_amount(invoice_ids),
+                'default_amount': self._compute_amount(invoice_ids),
+                'origin': ', '.join(str(i.number) for i in invoice_ids),
+                'invoice_ids': [(6, 0, invoice_ids.ids)],
                 'company_id': self.env.user.company_id.id,
-                'beneficiary': invoices.partner_id.name
+                'beneficiary': invoice_ids[0].partner_id.name
             })
         return vals
 
@@ -58,7 +65,11 @@ class PayOrderAbstract(models.AbstractModel):
         :return:
         """
         result = super(PayOrderAbstract, self).default_get(fields)
-        vals = self._get_vals_document(self._context['active_model'], self._context['active_id'])
+        if 'active_ids' in self._context:
+            records = self._context['active_ids']
+        else:
+            records = self._context['active_id']
+        vals = self._get_vals_document(self._context['active_model'], records)
         result.update(vals)
         return result
 
@@ -75,7 +86,7 @@ class PayOrderAbstract(models.AbstractModel):
                                                       "con fecha menor a la del documento.")
 
     type_egress = fields.Selection([
-        ('cash', 'Pagos varios (Efectivo)'),
+        ('cash', 'Pagos varios'),
         ('transfer', 'Transferencia')
     ], string='Forma de egreso', required=True, default='cash')
     origin = fields.Char('Origen', required=True)

@@ -60,7 +60,7 @@ class CollectionLine(models.Model):
             self.date_due = self.date_issue
 
     type_payment = fields.Selection([
-        ('cash', 'Efectivo'),
+        ('cash', 'Pagos varios'),
         ('deposit', 'Depósito'),
         ('transfer', 'Transferencia')
     ], string='Tipo de recaudación', required=True)
@@ -260,7 +260,7 @@ class Voucher(models.Model):
             year = str(self.date.year)
         else:
             year = str(self.bank_date.year)
-            code = self.bank_journal_id.exit_code
+            code = self.bank_journal_id.code
         if self.type_egress == 'cash':
             sequence = self.env['ir.sequence'].with_context(force_company=self.company_id.id).next_by_code(
                 'account.voucher.purchase.cash')
@@ -269,9 +269,7 @@ class Voucher(models.Model):
                     _("No existe secuencia 'account.voucher.purchase.cash' para compañía %s.") % self.company_id.name)
             move_name = prefix + "EFC-" + year + "-" + sequence
         else:
-            bank_sequence = self.bank_journal_id.bank_sequence_id
-            if not bank_sequence:
-                raise ValidationError(_("No existe secuencia de egresos para banco: %s") % self.bank_journal_id.name)
+            bank_sequence = self.bank_journal_id.sequence_id.next_by_id()
             move_name = prefix + code + "-" + year + "-" + bank_sequence.next_by_id()
         return move_name
 
@@ -331,7 +329,8 @@ class Voucher(models.Model):
                         'credit': 0.0,
                         'debit': line.amount,
                         'date': self.date,
-                        'analytic_account_id': self.account_analytic_id.id # Soló en está línea le mandamos centro de costo
+                        'analytic_account_id': self.account_analytic_id.id
+                        # Soló en está línea le mandamos centro de costo
                     })
                 for line in self.in_invoice_line:
                     number_invoices -= 1
@@ -377,7 +376,7 @@ class Voucher(models.Model):
                         })
                     else:
                         self.env['account.move.line'].with_context(check_move_validity=False).create({
-                            'name': line.name,
+                            'name': line.account_id.name,
                             'journal_id': move_id.journal_id.id,
                             'partner_id': self.partner_id.id if self.partner_id else False,
                             'account_id': line.account_id.id,
@@ -476,7 +475,7 @@ class Voucher(models.Model):
                                       track_visibility='onchange', readonly=True,
                                       states={'draft': [('readonly', False)]})
     type_egress = fields.Selection([
-        ('cash', 'Efectivo'),
+        ('cash', 'Pagos varios'),
         ('transfer', 'Transferencia'),
     ], string='Forma de egreso', track_visibility='onchange', readonly=True,
         states={'draft': [('readonly', False)]})
@@ -490,14 +489,26 @@ class Voucher(models.Model):
                        copy=False, default=fields.Date.context_today)  # CM
     reference = fields.Char(string='Concepto', readonly=True, states={'draft': [('readonly', False)]},
                             help="Colocar alguna referencia (concepto) del comprobante.", copy=False)  # CM
-    bank_date = fields.Date('Fecha del banco', readonly=True, states={'draft': [('readonly', False)]},
+    bank_date = fields.Date('Fecha de pago', readonly=True, states={'draft': [('readonly', False)]},
                             track_visibility='onchange')
     amount_cancel = fields.Float('Monto a cancelar', readonly=True,
                                  states={'draft': [('readonly', False)]},
                                  track_visibility='onchange')
+
     # Análisis de gastos
+    @api.model
+    def _default_company_division(self):
+        """
+        Defecto división empresarial
+        :return:
+        """
+        company = self.env.user.company_id.id
+        company_division_ids = self.env['account.company.division'].search([('company_id', '=', company)], limit=1)
+        return company_division_ids
+
     company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
-                                          states={'draft': [('readonly', False)]}, track_visibility='onchange')
+                                          states={'draft': [('readonly', False)]}, track_visibility='onchange',
+                                          default=_default_company_division)
     project_id = fields.Many2one('account.project', string='Proyecto', readonly=True,
                                  states={'draft': [('readonly', False)]}, track_visibility='onchange')
     account_analytic_id = fields.Many2one('account.analytic.account', 'Centro de costo', readonly=True,

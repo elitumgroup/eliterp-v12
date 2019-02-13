@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Búsquedas-->
+        <record id="eliterp_view_search_payment_request" model="ir.ui.view">
+            <field name="name">eliterp_view_search_payment_request</field>
+            <field name="model">eliterp.payment.request</field>
+            <field name="groups_id" eval="[(4,ref('eliterp_treasury.eliterp_group_treasury_manager'))]"/>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="No. Documento"/>
+                    <field string="Titular" name="beneficiary"/>
+                    <field string="Notas y comentarios" name="comments"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Creado" name="groupby_create_uid" domain="[]"
+                                context="{'group_by': 'create_uid'}"/>
+                        <filter string="Estado" name="groupby_state" domain="[]"
+                                context="{'group_by': 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <!--Caja chica-->
+        <record id="eliterp_view_search_voucher_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_search_voucher_small_box</field>
+            <field name="model">eliterp.voucher.small.box</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="beneficiary" string="Beneficiario"/>
+                    <field string="Custodio" name="custodian_id"/>
+                    <separator/>
+                    <filter name="state_reposition" string="Pagados"
+                            domain="[('state_reposition', '=', 'paid')]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Creado" name="groupby_create_uid" domain="[]"
+                                context="{'group_by': 'create_uid'}"/>
+                        <filter string="Estado de reposición" name="groupby_state_reposition" domain="[]"
+                                context="{'group_by': 'state_reposition'}"/>
+                        <filter string="Reposición" name="groupby_replacement_small_box_id" domain="[]"
+                                context="{'group_by': 'replacement_small_box_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="eliterp_view_search_pay_order" model="ir.ui.view">
+            <field name="name">eliterp_view_search_pay_order</field>
+            <field name="model">eliterp.pay.order</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="Nombre u Origen"
+                           filter_domain="['|', ('name','ilike',self), ('origin','ilike',self)]"/>
+                    <field name="beneficiary"/>
+                    <separator/>
+                    <filter name="draft" string="Borrador" domain="[('state','=','draft')]"/>
+                    <filter name="paid" string="Cerrada" domain="[('state', '=', 'paid')]"/>
+                    <filter name="cancel" string="Anulada" domain="[('state', '=', 'cancel')]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Tipo de origen" name="groupby_type" domain="[]"
+                                context="{'group_by': 'type'}"/>
+                        <filter string="Origen" name="groupby_origin" domain="[]"
+                                context="{'group_by': 'origin'}"/>
+                        <filter string="Estado" name="groupby_state" domain="[]" context="{'group_by': 'state'}"/>
+                        <filter string="Creado por" name="groupby_create_uid" domain="[]"
+                                context="{'group_by': 'create_uid'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Viáticos-->
+        <record id="eliterp_view_search_travel_allowance_request" model="ir.ui.view">
+            <field name="name">eliterp_view_search_travel_allowance_request</field>
+            <field name="model">eliterp.travel.allowance.request</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="No. Documento"/>
+                    <field name="beneficiary"
+                           filter_domain="['|', ('beneficiary','ilike',self), ('create_uid','ilike',self)]"/>
+                    <separator/>
+                    <filter name="approve" string="Aprobadas" domain="[('state','=','approve')]"/>
+                    <filter name="liquidated" string="Liquidadas" domain="[('state', '=', 'liquidated')]"/>
+                    <separator/>
+                    <filter name="month" string="Este mes"
+                            domain="[
+                                '&amp;',
+                                ('application_date', '>=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                ('application_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d')),
+                            ]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Beneficiario" name="groupby_beneficiary" domain="[]"
+                                context="{'group_by': 'beneficiary'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="eliterp_view_search_liquidation_settlement" model="ir.ui.view">
+            <field name="name">eliterp_view_search_liquidation_settlement</field>
+            <field name="model">eliterp.liquidation.settlement</field>
+            <field name="arch" type="xml">
+                <search string="Buscar en...">
+                    <field name="name" string="No. Documento"
+                           filter_domain="['|', ('name','ilike',self), ('travel_allowance_request_id','ilike',self)]"/>
+                    <field name="beneficiary"/>
+                    <separator/>
+                    <filter name="approve" string="Aprobadas" domain="[('state','=','approve')]"/>
+                    <filter name="liquidated" string="Liquidadas" domain="[('state', '=', 'liquidated')]"/>
+                    <separator/>
+                    <filter name="month" string="Este mes"
+                            domain="[
+                                '&amp;',
+                                ('date', '>=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),
+                                ('date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d')),
+                            ]"/>
+                    <group expand="1" string="Agrupar por">
+                        <filter string="Estado de pago" name="groupby_state_pay_order" domain="[]"
+                                context="{'group_by': 'state_pay_order'}"/>
+                        <filter string="Beneficiario" name="groupby_beneficiary" domain="[]"
+                                context="{'group_by': 'beneficiary'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_search_voucher_sale" model="ir.ui.view">
+            <field name="name">view_search_voucher_sale</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <filter string="Borrador" domain="[('state','=','draft')]"/>
+                    <filter string="Contabilizado" domain="[('state','=','posted')]"/>
+                    <field name="partner_id" string="Cliente" filter_domain="[('partner_id','child_of',self)]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter string="Cliente" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Fecha de emisión" domain="[]" context="{'group_by':'date'}"/>
+                        <filter string="Estado" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!--Acciones-->
+        <record id="eliterp_action_voucher_sale" model="ir.actions.act_window">
+            <field name="name">Cobros</field>
+            <field name="res_model">account.voucher</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('voucher_type', '=', 'sale')]</field>
+            <field name="context">{'default_voucher_type': 'sale', 'voucher_type': 'sale'}</field>
+            <field name="search_view_id" ref="view_search_voucher_sale"/>
+        </record>
+
+        <record id="eliterp_action_pay_order" model="ir.actions.act_window">
+            <field name="name">Orden de pago</field>
+            <field name="res_model">eliterp.pay.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_groupby_state": 1}
+            </field>
+            <field name="search_view_id" ref="eliterp_view_search_pay_order"/>
+        </record>
+        <record id="eliterp_action_voucher_purchase" model="ir.actions.act_window">
+            <field name="name">Pagos</field>
+            <field name="res_model">account.voucher</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('voucher_type', '=','purchase')]</field>
+            <field name="context">{'default_voucher_type': 'purchase', 'voucher_type': 'purchase'}</field>
+            <field name="search_view_id" ref="account_voucher.view_voucher_filter_sale"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Se registrarán los pagos provenientes de una OP.
+                </p>
+            </field>
+        </record>
+
+        <record id="eliterp_action_withhold_sale" model="ir.actions.act_window">
+            <field name="name">Retenciones de cliente</field>
+            <field name="res_model">eliterp.withhold</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'sale')]</field>
+            <field name="context">{'default_type': 'sale', 'type': 'sale'}</field>
+        </record>
+        <record id="eliterp_action_withhold_purchase" model="ir.actions.act_window">
+            <field name="name">Retenciones de proveedor</field>
+            <field name="res_model">eliterp.withhold</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'purchase')]</field>
+            <field name="context">{'default_type': 'purchase', 'type': 'purchase'}</field>
+        </record>
+        <!---TODO
+        <record id="eliterp_action_withhold_purchase_cancel" model="ir.actions.act_window">
+            <field name="name">Retenciones de proveedor (Anuladas)</field>
+            <field name="res_model">eliterp.withhold</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type', '=', 'purchase'), ('state', '=', 'cancel')]</field>
+            <field name="context">{'default_type': 'purchase', 'type': 'purchase',
+                'default_not': True}
+            </field>
+        </record>
+        -->
+
+        <record id="eliterp_action_payment_request" model="ir.actions.act_window">
+            <field name="name">Requerimientos de pago</field>
+            <field name="res_model">eliterp.payment.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_groupby_create_uid": 1}
+            </field>
+            <field name="search_view_id" ref="eliterp_view_search_payment_request"/>
+        </record>
+
+
+        <record id="eliterp_action_voucher_small_box" model="ir.actions.act_window">
+            <field name="name">Comprobantes caja chica</field>
+            <field name="res_model">eliterp.voucher.small.box</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_groupby_create_uid": 1}</field>
+            <field name="search_view_id" ref="eliterp_view_search_voucher_small_box"/>
+        </record>
+        <record id="eliterp_action_replacement_small_box" model="ir.actions.act_window">
+            <field name="name">Reposición caja chica</field>
+            <field name="res_model">eliterp.replacement.small.box</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="eliterp_action_travel_allowance_request" model="ir.actions.act_window">
+            <field name="name">Solicitudes de viático</field>
+            <field name="res_model">eliterp.travel.allowance.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="eliterp_view_search_travel_allowance_request"/>
+        </record>
+        <record id="eliterp_action_liquidation_settlement" model="ir.actions.act_window">
+            <field name="name">Liquidaciones de viático</field>
+            <field name="res_model">eliterp.liquidation.settlement</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="eliterp_view_search_liquidation_settlement"/>
+        </record>
+
+
+        <record id="eliterp_action_treasury_settings" model="ir.actions.act_window">
+            <field name="name">Ajustes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'eliterp_treasury'}</field>
+        </record>
+
+        <record id="eliterp_action_custodian_small_box" model="ir.actions.act_window">
+            <field name="name">Custodios caja chica</field>
+            <field name="res_model">eliterp.custodian.small.box</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <record id="eliterp_action_viatical_concepts" model="ir.actions.act_window">
+            <field name="name">Conceptos de víatico</field>
+            <field name="res_model">eliterp.viatical.concepts</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="eliterp_action_travel_destinations" model="ir.actions.act_window">
+            <field name="name">Destinos para viático</field>
+            <field name="res_model">eliterp.travel.destinations</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!--Acciones/Vistas-->
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_tree_withhold_sale">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="eliterp_view_tree_withhold_sale"/>
+            <field name="act_window_id" ref="eliterp_action_withhold_sale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_form_withhold_sale">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_view_form_withhold_sale"/>
+            <field name="act_window_id" ref="eliterp_action_withhold_sale"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_tree_withhold_purchase">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="eliterp_view_tree_withhold_purchase"/>
+            <field name="act_window_id" ref="eliterp_action_withhold_purchase"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_form_withhold_purchase">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_view_form_withhold_purchase"/>
+            <field name="act_window_id" ref="eliterp_action_withhold_purchase"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_tree_voucher_sale">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="eliterp_view_tree_voucher_sale"/>
+            <field name="act_window_id" ref="eliterp_action_voucher_sale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_form_voucher_sale">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_view_form_voucher_sale"/>
+            <field name="act_window_id" ref="eliterp_action_voucher_sale"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_tree_voucher_purchase">
+            <field eval="0" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="eliterp_view_tree_voucher_purchase"/>
+            <field name="act_window_id" ref="eliterp_action_voucher_purchase"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="eliterp_action_view_form_voucher_purchase">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_view_form_voucher_purchase"/>
+            <field name="act_window_id" ref="eliterp_action_voucher_purchase"/>
+        </record>
+
+        <record id="eliterp_action_account_balance_report" model="ir.actions.act_window">
+            <field name="name">Reporte de saldo bancario</field>
+            <field name="res_model">eliterp.account.balance.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_account_balance_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="eliterp_action_accounts_receivable_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cuentas a cobrar</field>
+            <field name="res_model">eliterp.accounts.receivable.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_accounts_receivable_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <record id="eliterp_action_accounts_to_pay_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cuentas a pagar</field>
+            <field name="res_model">eliterp.accounts.to.pay.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_accounts_to_pay_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <record id="eliterp_action_checks_received_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cheques recibidos</field>
+            <field name="res_model">eliterp.checks.received.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_checks_received_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <record id="eliterp_action_checks_issued_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cheques emitidos</field>
+            <field name="res_model">eliterp.checks.issued.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_checks_issued_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <record id="eliterp_action_pay_orders_report" model="ir.actions.act_window">
+            <field name="name">Reporte de órdenes de pago</field>
+            <field name="res_model">eliterp.pay.orders.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury.eliterp_view_form_pay_orders_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+
+        <!--Menús-->
+        <menuitem name="Tesorería"
+                  id="eliterp_menu_treasury"
+                  web_icon="eliterp_treasury,static/description/icon.png"
+                  groups="eliterp_treasury.eliterp_group_treasury_user,eliterp_treasury.eliterp_group_treasury_manager"
+                  sequence="25"/>
+
+        <menuitem id="eliterp_menu_treasury_reports"
+                  name="Reportes"
+                  parent="eliterp_menu_treasury"
+                  groups="eliterp_treasury.eliterp_group_treasury_manager"
+                  sequence='5'/>
+
+        <menuitem id="eliterp_menu_account_balance_report"
+                  name="Saldo bancario"
+                  action="eliterp_action_account_balance_report"
+                  parent="eliterp_menu_treasury_reports"
+                  sequence="1"/>
+
+        <menuitem id="eliterp_menu_accounts_receivable_report"
+                  name="Cuentas por cobrar"
+                  action="eliterp_action_accounts_receivable_report"
+                  parent="eliterp_menu_treasury_reports"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_accounts_to_pay_report"
+                  name="Cuentas por pagar"
+                  action="eliterp_action_accounts_to_pay_report"
+                  parent="eliterp_menu_treasury_reports"
+                  sequence="3"/>
+
+        <menuitem id="eliterp_menu_treasury_checks"
+                  name="Cheques"
+                  parent="eliterp_menu_treasury_reports"
+                  sequence='4'/>
+        <menuitem id="eliterp_menu_checks_received_report"
+                  name="Recibidos"
+                  action="eliterp_action_checks_received_report"
+                  parent="eliterp_menu_treasury_checks"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_checks_issued_report"
+                  name="Emitidos"
+                  action="eliterp_action_checks_issued_report"
+                  parent="eliterp_menu_treasury_checks"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_pay_orders_report"
+                  name="Órdenes de pago"
+                  action="eliterp_action_pay_orders_report"
+                  parent="eliterp_menu_treasury_reports"
+                  sequence="5"/>
+
+
+        <menuitem id="eliterp_menu_accounts_receivable"
+                  name="Cuentas a cobrar"
+                  parent="eliterp_menu_treasury"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_out_invoice"
+                  name="Facturas de cliente"
+                  action="account.action_invoice_tree1"
+                  parent="eliterp_menu_accounts_receivable"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_voucher_sale"
+                  name="Cobros"
+                  parent="eliterp_menu_accounts_receivable"
+                  action="eliterp_action_voucher_sale"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_withhold_sale"
+                  name="Retenciones de cliente"
+                  action="eliterp_action_withhold_sale"
+                  parent="eliterp_menu_accounts_receivable"
+                  sequence="3"/>
+
+        <record id="action_invoice_sale_note" model="ir.actions.act_window">
+            <field name="name">Notas de venta</field>
+            <field name="res_model">account.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+            <field eval="False" name="view_id"/>
+            <field name="domain">[('is_sale_note','=', True)]</field>
+            <field name="context">{'default_type': 'in_invoice', 'type': 'in_invoice', 'default_is_sale_note': True}
+            </field>
+            <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Clic para crear una nueva nota de venta.
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="eliterp_menu_accounts_payable"
+                  name="Cuentas a pagar"
+                  parent="eliterp_menu_treasury"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_in_invoice"
+                  name="Facturas de proveedor"
+                  action="account.action_invoice_tree2"
+                  parent="eliterp_menu_accounts_payable"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_sale_note"
+                  name="Notas de venta"
+                  action="action_invoice_sale_note"
+                  parent="eliterp_menu_accounts_payable"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_payments"
+                  name="Pagos"
+                  parent="eliterp_menu_accounts_payable"
+                  sequence="3"/>
+        <menuitem id="eliterp_menu_pay_order"
+                  name="Orden de pago"
+                  parent="eliterp_menu_payments"
+                  action="eliterp_action_pay_order"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_voucher_purchase"
+                  name="Pagos"
+                  parent="eliterp_menu_payments"
+                  action="eliterp_action_voucher_purchase"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_withhold_purchase"
+                  name="Retenciones de proveedor"
+                  action="eliterp_action_withhold_purchase"
+                  parent="eliterp_menu_accounts_payable"
+                  sequence="3"/>
+        <!--TODO: Ver cómo subir retenciones anuladas
+        <menuitem id="eliterp_menu_withhold_purchase_cancel"
+                  action="eliterp_action_withhold_purchase_cancel"
+                  parent="eliterp_menu_accounts_payable"
+                  sequence="4"/>
+        -->
+
+        <menuitem id="eliterp_menu_transactions"
+                  name="Transacciones"
+                  parent="eliterp_menu_treasury"
+                  sequence="3"/>
+        <menuitem id="eliterp_menu_payment_request"
+                  action="eliterp_action_payment_request"
+                  parent="eliterp_menu_transactions"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_small_box"
+                  name="Caja chica"
+                  parent="eliterp_menu_transactions"
+                  sequence="2"/>
+        <menuitem id="eliterp_menu_voucher_small_box"
+                  name="Comprobantes caja chica"
+                  parent="eliterp_menu_small_box"
+                  action="eliterp_action_voucher_small_box"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_replacement_small_box"
+                  name="Reposición caja chica"
+                  parent="eliterp_menu_small_box"
+                  action="eliterp_action_replacement_small_box"
+                  sequence="2"/>
+
+        <menuitem id="eliterp_menu_travel_expenses"
+                  name="Viáticos"
+                  parent="eliterp_menu_transactions"
+                  sequence="3"/>
+        <menuitem id="eliterp_menu_travel_allowance_request"
+                  name="Solicitudes de viático"
+                  action="eliterp_action_travel_allowance_request"
+                  parent="eliterp_menu_travel_expenses"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_liquidation_settlement"
+                  name="Liquidaciones de viático"
+                  action="eliterp_action_liquidation_settlement"
+                  parent="eliterp_menu_travel_expenses"
+                  sequence="2"/>
+
+        <menuitem id="eliterp_menu_query_checks"
+                  name="Consulta de cheques"
+                  parent="eliterp_menu_treasury"
+                  sequence="4"/>
+        <menuitem id="eliterp_menu_query_checks_received"
+                  name="Cheques recibidos"
+                  parent="eliterp_menu_query_checks"
+                  action="eliterp_accounting.eliterp_action_checks_receipts"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_query_checks_issued"
+                  name="Cheques emitidos"
+                  parent="eliterp_menu_query_checks"
+                  action="eliterp_accounting.eliterp_action_checks_issued"
+                  sequence="2"/>
+
+        <menuitem id="eliterp_menu_treasury_configuration"
+                  name="Configuración"
+                  groups="eliterp_treasury.eliterp_group_treasury_manager"
+                  parent="eliterp_menu_treasury"
+                  sequence='6'/>
+        <menuitem id="eliterp_menu_treasury_settings"
+                  name="Ajustes"
+                  groups="base.group_erp_manager"
+                  action="eliterp_action_treasury_settings"
+                  parent="eliterp_menu_treasury_configuration"
+                  sequence='1'/>
+
+        <menuitem id="eliterp_menu_custodian_small_box"
+                  name="Custodios caja chica"
+                  parent="eliterp_menu_treasury_configuration"
+                  action='eliterp_action_custodian_small_box'
+                  sequence='2'/>
+
+        <menuitem id="eliterp_menu_travel_expenses_configuration"
+                  name="Viáticos"
+                  parent="eliterp_menu_treasury_configuration"
+                  sequence="3"/>
+        <menuitem id="eliterp_menu_viatical_concepts"
+                  name="Conceptos para viático"
+                  action="eliterp_action_viatical_concepts"
+                  parent="eliterp_menu_travel_expenses_configuration"
+                  sequence="1"/>
+        <!--TODO: Pendiente va a quedar hasta previo aviso
+        <menuitem id="eliterp_menu_travel_destinations"
+                  name="Destinos para viático"
+                  action="eliterp_action_travel_destinations"
+                  parent="eliterp_menu_travel_expenses_configuration"
+                  sequence="2"/>
+        -->
+        <!--
+            Menú en módulo Inicio
+        -->
+        <record id="eliterp_action_start_travel_allowance_request" model="ir.actions.act_window">
+            <field name="name">Solicitud de viático</field>
+            <field name="res_model">eliterp.travel.allowance.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Clic para registrar viáticos.
+                </p>
+            </field>
+        </record>
+        <record id="eliterp_action_start_payment_request" model="ir.actions.act_window">
+            <field name="name">Requerimiento de pago</field>
+            <field name="res_model">eliterp.payment.request</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('create_uid', '=', uid)]</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Clic para registrar requerimiento de pago.
+                </p>
+            </field>
+        </record>
+        <menuitem id="eliterp_menu_start_travel_expenses"
+                  name="Viáticos"
+                  parent="eliterp_start.eliterp_menu_requirements"
+                  sequence="10"/>
+        <menuitem id="eliterp_menu_start_travel_allowance_request"
+                  name="Solicitud de viático"
+                  action="eliterp_action_start_travel_allowance_request"
+                  parent="eliterp_menu_start_travel_expenses"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_start_payment_request"
+                  name="Requerimiento de pago"
+                  action="eliterp_action_start_payment_request"
+                  parent="eliterp_start.eliterp_menu_requirements"
+                  sequence="9"/>
+    </data>
+</odoo>

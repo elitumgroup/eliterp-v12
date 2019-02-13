@@ -173,11 +173,20 @@ class Invoice(models.Model):
         point_printing_ids = self.env['sri.point.printing'].search([('company_id', '=', company)], limit=1)
         return point_printing_ids
 
+    @api.model
+    def _default_payment_form(self):
+        """
+        Defecto forma de pago
+        :return:
+        """
+        payment_forms_ids = self.env['sri.payment.forms'].search([], limit=1)
+        return payment_forms_ids
+
     invoice_number = fields.Char('Secuencial', readonly=True, states={'draft': [('readonly', False)]},
                                  help="Número de factura de la compañía según el tipo.", copy=False, size=9)  # CM
     validate_payment_form = fields.Boolean('Validación forma de pago', compute='_compute_validate_payment_form')
     payment_form_id = fields.Many2one('sri.payment.forms', string='Forma de pago', readonly=True,
-                                      states={'draft': [('readonly', False)]})
+                                      states={'draft': [('readonly', False)]}, default=_default_payment_form)
     point_printing_id = fields.Many2one('sri.point.printing', string='Punto de impresión', readonly=True,
                                         states={'draft': [('readonly', False)]}, default=_default_point_printing)
     sri_authorization_id = fields.Many2one('sri.authorization', string='Autorización SRI', readonly=True,

@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Vistas del menú Órdenes de pago-->
+    <record id="eliterp_view_tree_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_pay_order</field>
+        <field name="model">eliterp.pay.order</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'paid'"
+                  decoration-bf="state == 'paid'"
+                  default_order='create_date desc'>
+                <field name="name" string="No. Orden de pago"/>
+                <field name="origin"/>
+                <field name="invoice_id"/>
+                <field name="date"/>
+                <field name="beneficiary"/>
+                <field name="amount"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="eliterp_view_form_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_form_pay_order</field>
+        <field name="model">eliterp.pay.order</field>
+        <field name="arch" type="xml">
+            <form create="false" duplicate="false">
+                <header>
+                    <field name="state"
+                           widget="statusbar"
+                           modifiers="{'readonly': true}"/>
+                    <button name="pay"
+                            string="Generar pago"
+                            attrs="{'invisible':['|', ('state','!=','draft'), ('general_check', '=', False)]}"
+                            type="object"
+                            groups="eliterp_treasury.eliterp_group_pay"
+                            confirm="Desea confirmar el pago para está orden?"
+                            class="oe_highlight"/>
+                    <button name="print_hr"
+                            string="Imprimir pago"
+                            attrs="{'invisible': ['|', ('type', 'not in', ('adq', 'rc'))]}"
+                            type="object"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="create_uid" string="Creado por" readonly="1"/>
+                            <field name="date"/>
+                            <field name="type" readonly="1"/>
+                            <field name="amount" widget="monetary"/>
+                            <field name="invoice_id" readonly="1" attrs="{'invisible': [('invoice_id', '=', False)]}"/>
+                            <field name="purchase_order_id" readonly="1"
+                                   attrs="{'invisible': [('purchase_order_id', '=', False)]}"/>
+                            <field name="advance_payment_id" readonly="1"
+                                   attrs="{'invisible': [('advance_payment_id', '=', False)]}"/>
+                            <field name="payslip_run_id" readonly="1"
+                                   attrs="{'invisible': [('payslip_run_id', '=', False)]}"/>
+                            <field name="replacement_small_box_id" readonly="1"
+                                   attrs="{'invisible': [('replacement_small_box_id', '=', False)]}"/>
+                            <field name="payment_request_id" readonly="1"
+                                   attrs="{'invisible': [('payment_request_id', '=', False)]}"/>
+                            <field name="viaticum_id" readonly="1"
+                                   attrs="{'invisible': [('viaticum_id', '=', False)]}"/>
+                            <field name="liquidation_settlement_id" readonly="1"
+                                   attrs="{'invisible': [('liquidation_settlement_id', '=', False)]}"/>
+                        </group>
+                        <group>
+                            <field name="voucher_id"
+                                   attrs="{'invisible': [('voucher_id', '=', False)]}"
+                                   context="{'form_view_ref': 'eliterp_treasury.eliterp_view_form_voucher_purchase'}"
+                                   groups="eliterp_treasury.eliterp_group_pay"/>
+                            <field name="comment"
+                                   placeholder="p.e Alguna referencia del pago"/>
+                            <field name="beneficiary" attrs="{'invisible': [('beneficiary', '=', False)]}"/>
+                            <field name="type_egress"/>
+                            <field name="bank_id"
+                                   attrs="{'invisible':[('type_egress', '==', 'payment_various')],
+                                   'required':[('type_egress', '!=', 'payment_various')]}"/>
+                            <field name="general_check"
+                                   attrs="{'invisible':['|', ('type', 'not in', ('adq', 'rc')), ('type_egress', '!=', 'bank')]}"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Facturas" attrs="{'invisible': [('invoice_ids', '=', [])]}">
+                        <field name="invoice_ids" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Lista de empleados" attrs="{'invisible':[('type', 'not in', ('adq', 'rc'))]}">
+                        <field name="lines_employee"
+                               nolabel="1">
+                            <tree editable="bottom" create="false" delete="false">
+                                <field name="generated" invisible="1"/>
+                                <field name="employee_id"/>
+                                <field name="amount"/>
+                                <field name="is_check" invisible="1"/>
+                                <field name="voucher_id"
+                                       attrs="{'invisible': ['|', ('is_check', '=', False), ('voucher_id', '=', False)]}"
+                                       context="{'form_view_ref': 'eliterp_treasury.eliterp_view_form_voucher_purchase'}"
+                                       readonly="1"/>
+                                <button name="generate_check"
+                                        string="Generar cheque"
+                                        type="object"
+                                        class="oe_stat_button"
+                                        attrs="{'invisible': ['|', '|', ('is_check', '=', False), ('generated', '=', True), ('voucher_id', '!=', False)]}"
+                                        icon="fa-file-text"/>
+                            </tree>
+                        </field>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="eliterp_view_form_pay_wizard" model="ir.ui.view">
+        <field name="name">elitum_view_form_pay_wizard</field>
+        <field name="model">eliterp.pay.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <group col="4">
+                    <field name="date"/>
+                    <field name="payment_type"
+                           widget="radio"
+                           options="{'horizontal': true}"/>
+                    <field name="amount"/>
+                    <!--Campos para transacciones-->
+                    <field name="type" invisible="1"/>
+                    <field name="default_amount" invisible="1"/>
+                    <field name="default_date" invisible="1"/>
+                </group>
+                <group string="Datos de pago" col="4">
+                    <field name="type_egress"/>
+                    <field name="bank_id"
+                           options="{'no_open': True, 'no_create': True}"
+                           attrs="{'invisible':[('type_egress', '==', 'payment_various')],
+                                   'required':[('type_egress', '!=', 'payment_various')]}"
+                           domain="[('type_use', '=', 'payments')]"/>
+                </group>
+                <group string="Notas y comentarios">
+                    <field name="comment" nolabel="1" placeholder="p.e Colocar forma de pago u otra cosa"/>
+                </group>
+                <footer>
+                    <button type="object" name="confirm_payment" class="oe_highlight" string="Confirmar"/>
+                    <button string="Descartar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <!--Botón Generar orden de pago-->
+    <!--Facturas de proveedor-->
+    <record id="eliterp_view_form_account_invoice_pay_order" model="ir.ui.view"><!--Facturas de proveedor-->
+        <field name="name">eliterp_view_form_account_invoice_pay_order</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_supplier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="before"><!--Proveedor-->
+                <field name="small_box" invisible="1"/>
+                <field name="takes_hold"
+                       attrs="{'invisible':[('small_box', '!=', True)]}"
+                />
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="open_pay_orders"
+                        attrs="{'invisible':['|', '|', ('type', '=', 'in_refund'), ('viaticum', '=', True), ('small_box', '=', True)]}"
+                        class="oe_stat_button" icon="fa-list" type="object">
+                    <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                </button>
+            </xpath>
+            <button name="%(account.action_account_invoice_payment)d" position="after">
+                <field name="state_pay_order" invisible="1"/>
+                <field name="viaticum" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', '|', '|', '|', ('state','!=', 'open'), ('state_pay_order', '=', 'paid'), ('type', '=', 'in_refund'), ('viaticum', '=', True), ('small_box', '=', True)]}"
+                        class="oe_highlight"/>
+
+            </button>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_account_invoice_supplier_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_account_invoice_supplier_order</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="eliterp_accounting.eliterp_view_tree_account_invoice_supplier"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <field name="small_box" invisible="1"/>
+                <field name="viaticum" invisible="1"/>
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', '|', '|', '|', ('state','!=', 'open'), ('state_pay_order', '=', 'paid'), ('type', '=', 'in_refund'), ('viaticum', '=', True), ('small_box', '=', True)]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--Órdenes de compra-->
+    <record id="eliterp_view_form_purchase_order_pay_order" model="ir.ui.view"><!--Órdenes de compra-->
+        <field name="name">eliterp_view_form_purchase_order_pay_order</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                    <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='action_view_picking']" position="before"><!--Recibir productos-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', '|', ('state','!=', 'purchase'), ('state_pay_order', '=', 'paid'), ('invoice_status','=', 'invoiced')]}"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_purchase_order_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_purchase_order_pay_order</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-success">invoice_status == 'invoiced'</attribute>
+                <attribute name="decoration-bf">invoice_status == 'invoiced'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="before"><!--Estado de facturación-->
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'purchase'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    <!--ADQ-->
+    <record id="eliterp_view_form_lines_advance_payment" model="ir.ui.view">
+        <field name="name">eliterp_view_form_lines_advance_payment</field>
+        <field name="model">eliterp.lines.advance.payment</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="job_id"/>
+                            <field name="admission_date"/>
+                        </group>
+                        <group>
+                            <field name="amount_total"/>
+                            <field name="paid_amount"/>
+                            <field name="residual"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="eliterp_view_form_advance_pay_order" model="ir.ui.view"><!--Anticipo de quincena-->
+        <field name="name">eliterp_view_form_advance_pay_order</field>
+        <field name="model">eliterp.advance.payment</field>
+        <field name="inherit_id" ref="eliterp_hr.eliterp_view_form_advance"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='print_advance']" position="before"><!--Imprimir anticipo-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', ('state','!=', 'posted'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+            <xpath expr='//sheet/group[2]' position="after"><!--Notas y comentarios-->
+                <group attrs="{'invisible':['|', ('state','!=', 'posted'), ('state_pay_order', '=', 'paid')]}">
+                    <div class="o_row">
+                        <field name="select_all"
+                               nolabel="1"/>
+                        <span>
+                            <b>Seleccionar todos de check aquí.</b>
+                        </span>
+                    </div>
+                </group>
+            </xpath>
+
+            <field name="total" position="replace"/>
+
+            <xpath expr='//sheet/group[2]' position="inside">
+                <group class="oe_subtotal_footer oe_right">
+                    <field name="total"/>
+                    <field name="improved_pay_order" string="(-) Pagado"/>
+                    <field name="residual_pay_order" string="Saldo" class="oe_subtotal_footer_separator"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//field[@name='approval_user']" position="after">
+                <field name="total_pay_order"
+                       attrs="{'invisible':['|', ('state','!=', 'posted'), ('state_pay_order', '=', 'paid')]}"/>
+            </xpath>
+
+            <!--Líneas de empleados-->
+            <xpath expr="//field[@name='lines_advance']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state_pay_order', '!=', 'generated')]}</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='lines_advance']//tree//field[@name='parent_state']"
+                   position="before">
+                <field name="selected"
+                       string="&#x02611;"
+                       attrs="{'invisible': ['|', ('flag', '=', True), ('parent_state', '!=', 'posted')], 'readonly': [('flag', '=', True)]}"/>
+                <field name="flag" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='lines_advance']/tree" position="attributes">
+                <attribute name="decoration-success">flag==True</attribute>
+                <attribute name="decoration-bf">flag==True</attribute>
+                <attribute name="class">lines_checkbox</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lines_advance']//tree//field[@name='amount_total']"
+                   position="after">
+                <field name="paid_amount"/>
+                <field name="residual" string="Saldo"/>
+                <field name="amount_payable"
+                       attrs="{'invisible': ['|', ('flag', '=', True), ('parent_state', '!=', 'posted')], 'readonly': [('flag', '=', True)]}"/>
+
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_advance_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_advance_pay_order</field>
+        <field name="model">eliterp.advance.payment</field>
+        <field name="inherit_id" ref="eliterp_hr.eliterp_view_tree_advance"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="attributes">
+                <attribute name="decoration-success">state_pay_order=='paid'</attribute>
+                <attribute name="decoration-bf">state_pay_order=='paid'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--RC-->
+    <record id="eliterp_view_form_hr_payslip_run_pay_order" model="ir.ui.view"><!--Rol consolidado-->
+        <field name="name">eliterp_view_form_hr_payslip_run_pay_order</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="eliterp_hr.eliterp_view_form_payslip_run"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/h1" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='print_payslip_run']" position="before"><!--Imprimir rol-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', ('state','!=', 'closed'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+            <xpath expr="//field[@name='approval_user']" position="after">
+                <field name="total_pay_order"
+                       attrs="{'invisible':['|', ('state','!=', 'closed'), ('state_pay_order', '=', 'paid')]}"/>
+            </xpath>
+            <xpath expr='//sheet/group[2]' position="after">
+                <group>
+                    <group attrs="{'invisible':['|', ('state','!=', 'closed'), ('state_pay_order', '=', 'paid')]}">
+                        <div class="o_row">
+                            <field name="select_all"
+                                   nolabel="1"/>
+                            <span>
+                                <b>Seleccionar todos de check aquí.</b>
+                            </span>
+                        </div>
+                    </group>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total"/>
+                        <field name="improved_pay_order" string="(-) Pagado"/>
+                        <field name="residual_pay_order" string="Saldo" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </group>
+            </xpath>
+            <!--Líneas de roles-->
+            <xpath expr="//field[@name='lines_payslip_run']//tree//field[@name='parent_state']"
+                   position="before">
+                <field name="selected"
+                       string="&#x02611;"
+                       attrs="{'invisible': ['|', ('flag', '=', True), ('parent_state', '!=', 'closed')], 'readonly': [('flag', '=', True)]}"/>
+                <field name="flag" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='lines_payslip_run']/tree" position="attributes">
+                <attribute name="decoration-success">flag==True</attribute>
+                <attribute name="decoration-bf">flag==True</attribute>
+                <attribute name="class">lines_checkbox</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lines_payslip_run']//tree//field[@name='net_receive']"
+                   position="after">
+                <field name="paid_amount" sum="Total pagado"/>
+                <field name="residual" sum="Total saldo" string="Saldo"/>
+                <field name="amount_payable"
+                       attrs="{'invisible': ['|', ('flag', '=', True), ('parent_state', '!=', 'closed')], 'readonly': [('flag', '=', True)]}"/>
+
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_hr_payslip_run_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_hr_payslip_run_pay_order</field>
+        <field name="model">hr.payslip.run</field>
+        <field name="inherit_id" ref="eliterp_hr.eliterp_view_tree_payslip_run"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'closed'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--Caja chica-->
+    <record id="eliterp_view_form_replacement_small_box_pay_order" model="ir.ui.view"><!--Caja chica-->
+        <field name="name">eliterp_view_form_replacement_small_box_pay_order</field>
+        <field name="model">eliterp.replacement.small.box</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_form_replacement_small_box"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='print_replacement']" position="before"><!--Imprimir reposición-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', ('state','!=', 'liquidated'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_replacement_small_box_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_replacement_small_box_pay_order</field>
+        <field name="model">eliterp.replacement.small.box</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_tree_replacement_small_box"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'liquidated'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--Requerimiento de pago-->
+    <record id="eliterp_view_form_payment_request_pay_order" model="ir.ui.view"><!--Requerimiento de pago-->
+        <field name="name">eliterp_view_form_payment_request_pay_order</field>
+        <field name="model">eliterp.payment.request</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_form_payment_request"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='print_request']" position="before"><!--Imprimir RP-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_payment_request_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_payment_request_pay_order</field>
+        <field name="model">eliterp.payment.request</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_tree_payment_request"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--SV-->
+    <record id="eliterp_view_form_travel_allowance_request_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_form_travel_allowance_request_pay_order</field>
+        <field name="model">eliterp.travel.allowance.request</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_form_travel_allowance_request"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='print_request']" position="before"><!--Imprimir SV-->
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_travel_allowance_request_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_travel_allowance_request_pay_order</field>
+        <field name="model">eliterp.travel.allowance.request</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_tree_travel_allowance_request"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', ('state','!=', 'approve'), ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--Liquidación-->
+    <record id="eliterp_view_form_liquidation_settlement_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_form_liquidation_settlement_pay_order</field>
+        <field name="model">eliterp.liquidation.settlement</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_form_liquidation_settlement"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/div[1]" position="before">
+                <div class="oe_button_box" name="button_box">
+                    <button name="open_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                        <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                    </button>
+                </div>
+            </xpath>
+            <xpath expr="//button[@name='liquidate']" position="before"><!--Imprimir SV-->
+                <field name="reconciled" invisible="1"/>
+                <field name="state_pay_order" invisible="1"/>
+                <button name="generate_request" string="Generar orden de pago"
+                        type="object"
+                        attrs="{'invisible':['|', '|', ('state','!=', 'liquidated'),
+                        ('reconciled','=', True),
+                        ('state_pay_order', '=', 'paid')]}"
+                        class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="eliterp_view_tree_liquidation_settlement_pay_order" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_liquidation_settlement_pay_order</field>
+        <field name="model">eliterp.liquidation.settlement</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_tree_liquidation_settlement"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after"><!--Estado-->
+                <field name="reconciled" invisible="1"/>
+                <button name="generate_request"
+                        type='object'
+                        string="Generar orden de pago"
+                        attrs="{'invisible':['|', '|', ('state','!=', 'liquidated'),
+                        ('reconciled','=', True),
+                        ('state_pay_order', '=', 'paid')]}"
+                        icon='fa-dollar'/>
+                <field name="state_pay_order"/>
+            </xpath>
+        </field>
+    </record>
+    <!--CSV (SAT para bancos)-->
+    <record id="eliterp_view_form_voucher_purcahse_sat" model="ir.ui.view">
+        <field name="name">eliterp_view_form_voucher_purchase_sat</field>
+        <field name="model">account.voucher</field>
+        <field name="inherit_id" ref="eliterp_treasury.eliterp_view_form_voucher_purchase"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='open_voucher_cancel_reason']" position="before">
+                <button name="print_sat"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|', ('type_pay', 'not in', ('adq', 'rc')), ('type_egress', '!=', 'transfer')]}"
+                        string="Archivo para banco"/>
+            </xpath>
+            <xpath expr="//field[@name='check_date']" position="after">
+                <field name="sat_binary" filename="sat_filename" attrs="{'invisible': [('sat_binary', '=', False)]}"
+                       widget="binary"/>
+                <field name="sat_filename" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

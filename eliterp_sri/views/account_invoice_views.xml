@@ -60,7 +60,6 @@
                     <field name="validate_payment_form" invisible="1"/>
                     <field name="payment_form_id"
                            widget="selection"
-                           string="Forma de cobro"
                            required="1"/>
                 </xpath>
             </field>

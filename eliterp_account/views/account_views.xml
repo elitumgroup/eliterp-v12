@@ -58,8 +58,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_id']" position="replace">
                     <field name="company_id" invisible="1"/>
-                    <field name="exit_code" required="1"/>
-                    <field name="bank_sequence_id" groups="base.group_erp_manager"/>
                 </xpath>
             </field>
         </record>
@@ -71,11 +69,6 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_id']"
-                       position="replace">
-                    <field name="account_id" groups="account.group_account_user"
-                           domain="[('company_id', '=', parent.company_id), ('internal_type', '!=', 'view'), ('deprecated', '=', False)]"/>
-                </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']"
                        position="replace">
                     <field name="invoice_line_tax_ids" widget="many2many_tags"
@@ -91,11 +84,6 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_id']" position="attributes">
                     <attribute name="required">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='account_id']"
-                       position="replace">
-                    <field name="account_id" groups="account.group_account_user"
-                           domain="[('company_id', '=', parent.company_id), ('internal_type', '!=', 'view'), ('deprecated', '=', False)]"/>
                 </xpath>
                 <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='invoice_line_tax_ids']"
                        position="replace">

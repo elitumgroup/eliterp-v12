@@ -9,7 +9,7 @@ class PaymentForms(models.Model):
     _name = 'sri.payment.forms'
     _description = _("Forma de pago SRI")
 
-    _order = "code asc"
+    _order = "priority"
 
     @api.multi
     def name_get(self):
@@ -23,6 +23,8 @@ class PaymentForms(models.Model):
         return res
 
     name = fields.Char('Nombre', required=True)
+    priority = fields.Integer(default=10,
+                              help='La prioridad sirve para poner por defecto en sistema.')
     code = fields.Char('Código', size=2, required=True)
 
     _sql_constraints = [
@@ -139,7 +141,6 @@ class SriPointPrinting(models.Model):
     shop_id = fields.Many2one('sale.shop', 'Establecimiento', required=True)
     emission_point = fields.Char('Punto emisión', size=3, default='001', required=True)
     company_id = fields.Many2one('res.company', string='Compañía')
-
 
     _sql_constraints = [
         ('point_printing_unique', 'unique(shop_id, emission_point, company_id)',

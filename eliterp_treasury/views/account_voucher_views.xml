@@ -155,7 +155,7 @@
                                         <field name="date_issue"/>
                                         <field name="date_due"/>
                                         <field name="account_id"
-                                               domain="[('internal_type', '!=', 'view'), ('company_id', '=', parent.company_id)]"/>
+                                               domain="[('company_id', '=', parent.company_id)]"/>
                                         <field name="amount" sum="Total de recaudación"/>
                                         <field name="move_id" string="Asiento contable (Interno)" readonly="1"/>
                                     </tree>
@@ -224,7 +224,7 @@
                                 <field name="beneficiary" required="1"/>
                                 <field name="reference" string="Concepto" required="1"/>
                                 <field name="account_id"
-                                       domain="[('company_id', '=', company_id), ('internal_type', '!=', 'view')]"
+                                       domain="[('company_id', '=', company_id)]"
                                        attrs="{'invisible':[('type_egress', '!=', 'cash')], 'required':[('type_egress', '=', 'cash')]}"/>
                                 <field name="company_id" invisible="1"/>
                                 <field name="partner_id" string="Proveedor" invisible="1"/>
@@ -250,7 +250,7 @@
                                         <tree editable="bottom">
                                             <field name="company_id" invisible="1"/>
                                             <field name="account_id"
-                                                   domain="[('internal_type', '!=', 'view'), ('company_id', '=', parent.company_id)]"/>
+                                                   domain="[('company_id', '=', parent.company_id)]"/>
                                             <field name="amount"/>
                                         </tree>
                                     </field>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Quitar menú Contabilidad/Ventas/Documentos/Recibos de ventas-->
+    <record id="account_voucher.menu_action_sale_receipt" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+    <!--Quitar menú Contabilidad/Compras/Documentos/Recibos de compra-->
+    <record id="account_voucher.menu_action_purchase_receipt" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+</odoo>

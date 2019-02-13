@@ -110,7 +110,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='appears_on_payslip']" position="after"><!--Aparece en nómina-->
                 <field name="account_id" required="1"
-                       domain="[('internal_type', '!=', 'view'), ('company_id', '=', company_id)]"
+                       domain="[('company_id', '=', company_id)]"
                        options='{"no_open": True, "no_create": True}'/>
             </xpath>
             <xpath expr="//field[@name='company_id']" position="attributes"><!--Compañía-->

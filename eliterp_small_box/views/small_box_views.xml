@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Vistas del menú Custodios caja chica-->
+        <record id="eliterp_view_tree_custodian_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_custodian_small_box</field>
+            <field name="model">eliterp.custodian.small.box</field>
+            <field name="arch" type="xml">
+                <tree default_order='create_date desc'>
+                    <field name="name"/>
+                    <field name="account_id"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+        <record id="eliterp_view_form_custodian_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_form_custodian_small_box</field>
+            <field name="model">eliterp.custodian.small.box</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object" name="open_replacement" icon="fa-list">
+                                <field name="replacement_count" widget="statinfo" string="Reposiciones"/>
+                            </button>
+                        </div>
+                        <group col="4">
+                            <field name="name"/>
+                            <field name="account_id"/>
+                            <field name="amount"/>
+                            <field name="replacement_small_box_id"
+                                   attrs="{'invisible': [('replacement_small_box_id', '=', False)]}"
+                                   readonly="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Vistas del menú Registro-->
+        <record id="eliterp_view_tree_voucher_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_voucher_small_box</field>
+            <field name="model">eliterp.voucher.small.box</field>
+            <field name="arch" type="xml">
+                <tree decoration-success="state=='confirm'"
+                      decoration-bf="state=='confirm'"
+                      decoration-info="state=='draft'"
+                      default_order='date desc'>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="type_voucher"/>
+                    <field name="beneficiary"/>
+                    <field name="amount_total" sum="Total"/>
+                    <field name="replacement_small_box_id" string="Referencia"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="eliterp_view_form_voucher_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_form_voucher_small_box</field>
+            <field name="model">eliterp.voucher.small.box</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
+                        <button name="print_voucher"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir comprobante"/>
+                        <button name="confirm_voucher"
+                                string="Confirmar vale"
+                                class="oe_highlight"
+                                type="object"
+                                attrs="{'invisible': ['|', ('type_voucher','=','invoice'), ('state','!=', 'draft')]}"/>
+                        <button name="create_invoice"
+                                string="Crear factura"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible':['|',('type_voucher','=','vale'), ('has_invoice','=',True)]}"/>
+                        <button name="view_invoice"
+                                string="Ver factura"
+                                type="object"
+                                class="oe_highlight"
+                                attrs="{'invisible':['|',('type_voucher','=','vale'), ('has_invoice','=',False)]}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <field name="has_invoice" invisible="1"/>
+                            <group>
+                                <field name="date" required="1"/>
+                                <field name="beneficiary"
+                                       attrs="{'invisible':[('type_voucher','=','invoice')], 'required':[('type_voucher','=','vale')]}"/>
+                                <field name="amount_total"/>
+                            </group>
+                            <group>
+                                <field name="type_voucher" options="{'horizontal': true}" widget="radio"/>
+                                <field name="concept"
+                                       attrs="{'invisible':[('type_voucher','=','invoice')], 'required':[('type_voucher','=','vale')]}"/>
+                                <field name="custodian_id" options="{'no_create': True}"/>
+                            </group>
+                        </group>
+                        <group colspan="2" string="Líneas de cuentas"
+                               attrs="{'invisible':[('type_voucher', '!=', 'vale')]}">
+                            <field name="lines_account" attrs="{'readonly':[('state', '=', 'confirm')]}" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="account_id"/>
+                                    <field name="amount"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!--Vistas del menú Reposición caja chica-->
+        <record id="eliterp_view_tree_replacement_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_replacement_small_box</field>
+            <field name="model">eliterp.replacement.small.box</field>
+            <field name="arch" type="xml">
+                <tree
+                        decoration-info="state=='draft'"
+                        decoration-success="state=='liquidated'"
+                        decoration-bf="state=='liquidated'">
+                    <field name="name"/>
+                    <field name="custodian_id"/>
+                    <field name="total_vouchers"/>
+                    <field name="opening_date"/>
+                    <field name="replacement_date"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="eliterp_view_form_replacement_small_box" model="ir.ui.view">
+            <field name="name">eliterp_view_form_replacement_small_box</field>
+            <field name="model">eliterp.replacement.small.box</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,to_approve,liquidated"
+                               modifiers="{'readonly': true}"/>
+                        <button name="print_replacement"
+                                type="object"
+                                class="oe_highlight"
+                                string="Imprimir reposición"/>
+                        <button name="open_small_box"
+                                states="draft"
+                                type="object"
+                                string="Aperturar caja"
+                                class="oe_highlight"/>
+                        <button name="to_approve"
+                                attrs="{'invisible':['|', ('state','!=', 'open'), ('lines_voucher','=', [])]}"
+                                type="object"
+                                string="Solicitar aprobación"
+                                class="oe_highlight"/>
+                        <button name="approve"
+                                states="to_approve"
+                                type="object"
+                                groups="eliterp_treasury.eliterp_group_approve_small_box"
+                                string="Aprobar"
+                                class="oe_highlight"/>
+                        <button name="liquidate_small_box"
+                                states="approve"
+                                type="object"
+                                groups="eliterp_treasury.eliterp_group_treasury_manager"
+                                string="Liquidar caja"
+                                class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date"/>
+                            <field name="custodian_id" options="{'no_create': True}"/>
+                            <field name="amount_allocated" readonly="1"/>
+                            <field name="total_vouchers" readonly="1"/>
+                            <field name="residual" readonly="1"/>
+                            <field name="move_id" readonly="1" attrs="{'invisible':[('state','!=', 'liquidated')]}"/>
+                            <field name="journal_id" invisible="1"/>
+                        </group>
+                        <group string="Líneas de comprobantes" col="1">
+                            <field name="lines_voucher" nolabel="1" attrs="{'readonly':[('state', '=', 'liquidated')]}">
+                                <tree editable="bottom"
+                                      delete="false"
+                                      decoration-bf="check_reposition == True or state_reposition == 'paid'"
+                                      decoration-success="state_reposition == 'paid'"
+                                      create="false">
+                                    <field name="date" readonly="1"/>
+                                    <field name="type_voucher" readonly="1"/>
+                                    <field name="concept" readonly="1"/>
+                                    <field name="amount_total" readonly="1"/>
+                                    <field name="check_reposition"/>
+                                    <field name="state_reposition" readonly="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

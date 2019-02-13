@@ -21,8 +21,19 @@ class Move(models.Model):
 class Invoice(models.Model):
     _inherit = 'account.invoice'
 
+    @api.model
+    def _default_company_division(self):
+        """
+        Defecto división empresarial
+        :return:
+        """
+        company = self.env.user.company_id.id
+        company_division_ids = self.env['account.company.division'].search([('company_id', '=', company)], limit=1)
+        return company_division_ids
+
     company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
-                                          states={'draft': [('readonly', False)]}, track_visibility='onchange')
+                                          states={'draft': [('readonly', False)]}, track_visibility='onchange',
+                                          default=_default_company_division)
 
 
 class CompanyDivision(models.Model):

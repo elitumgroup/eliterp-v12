@@ -3,6 +3,12 @@
 from odoo import fields, models
 
 
+class Partner(models.Model):
+    _inherit = 'res.partner'
+
+    email_optional = fields.Char('Correo electrónico opcional')
+
+
 class Company(models.Model):
     _inherit = 'res.company'
 

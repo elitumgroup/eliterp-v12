@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Vistas de Retenciones en-->
+        <record id="eliterp_view_withhold_cancel_reason_wizard" model="ir.ui.view">
+            <field name="name">eliterp_view_withhold_cancel_reason_wizard</field>
+            <field name="model">eliterp.withhold.cancel.reason</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="confirm_cancel_withhold"
+                                type="object"
+                                class="oe_highlight"
+                                string="Confirmar"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <!--Compras-->
+        <record id="eliterp_view_withhold_purchase_wizard" model="ir.ui.view">
+            <field name="name">eliterp_view_withhold_purchase_wizard</field>
+            <field name="model">eliterp.withhold</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"
+                               modifiers="{'readonly': true}"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                                <field name="type" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date_withhold"/>
+                            <field name="partner_id"
+                                   required="1"
+                                   options="{'no_create': True}"
+                                   domain="[('supplier', '=', True)]" string="Proveedor"/>
+                            <field name="invoice_id"
+                                   required="1"
+                                   options="{'no_create': True}"
+                                   domain="[('type', '=', 'out_invoice'), ('partner_id', '=', partner_id)]"/>
+                            <field name="is_sequential"/>
+                            <field name="reference"
+                                   attrs="{'required': [('is_sequential', '=', True)], 'invisible': ['|', ('is_sequential', '=', False), ('state', '=', 'confirm')]}"/>
+                            <field name="withhold_number"
+                                   attrs="{'invisible': [('withhold_number', '=', False)]}"
+                                   readonly="1"/>
+                            <field name="journal_id" invisible="1"/>
+                            <field name="base_taxable" invisible="1"/>
+                            <field name="base_iva" invisible="1"/>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="lines_withhold" nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use', '=', 'purchase'),  ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Guardar" special="save" class="oe_highlight"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="eliterp_view_form_withhold_purchase" model="ir.ui.view">
+            <field name="name">eliterp_view_form_withhold_purchase</field>
+            <field name="model">eliterp.withhold</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,confirm"
+                               modifiers="{'readonly': true}"/>
+                        <button name="confirm_withhold"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"
+                                string="Confirmar"
+                                class="oe_highlight"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                                <field name="type" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date_withhold" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="partner_id"
+                                   required="1"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   options="{'no_create': True}"
+                                   domain="[('supplier', '=', True)]" string="Proveedor"/>
+                            <field name="invoice_id"
+                                   required="1"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   options="{'no_create': True}"
+                                   domain="[('type', '=', 'in_invoice'), ('partner_id', '=', partner_id), ('have_withhold', '=', False), ('state', '=', 'draft')]"/>
+                            <field name="is_sequential"/>
+                            <field name="reference"
+                                   attrs="{'required': [('is_sequential', '=', True)], 'invisible': ['|', ('is_sequential', '=', False), ('state', '=', 'confirm')]}"/>
+                            <field name="withhold_number"
+                                   attrs="{'invisible': [('withhold_number', '=', False)]}"
+                                   readonly="1"/>
+                            <field name="journal_id" invisible="1"/>
+                            <field name="base_taxable" invisible="1"/>
+                            <field name="base_iva" invisible="1"/>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="lines_withhold" nolabel="1" attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use','=','purchase'), ('tax_type', '=', 'retention'), ('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="eliterp_view_tree_withhold_purchase" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_withhold_purchase</field>
+            <field name="model">eliterp.withhold</field>
+            <field name="arch" type="xml">
+                <tree
+                        decoration-success="state == 'confirm'"
+                        decoration-bf="state == 'confirm'"
+                        decoration-info="state=='draft'"
+                        decoration-muted="state=='cancel'"
+                        default_order='date_withhold desc'>
+                    <field name="name" string="Documento"/>
+                    <field name="withhold_number"/>
+                    <field name="date_withhold"/>
+                    <field name="invoice_id"/>
+                    <field name="partner_id"/>
+                    <field name="total"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <!--Ventas-->
+        <record id="eliterp_view_form_withhold_sale" model="ir.ui.view">
+            <field name="name">eliterp_view_form_withhold_sale</field>
+            <field name="model">eliterp.withhold</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar" modifiers="{'readonly': true}"/>
+                        <button name="confirm_withhold"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}"
+                                string="Confirmar"
+                                class="oe_highlight"
+                                type="object"/>
+                        <button name="open_withhold_cancel_reason"
+                                attrs="{'invisible': [('state', '=', 'cancel')]}"
+                                string="Anular"
+                                groups="eliterp_treasury.eliterp_group_treasury_manager"
+                                type="object"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" string="Documento" class="oe_edit_only"/>
+                            <h1>
+                                <field name="name" readonly="1"/>
+                                <field name="type" invisible="1"/>
+                            </h1>
+                        </div>
+                        <group col="4">
+                            <field name="date_withhold" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="partner_id"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   required="1"
+                                   options="{'no_create': True}"
+                                   domain="[('is_contact', '=', False), ('customer','=',True)]"/>
+                            <field name="invoice_id"
+                                   required="1"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   options="{'no_create': True}"
+                                   domain="[('type', '=', 'out_invoice'), ('partner_id', '=', partner_id), ('have_withhold', '=', False), ('state', '=', 'open')]"/>
+                            <field name="withhold_number" attrs="{'readonly': [('state', '!=', 'draft')]}"
+                                   required="1"/>
+                            <field name="move_id" readonly="1"
+                                   attrs="{'invisible': [('state', '=', 'draft')]}"/>
+                            <field name="journal_id" invisible="1"/>
+                            <field name="base_taxable" invisible="1"/>
+                            <field name="base_iva" invisible="1"/>
+                        </group>
+                        <group string="Líneas de retención">
+                            <field name="lines_withhold" attrs="{'readonly': [('state', '!=', 'draft')]}" nolabel="1">
+                                <tree editable="top/bottom">
+                                    <field name="retention_type"/>
+                                    <field name="tax_id"
+                                           domain="[('type_tax_use', '=', 'sale'),('tax_type', '=', 'retention'),('retention_type', '=', retention_type)]"
+                                           options="{'no_create': True}"/>
+                                    <field name="base_taxable"/>
+                                    <field name="amount" sum="Total"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="eliterp_view_tree_withhold_sale" model="ir.ui.view">
+            <field name="name">eliterp_view_tree_retention_sale</field>
+            <field name="model">eliterp.withhold</field>
+            <field name="arch" type="xml">
+                <tree decoration-info="state=='draft'"
+                      decoration-success="state == 'confirm'"
+                      decoration-bf="state == 'confirm'"
+                      decoration-danger="state=='cancel'"
+                      default_order='date_withhold desc'>
+                    <field name="name" string="Documento"/>
+                    <field name="withhold_number"/>
+                    <field name="date_withhold"/>
+                    <field name="invoice_id"/>
+                    <field name="partner_id"/>
+                    <field name="total"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

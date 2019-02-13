@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
+from odoo.osv import expression
 
 SRI = [
     ('i', 'IVA diferente de 0%'),
@@ -46,20 +47,23 @@ class Account(models.Model):
         :param end_date:
         :return: float
         """
+        debit = 0.00
+        credit = 0.00
         move_lines = self.env['account.move.line'].search([
             ('account_id', '=', self.id),
             ('date', '<', start_date)
         ])
-        balance = 0.00
         for line in move_lines:
-            type = (self.code.split("."))[0]
-            balance += self._get_balance_nature_account(type, line.debit, line.credit)
-        return balance
+            credit += line.credit
+            debit += line.debit
+        type = (self.code.split("."))[0]
+        return self._get_balance_nature_account(type, debit, credit)
 
     @staticmethod
     def _get_balance_nature_account(type, debit, credit):
         """
         Monto de balance según naturaleza de cuenta contable
+        http://enrique-asuntoscontables.blogspot.com/2011/09/clasificacion-general-de-las-cuentas.html
         :param type:
         :param debit:
         :param credit:
@@ -80,9 +84,10 @@ class Account(models.Model):
         return balance
 
     @api.multi
-    def _account_balance(self, accounts, date_from=False, date_to=False):
+    def _account_balance(self, account, accounts, date_from=False, date_to=False):
         """
         Balance de cuenta contable
+        https://www.contabilidae.com/deudor-y-acreedor/
         :param accounts:
         :param date_from:
         :param date_to:
@@ -93,7 +98,7 @@ class Account(models.Model):
         balance = 0.00
         arg = []
         arg.append(('account_id', 'in', accounts.ids))
-        if date_from and date_to:  # TODO: Si existen las fechas se las filtra por las mismas (Dejamos esto para futuro reportes)
+        if date_from and date_to:
             arg.append(('date', '>=', date_from))
             arg.append(('date', '<=', date_to))
         account_lines = self.env['account.move.line'].search(arg)
@@ -102,10 +107,7 @@ class Account(models.Model):
         for line in account_lines:
             credit += line.credit
             debit += line.debit
-            balance += self._get_balance_nature_account(
-                line.account_id.code.split(".")[0],
-                line.debit, line.credit
-            )
+        balance = self._get_balance_nature_account(account.code.split(".")[0], debit, credit)
         return debit, credit, balance
 
     @api.multi
@@ -117,10 +119,9 @@ class Account(models.Model):
         :return:
         """
         for account in self:
-            # TODO: Revisar si colocamos contexto para no mostrar cuentas padres en transacciones
-            # with_context({'show_parent_account': True})
-            childs = self.search([('id', 'child_of', [account.id])])
-            data = list(self._account_balance(childs))
+            # Colocamos contexto para no mostrar cuentas padres en transacciones
+            subaccounts = self.with_context({'show_parent_account': True}).search([('id', 'child_of', [account.id])])
+            data = list(self._account_balance(account, subaccounts))
             account.debit = data[0]
             account.credit = data[1]
             account.balance = data[2]
@@ -133,10 +134,13 @@ class Account(models.Model):
         :return:
         """
         if ('user_type_id' in vals and self.user_type_id.id != vals['user_type_id']):
-            if self.env['account.move.line'].search([('account_id', 'in', self.ids)], limit=1):
-                raise UserError(
-                    _(
-                        "Está cuenta ya contiene apuntes, por lo tanto, no puede cambiar a tipo vista. (código: %s)" % self.code))
+            user_type_id = self.env['account.account.type'].browse(vals['user_type_id'])
+            # Soló cuando queremos cambiar a tipo vista verificamos no tenga movimientos
+            if user_type_id.type == 'view':
+                if self.env['account.move.line'].search([('account_id', 'in', self.ids)], limit=1):
+                    raise UserError(
+                        _(
+                            "Está cuenta ya contiene apuntes, por lo tanto, no puede cambiar a tipo vista. (código: %s)" % self.code))
         return super(Account, self).write(vals)
 
     @api.constrains('parent_id')
@@ -149,12 +153,29 @@ class Account(models.Model):
             raise ValidationError(_('No puede crear cuentas padres recursivas.'))
         return True
 
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
+        """
+        MM: Agregamos ala búsqueda el código alterno de la cuenta contable y soló cuentas tipo vista
+        cuando estemos en el menú del mismo
+        :param name:
+        :param args:
+        :param operator:
+        :param limit:
+        :param name_get_uid:
+        :return:
+        """
+        args = args or []
+        if not self._context.get('show_parent_account', False):
+            args += [('internal_type', '!=', 'view')]
+        return self._name_search(name=name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
+
     accounting_lines = fields.One2many('account.move.line', 'account_id', string='Líneas contables')
-    parent_id = fields.Many2one('account.account', 'Cuenta padre', ondelete="set null")
+
     child_ids = fields.One2many('account.account', 'parent_id', string='Cuentas hijas')
     credit = fields.Float(string='Crédito', compute='_compute_balance', digits=dp.get_precision('Account'))
     debit = fields.Float(string='Débito', compute='_compute_balance', digits=dp.get_precision('Account'))
-    balance = fields.Float(string='Balance', compute='_compute_balance', digits=dp.get_precision('Account'))
+    balance = fields.Float(string='Saldo en cuenta', compute='_compute_balance', digits=dp.get_precision('Account'))
     parent_path = fields.Char(index=True)
 
 
@@ -178,11 +199,6 @@ class TaxTemplate(models.Model):
         ('iva', 'IVA')
     ], string='Tipo de retención', default='rent')
 
-    _sql_constraints = [
-        ('code_unique', 'unique (code,type_tax_use,company_id)',
-         _("El código de retención debe ser único por tipo de impuesto."))
-    ]
-
 
 class Tax(models.Model):
     _inherit = 'account.tax'
@@ -201,6 +217,34 @@ class Tax(models.Model):
                 result.append((data.id, "%s" % (data.name)))
         return result
 
+    @api.multi
+    @api.returns('self', lambda value: value.id)
+    def copy(self, default=None):
+        default = default or {}
+        if self.code:
+            default['code'] = _("%s (copia)") % (self.code)
+        return super(Tax, self).copy(default=default)
+
+    @api.model
+    def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
+        """
+        ME: Agregamos a la búsqueda el código de retención
+        :param name:
+        :param args:
+        :param operator:
+        :param limit:
+        :param name_get_uid:
+        :return:
+        """
+        args = args or []
+        if name:
+            args = [('code', '=', name)]
+        tax_ids = self._search(args, limit=limit, access_rights_uid=name_get_uid)
+        if not tax_ids:
+            return super(Tax, self)._name_search(name, args=None, operator=operator, limit=limit,
+                                                 name_get_uid=name_get_uid)
+        return self.browse(tax_ids).name_get()
+
     code = fields.Char('Código de retención')
     tax_type = fields.Selection([
         ('iva', 'IVA'),
@@ -212,5 +256,6 @@ class Tax(models.Model):
     ], string='Tipo de retención', default='rent')
 
     _sql_constraints = [
-        ('code_unique', 'unique (code, type_tax_use, company_id)', _("El código de retención debe ser único por tipo de impuesto."))
+        ('code_unique', 'unique (code, type_tax_use, company_id)',
+         _("El código de retención debe ser único por tipo de impuesto."))
     ]
