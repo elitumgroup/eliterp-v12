@@ -171,7 +171,7 @@ class Account(models.Model):
         return self._name_search(name=name, args=args, operator=operator, limit=limit, name_get_uid=name_get_uid)
 
     accounting_lines = fields.One2many('account.move.line', 'account_id', string='Líneas contables')
-
+    parent_id = fields.Many2one('account.account', 'Cuenta padre', ondelete="set null")
     child_ids = fields.One2many('account.account', 'parent_id', string='Cuentas hijas')
     credit = fields.Float(string='Crédito', compute='_compute_balance', digits=dp.get_precision('Account'))
     debit = fields.Float(string='Débito', compute='_compute_balance', digits=dp.get_precision('Account'))
