@@ -264,7 +264,7 @@ class PayslipRun(models.Model):
                     tenth_4 += round(role.tenth_4, 3)
                 # Fondos de reserva retenidos
                 if role.role_id.employee_id.accumulate_reserve_funds == 'yes' and role.role_id.employee_id.working_time:
-                    reserve_funds = True
+                    flag_reserve_funds = True
                     provision_reserve_funds += round((float(role.wage) * float(8.33)) / float(100),
                                                      3)
                 # Fondos de reserva cobrados
@@ -296,7 +296,7 @@ class PayslipRun(models.Model):
 
         # Creamos líneas de movimiento de provisión, PROVISIÓN VACACIONES
         _logger.info('***PROVISIONES***')
-        if reserve_funds:  # Si acumula beneficios (Fondos de reserva) se crea está línea de movimiento
+        if flag_reserve_funds:  # Si acumula beneficios (Fondos de reserva) se crea está línea de movimiento
             self._create_line_expenses('PFR', journal_id, move_id, provision_reserve_funds)
         patronal = round((float(wage * 12.15)) / 100, 3)
         self._create_line_expenses('PDT', journal_id, move_id, amount_provision_tenth_3)  # Provisión de DT

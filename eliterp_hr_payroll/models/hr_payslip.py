@@ -155,7 +155,7 @@ class Payslip(models.Model):
         for input in inputs:  # Operaciones de reglas salariales
             if input.condition_select == 'python' and input.code != 'ADQ':
                 safe_eval(input.condition_python, local_dict, mode='exec', nocopy=True)
-                amount = local_dict['result']
+                amount = round(local_dict['result'], 3)
             elif input.code == 'ADQ':
                 advance_payment = self.env['hr.salary.advance.line'].search([
                     ('parent_state', '=', 'posted'),
@@ -165,7 +165,7 @@ class Payslip(models.Model):
                 ])
                 if advance_payment:
                     # Si existen se suman todos los anticipos contabilizados en ese período
-                    amount = sum(line.amount_advance for line in advance_payment)
+                    amount = round(sum(line.amount_advance for line in advance_payment), 3)
                 else:
                     amount = 0.00
             else:

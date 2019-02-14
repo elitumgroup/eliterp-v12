@@ -17,6 +17,7 @@
                             <field name="period_id" options="{'no_open': True, 'no_create': True}"
                                    domain="[('period_id','=', year_accounting)]"/>
                             <field name="shop_id"
+                                   required="1"
                                    domain="[('company_id', '=', company_id)]"
                                    options="{'no_open': True, 'no_create': True}"/>
                             <field name="no_validate"/>
@@ -26,12 +27,11 @@
                     </group>
 
                     <!--Si se genera correctamente se muestra este grupo-->
-                    <group states="export">
-                        <separator string="Archivo generado correctamente, guardelo en su ubicación de preferencia."
-                                   colspan="4"/>
+                    <group states="export"
+                           string="Archivo (.xml) generado correctamente, guardelo en su ubicación de preferencia.">
                         <group>
                             <field name="file_name" invisible="1"/>
-                            <field name="file" filename="file_name" readonly="1"/>
+                            <field name="file" filename="file_name" nolabel="1" readonly="1"/>
                         </group>
                     </group>
 
@@ -54,15 +54,25 @@
             </field>
         </record>
 
-        <!--Taxes (103, 104)-->
-        <record id="view_form_taxes_103_104_wizard" model="ir.ui.view">
-            <field name="name">view_form_taxes_103_104_wizard</field>
-            <field name="model">sri.taxes.103.104</field>
+        <!--Taxes-->
+        <record id="view_form_retention_summary_report_wizard" model="ir.ui.view">
+            <field name="name">view_form_retention_summary_report_wizard</field>
+            <field name="model">sri.retention.summary</field>
             <field name="arch" type="xml">
                 <form>
-                    <group col="4">
-                        <field name="start_date"/>
-                        <field name="end_date"/>
+                    <group>
+                        <separator
+                                string="Resumen de retenciones (103, 104), para formularios del SRI."
+                                colspan="4"/>
+                        <group>
+                            <field name="year_accounting" options="{'no_open': True, 'no_create': True}"/>
+                            <field name="period_id" options="{'no_open': True, 'no_create': True}"
+                                   domain="[('period_id','=', year_accounting)]"/>
+                        </group>
+                    </group>
+                    <group string="Archivo (.xlsx)" attrs="{'invisible': [('file', '=', False)]}">
+                        <field name="file_name" invisible="1"/>
+                        <field name="file" filename="file_name" nolabel="1" readonly="1"/>
                     </group>
                     <footer>
                         <button name="print_report_xlsx"

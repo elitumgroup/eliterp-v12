@@ -44,7 +44,7 @@
             <field name="inherit_id" ref="account.view_account_form"/>
             <field name="arch" type="xml">
                 <field name="user_type_id" position="after">
-                    <field name="parent_id" domain="[('internal_type', '=', 'view')]"/>
+                    <field name="parent_id" context="{'show_parent_account': True}"//>
                     <field name="debit"/>
                     <field name="credit"/>
                     <field name="balance"/>

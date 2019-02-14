@@ -331,7 +331,8 @@ class Ats(models.TransientModel):
         purchases = object_invoice.search(domain_purchase)
         ats_purchases = []
         for line in purchases:
-            if not ID_SUPPLIER[line.partner_id.type_documentation] == '06':  # TODO: Proveedores con pasaporte no se procesa
+            if not ID_SUPPLIER[
+                       line.partner_id.type_documentation] == '06':  # TODO: Proveedores con pasaporte no se procesa
                 if line.type == 'in_invoice':
                     code = '01'
                     # TODO: If line.is_sale_note: code = '02'
@@ -449,6 +450,7 @@ class Ats(models.TransientModel):
             })
         self.write(data2save)
         return {
+            'name': 'ATS',
             'type': 'ir.actions.act_window',
             'res_model': 'sri.ats',
             'view_mode': ' form',
@@ -485,8 +487,7 @@ class Ats(models.TransientModel):
     )
     shop_id = fields.Many2one(
         'sale.shop',
-        'No. establecimiento',
-        required=True
+        'No. establecimiento'
     )
     pay_limit = fields.Float('Límite de pago', default=1000)
     file = fields.Binary('Archivo XML')
@@ -503,9 +504,351 @@ class Ats(models.TransientModel):
     )
 
 
-class Taxes103104Report(models.TransientModel):
-    _name = 'sri.taxes.103.104'
-    _description = _("Ventana para reporte de impuestos (103, 104)")
+class RetentionSummary(models.TransientModel):
+    _name = 'sri.retention.summary'
+    _inherit = ['report.report_xlsx.abstract', 'sri.ats']
+    _description = _("Ventana para reporte de resumen de retenciones")
+
+    def _get_lines_sales(self, context):
+        """
+        Obtenemos todas las líneas facturadas de ventas con sus valores de retención
+        :param context:
+        :return: list
+        """
+        data = []
+        arg = []
+        arg.append(('period_id', '>=', context['period_id'].id))
+        arg.append(('state', 'not in', ('draft', 'cancel')))
+        arg.append(('type', '=', 'out_invoice'))
+        invoices = self.env['account.invoice'].search(arg)
+        count = 0
+        for invoice in invoices:
+            count_invoice = 0
+            point_printing = invoice.point_printing_id
+            for line in invoice.invoice_line_ids:
+                register = []
+                register.append("F" if invoice.type == 'out_invoice' else "N")  # Tipo
+                register.append(point_printing.shop_id.establishment)  # Establecimiento
+                register.append(point_printing.emission_point)  # P. Emisión
+                register.append(invoice.invoice_number)  # Secuencial
+                register.append(invoice.date_invoice.strftime(STD_FORMAT))  # Fecha
+                register.append(invoice.retention_number if invoice.retention_id else "-")  # No. Retención
+                register.append(line.name)  # Descripción
+                register.append(invoice.partner_id.name)  # Cliente
+                register.append(invoice.partner_id.documentation_number)  # No. Documento
+                register.append(
+                    invoice.authorization if invoice.is_electronic else invoice.sri_authorization_id.authorization)  # Autorización
+                register.append("-")  # S. Tributario
+                register.append(0.00)  # Base iva (11)
+                register.append(0.00)  # Base 0
+                register.append(0.00)  # ICE
+                register.append(0.00)  # Base no iva
+                register.append("-")  # C. Renta
+                register.append("-")  # P. Renta
+                register.append(0.00)  # Monto renta
+                register.append(invoice.amount_tax if count_invoice == 0 else 0.00)  # R. Base I.
+                register.append("-")  # C. Iva
+                register.append("-")  # P. Iva
+                register.append(0.00)  # Valor iva
+                register.append(0.00)  # Total de factura
+                data.append(register)
+                count_invoice = 1
+                if len(line.invoice_line_tax_ids) == 0:
+                    data[-1][14] = line.price_subtotal
+                else:
+                    for tax in line.invoice_line_tax_ids:
+                        if tax.amount > 0:
+                            data[-1][11] = line.price_subtotal
+                        if tax.amount == 0:
+                            data[-1][12] = line.price_subtotal
+            rent = []
+            iva = []
+            for line in invoice.retention_id.retention_lines:
+                if line.retention_type == 'rent':
+                    rent.append(line)
+                if line.retention_type == 'iva':
+                    iva.append(line)
+            count = -1
+            for r in rent:
+                data[count][15] = r.tax_id.code if r.tax_id.code else "-"
+                data[count][16] = str(int(r.tax_id.amount)) + '%' if r.tax_id.amount else "-"
+                data[count][17] = r.amount
+                count = count - 1
+            count = -1
+            for i in iva:
+                data[count][19] = i.tax_id.code if i.tax_id.code else "-"
+                data[count][20] = str(int(i.tax_id.amount)) + '%' if i.tax_id.amount else "-"
+                data[count][21] = i.amount
+                count = count - 1
+            data[-1][22] = invoice.amount_total
+        return data
+
+    def _get_lines_purchases(self, context):
+        """
+        Obtenemos todas las líneas facturadas de compras con sus valores de retención
+        :param context:
+        :return: list
+        """
+        data = []
+        arg = []
+        arg.append(('period_id', '>=', context['period_id'].id))
+        arg.append(('state', 'not in', ('draft', 'cancel')))
+        arg.append(('type', '=', 'in_invoice'))
+        invoices = self.env['account.invoice'].search(arg)
+        count = 0
+        for invoice in invoices:
+            count_invoice = 0
+            authorization = invoice.authorization
+            establishment = invoice.serial_number[:3]
+            emission_point = invoice.serial_number[4:]
+            for line in invoice.invoice_line_ids:
+                register = []
+                register.append("F" if invoice.type == 'in_invoice' else "N")  # Tipo
+                register.append(establishment)  # Establecimiento
+                register.append(emission_point)  # P. Emisión
+                register.append(invoice.invoice_number)  # Secuencial
+                register.append(invoice.date_invoice.strftime(STD_FORMAT))  # Fecha
+                register.append(invoice.retention_number if invoice.retention_id else "-")  # No. Retención
+                register.append(line.name)  # Descripción
+                register.append(invoice.partner_id.name)  # Cliente
+                register.append(invoice.partner_id.documentation_number)  # No. Documento
+                register.append(authorization)  # Autorización
+                register.append(invoice.proof_support_id.code)  # S. Tributario
+                register.append(0.00)  # Base iva (11)
+                register.append(0.00)  # Base 0
+                register.append(0.00)  # ICE
+                register.append(0.00)  # Base no iva
+                register.append("-")  # C. Renta
+                register.append("-")  # P. Renta
+                register.append(0.00)  # Monto renta
+                register.append(invoice.amount_tax if count_invoice == 0 else 0.00)  # R. Base I.
+                register.append("-")  # C. Iva
+                register.append("-")  # P. Iva
+                register.append(0.00)  # Valor iva
+                register.append(0.00)  # Total de factura
+                data.append(register)
+                count_invoice = 1
+                if len(line.invoice_line_tax_ids) == 0:
+                    data[-1][14] = line.price_subtotal
+                else:
+                    for tax in line.invoice_line_tax_ids:
+                        if tax.amount > 0:
+                            data[-1][11] = line.price_subtotal
+                        if tax.amount == 0:
+                            data[-1][12] = line.price_subtotal
+            rent = []
+            iva = []
+            for retention_line in invoice.retention_id.retention_lines:
+                if retention_line.retention_type == 'rent':
+                    rent.append(retention_line)
+                if retention_line.retention_type == 'iva':
+                    iva.append(retention_line)
+            if len(rent) == 2:
+                register = []
+                register.append("F" if invoice.type == 'in_invoice' else "N")  # Tipo
+                register.append(establishment)  # Establecimiento
+                register.append(emission_point)  # P. Emisión
+                register.append(invoice.invoice_number)  # Secuencial
+                register.append(invoice.date_invoice.strftime(STD_FORMAT))  # Fecha
+                register.append(invoice.retention_number if invoice.retention_id else "-")  # No. Retención
+                register.append(line.name)  # Descripción
+                register.append(invoice.partner_id.name)  # Cliente
+                register.append(invoice.partner_id.documentation_number)  # No. Documento
+                register.append(authorization)  # Autorización
+                register.append(invoice.proof_support_id.code)  # S. Tributario
+                register.append(0.00)  # Base iva (11)
+                register.append(0.00)  # Base 0
+                register.append(0.00)  # ICE
+                register.append(0.00)  # Base no iva
+                register.append("-")  # C. Renta
+                register.append("-")  # P. Renta
+                register.append(0.00)  # Monto renta
+                register.append(0.00)  # R. Base I.
+                register.append("-")  # C. Iva
+                register.append("-")  # P. Iva
+                register.append(0.00)  # Valor iva
+                register.append(0.00)  # Total de factura
+                data.append(register)
+            count = -1
+            for r in rent:
+                data[count][15] = r.tax_id.code if r.tax_id.code else "-"
+                data[count][16] = str(int(r.tax_id.amount)) + '%' if r.tax_id.amount else "-"
+                data[count][17] = r.amount if invoice.state != 'cancel' else 0.00
+                count = count - 1
+                if not RETENTIONS:  # No existe retenciones (código) se crea
+                    RETENTIONS.append({
+                        'code': r.tax_id.code,
+                        'name': r.tax_id.name,
+                        'subtotal': r.base_taxable if invoice.state != 'cancel' else 0.00,
+                        'amount': r.amount if invoice.state != 'cancel' else 0.00,
+                        'type': "rent"
+                    })
+                else:
+                    flag = any(x['code'] == r.tax_id.code for x in RETENTIONS)
+                    if flag:  # Si existe código  actualizamso monto
+                        index = list(map(lambda x: x['code'], RETENTIONS)).index(r.tax_id.code)
+                        RETENTIONS[index]['amount'] = RETENTIONS[index]['amount'] + (
+                            r.amount if invoice.state != 'cancel' else 0.00)
+                        RETENTIONS[index]['subtotal'] = RETENTIONS[index]['subtotal'] + (
+                            r.base_taxable if invoice.state != 'cancel' else 0.00)
+                    else:
+                        RETENTIONS.append({
+                            'code': r.tax_id.code,
+                            'name': r.tax_id.name,
+                            'subtotal': r.base_taxable if invoice.state != 'cancel' else 0.00,
+                            'amount': r.amount if invoice.state != 'cancel' else 0.00,
+                            'type': "rent"
+                        })
+            count = -1
+            for i in iva:
+                data[count][19] = i.tax_id.code if i.tax_id.code else "-"
+                data[count][20] = str(int(i.tax_id.amount)) + '%' if i.tax_id.amount else "-"
+                data[count][21] = i.amount
+                count = count - 1
+                if not RETENTIONS:  # No existe retenciones (código) se crea
+                    RETENTIONS.append({
+                        'code': i.tax_id.code,
+                        'name': i.tax_id.name,
+                        'subtotal': i.base_taxable if invoice.state != 'cancel' else 0.00,
+                        'amount': i.amount if invoice.state != 'cancel' else 0.00,
+                        'type': "iva"
+                    })
+                else:
+                    flag = any(x['code'] == i.tax_id.code for x in RETENTIONS)
+                    if flag:  # Si existe código  actualizamos monto
+                        index = list(map(lambda x: x['code'], RETENTIONS)).index(i.tax_id.code)
+                        RETENTIONS[index]['amount'] = RETENTIONS[index]['amount'] + (
+                            i.amount if invoice.state != 'cancel' else 0.00)
+                        RETENTIONS[index]['subtotal'] = RETENTIONS[index]['subtotal'] + (
+                            i.base_taxable if invoice.state != 'cancel' else 0.00)
+                    else:
+                        RETENTIONS.append({
+                            'code': i.tax_id.code,
+                            'name': i.tax_id.name,
+                            'subtotal': i.base_taxable if invoice.state != 'cancel' else 0.00,
+                            'amount': i.amount if invoice.state != 'cancel' else 0.00,
+                            'type': "iva"
+                        })
+            data[-1][22] = invoice.amount_total
+        return data
+
+    def generate_xlsx_report(self, workbook, context):
+        global RETENTIONS  # Variable global para suma total de retenciones por código
+        RETENTIONS = []
+        sales = self._get_lines_sales(context)  # Lista de factura de ventas
+        purchases = self._get_lines_purchases(context)  # Lista de factura de compras
+        sheet = workbook.add_worksheet('103-104')
+        # Formatos de celda
+        bold = workbook.add_format({'bold': 1})
+        title = workbook.add_format({
+            'bold': True,
+            'align': 'center',
+            'border': 1
+        })
+        heading = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D3D3D3',
+            'align': 'center',
+            'border': 1
+        })
+        money_format = workbook.add_format({'num_format': '#,##0.00'})
+        date_format = workbook.add_format({'num_format': 'dd/mm/yy'})
+        sheet.write('A1', 'ANEXO DE DECLARACIÓN 103, 104', title)
+        sheet.write('A3', 'COMPRAS', heading)
+        columns = [
+            'TIPO', 'EST.', 'P. EMI.', 'SEC.', 'FECHA', '# RET.', 'DESCRIPCIÓN', 'RAZÓN SOCIAL',
+            '# DOCUMENTO', 'AUTORIZACIÓN', 'S. TRI.', 'B. IVA', 'B. CERO', 'ICE', 'B. NO IVA',
+            'C. RENTA', 'P. RENTA', 'MONTO R.', 'R. BASE IVA', 'C. IVA', 'P. IVA', 'MONTO I.', 'TOTAL'
+        ]
+        row = 4
+        col = 0
+        # Variable par sumar columnas
+        sum_columns = (
+            ['L', 11], ['M', 12], ['N', 13], ['O', 14],
+            ['R', 17], ['S', 18], ['V', 21], ['W', 22]
+        )
+        """
+            COMRPAS
+        """
+        for column in columns:
+            sheet.write(row, col, column, bold)
+            col += 1
+        row += 1
+        for line in purchases:
+            col = 0
+            for column in line:
+                if isinstance(column, str):
+                    sheet.write(row, col, column)
+                elif isinstance(column, datetime):
+                    sheet.write(row, col, column, date_format)
+                else:
+                    sheet.write(row, col, column, money_format)
+                col += 1
+            row += 1
+        sheet.write(row, 10, 'Totales', bold)
+        for l, c in sum_columns:
+            sum_purchases = '=SUM(%s6:%s%s)' % (l, l, str(row))  # Sumar columnas
+            sheet.write(row, c, sum_purchases, money_format)
+        """
+            VENTAS
+        """
+        row += 2
+        col = 0
+        sheet.write('A%s' % str(row), 'VENTAS', heading)
+        row += 1
+        for column in columns:
+            sheet.write(row, col, column, bold)
+            col += 1
+        row += 1
+        sum_row = row + 1
+        for line in sales:
+            col = 0
+            for column in line:
+                if isinstance(column, str):
+                    sheet.write(row, col, column)
+                elif isinstance(column, datetime):
+                    sheet.write(row, col, column, date_format)
+                else:
+                    sheet.write(row, col, column, money_format)
+                col += 1
+            row += 1
+        sheet.write(row, 10, 'Totales', bold)
+        for l, c in sum_columns:
+            sum_sales = '=SUM(%s%s:%s%s)' % (l, str(sum_row), l, str(row))  # Sumar columnas
+            sheet.write(row, c, sum_sales, money_format)
+        """
+             RESUMEN RENTA/IVA
+        """
+        row += 2
+        col = 0
+        sheet.write('A%s' % str(row), 'CÓDIGO DE RENTENCIÓN', heading)
+        row += 1
+        columns_ = [
+            'CÓDIGO', 'NOMBRE', 'TOTAL'
+        ]
+        for column in columns_:
+            sheet.write(row, col, column, bold)
+            col += 1
+        row += 1
+        sum_row = row + 1
+        data = []
+        for line in RETENTIONS:
+            register = []
+            register.append(line['code'])
+            register.append(line['name'])
+            register.append(line['amount'])
+            data.append(register)
+        for line in data:
+            col = 0
+            for column in line:
+                if isinstance(column, str):
+                    sheet.write(row, col, column)
+                else:
+                    sheet.write(row, col, column, money_format)
+                col += 1
+            row += 1
+        sum_retentions = '=SUM(C%s:C%s)' % (str(sum_row), str(row))
+        sheet.write(row, 2, sum_retentions, money_format)
 
     @api.multi
     def print_report_xlsx(self):
@@ -513,8 +856,17 @@ class Taxes103104Report(models.TransientModel):
         Imprimimos reporte en xlsx
         :return:
         """
-        self.ensure_one()
-        # TODO: return self.env.ref('eliterp_sri_reports.action_report_taxes_103_104_xlsx').report_action(self)
-
-    start_date = fields.Date('Fecha inicio', required=True)
-    end_date = fields.Date('Fecha fin', required=True)
+        context = dict(
+            period_id=self.period_id
+        )
+        self.write(self.create_xlsx_report('Resumen de retenciones', context))
+        return {
+            'name': "Resumen de retenciones",
+            'type': 'ir.actions.act_window',
+            'res_model': 'sri.retention.summary',
+            'view_mode': ' form',
+            'view_type': ' form',
+            'res_id': self.id,
+            'views': [(False, 'form')],
+            'target': 'new',
+        }

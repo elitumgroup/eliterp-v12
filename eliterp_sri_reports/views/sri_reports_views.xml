@@ -20,18 +20,18 @@
                   action="action_ats_report"
                   sequence="1"/>
 
-        <record id="action_taxes_103_104_report" model="ir.actions.act_window">
-            <field name="name">Impuestos (103,104)</field>
-            <field name="res_model">sri.taxes.103.104</field>
+        <record id="action_retention_summary_report" model="ir.actions.act_window">
+            <field name="name">Resumen de retenciones</field>
+            <field name="res_model">sri.retention.summary</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="eliterp_sri_reports.view_form_taxes_103_104_wizard"/>
+            <field name="view_id" ref="eliterp_sri_reports.view_form_retention_summary_report_wizard"/>
             <field name="target">new</field>
         </record>
-        <menuitem id="menu_taxes_103_104_report"
+        <menuitem id="menu_retention_summary_report"
                   parent="menu_sri_reports"
-                  action="action_taxes_103_104_report"
+                  action="action_retention_summary_report"
                   sequence="2"/>
     </data>
 </odoo>

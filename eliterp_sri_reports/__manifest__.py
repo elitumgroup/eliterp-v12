@@ -12,8 +12,7 @@
     ],
     'data': [
         'wizard/sri_reports_wizard_views.xml',
-        'views/sri_reports_views.xml',
-        'reports/sri_reports.xml'
+        'views/sri_reports_views.xml'
     ],
     'init_xml': [],
     'update_xml': [],
