@@ -267,7 +267,7 @@ class Voucher(models.Model):
             if not sequence:
                 raise ValidationError(
                     _("No existe secuencia 'account.voucher.purchase.cash' para compañía %s.") % self.company_id.name)
-            move_name = prefix + "EFC-" + year + "-" + sequence
+            move_name = prefix + "VAR-" + year + "-" + sequence
         else:
             bank_sequence = self.bank_journal_id.sequence_id.next_by_id()
             move_name = prefix + code + "-" + year + "-" + bank_sequence

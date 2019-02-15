@@ -190,15 +190,12 @@
                     <group string="Análisis de gasto"
                            attrs="{'invisible':[('type_pay_order', '=', 'invoice')]}">
                         <field name="company_division_id"
-                               attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
                                context="{'default_company_id': company_id}"
                                domain="[('company_id', '=', company_id)]"/>
                         <field name="project_id"
-                               attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
                                domain="[('company_division_id', '=', company_division_id)]"
                                options="{'no_open': True, 'no_create': True}"/>
                         <field name="account_analytic_id"
-                               attrs="{'required':[('type_pay_order', '!=', 'invoice')]}"
                                options="{'no_open': True, 'no_create': True}"
                                domain="[('project_ids','in', [project_id])]"
                                groups="analytic.group_analytic_accounting"/>
