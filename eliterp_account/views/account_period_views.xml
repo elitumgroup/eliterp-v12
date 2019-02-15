@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <menuitem id="menu_account_period" action="account.actions_account_fiscal_year"
-                  groups="account.group_account_user" parent="account.account_account_menu"
-                  sequence="15"/>
-
         <record id="view_form_fiscal_year" model="ir.ui.view">
             <field name="name">view_form_fiscal_year</field>
             <field name="model">account.fiscal.year</field>

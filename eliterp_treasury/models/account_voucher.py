@@ -119,15 +119,6 @@ class Voucher(models.Model):
         """
         return {}
 
-    @api.one
-    @api.constrains('bank_date')
-    def _check_bank_date(self):
-        """
-        Verificamos la fecha del banco no sea menor a la de emisión
-        """
-        if self.type_egress != 'cash' and self.bank_date < self.date:
-            raise ValidationError("Fecha del banco no puede ser menor a la del comprobante.")
-
     def _set_amount(self, invoices, total):
         """
         Dividimos monto para facturas
