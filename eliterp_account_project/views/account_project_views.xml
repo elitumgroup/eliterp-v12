@@ -46,7 +46,7 @@
                 <xpath expr="//field[@name='company_division_id']" position="after">
                     <field name="project_id"
                            domain="[('company_division_id', '=', company_division_id)]"
-                           required="1" options="{'no_open': True, 'no_create': True}"/>
+                           options="{'no_open': True, 'no_create': True}"/>
                 </xpath>
             </field>
         </record>

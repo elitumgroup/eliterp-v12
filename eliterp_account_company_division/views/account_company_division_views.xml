@@ -40,7 +40,7 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='company_id']" position="after">
-                    <field name="company_division_id" required="1"
+                    <field name="company_division_id"
                            context="{'default_company_id': company_id}"
                            domain="[('company_id', '=', company_id)]"/>
                 </xpath>
