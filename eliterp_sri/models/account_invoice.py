@@ -198,7 +198,7 @@ class Invoice(models.Model):
                             copy=False)  # Modificamos el campo para facilitar referencia (SRI Ecuador)
     proof_support_id = fields.Many2one('sri.proof.support', string='Sustento del comprobante', readonly=True,
                                        states={'draft': [('readonly', False)]})
-    serial_number = fields.Char(string='Nº Serie', default='001-001', size=7,
+    serial_number = fields.Char(string='Nº Serie', size=7,
                                 readonly=True, states={'draft': [('readonly', False)]})
     is_electronic = fields.Boolean(string='Es electrónica?',
                                    default=False)  # Dejar para futuras implementaciones de F.E.

@@ -86,7 +86,9 @@ class Invoice(models.Model):
         :return object:
         """
         if self.type == 'in_invoice':
-            if self.retention_id:
+            if not self.retention_id:
+                raise UserError(_("Debe ingresar retención de documento."))
+            else:
                 self.retention_id.confirm()
         res = super(Invoice, self).action_invoice_open()
         return res
@@ -452,7 +454,7 @@ class Retention(models.Model):
     total = fields.Float(compute='_compute_total', string='Total', store=True, track_visibility='onchange')
     is_sequential = fields.Boolean('Es secuencial?',
                                    help="Si no se marca, la compañía asume la retención.", readonly=True,
-                                   states={'draft': [('readonly', False)]}, default=True)
+                                   states={'draft': [('readonly', False)]}, default=False)
     journal_id = fields.Many2one('account.journal', string='Diario', readonly=True)
     move_id = fields.Many2one('account.move', string='Asiento contable')
     modified_bill = fields.Boolean('Factura modificada?', default=False)  # TODO: Revisar para que sirve esto
