@@ -80,8 +80,7 @@ class Checks(models.Model):
         ('received', 'Recibido'),
         ('deposited', 'Depositado'),
         ('issued', 'Emitido'),
-        ('delivered', 'Entregado'),
-        ('charged', 'Debitado'),
+        ('delivered', 'Entregado')
         ('protested', 'Anulado')
     ], string='Estado', track_visibility='onchange')
     voucher_id = fields.Many2one('account.voucher', string='Pago/Cobro')
