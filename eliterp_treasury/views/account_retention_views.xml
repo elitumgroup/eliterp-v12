@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="view_search_retention" model="ir.ui.view">
+            <field name="name">view_search_retention</field>
+            <field name="model">account.retention</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field string="Nombre" name="name" filter_domain="['|', ('name','ilike',self), ('retention_number','ilike',self)]"/>
+                    <field name="partner_id" string="Empresa"/>
+                    <separator/>
+                    <filter string="Borrador" domain="[('state','=','draft')]" name="state_draft"/>
+                    <filter string="Confirmada" domain="[('state','=','confirm')]" name="state_confirm"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Empresa" name="groupby_partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Período" name="groupby_period" domain="[]" context="{'group_by':'period_id'}"/>
+                        <filter string="Estado" name="groupby_state" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
         <!--Actions-->
         <record id="action_retention_sale" model="ir.actions.act_window">
             <field name="name">Retenciones de cliente</field>
@@ -9,6 +28,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('type', '=', 'sale')]</field>
             <field name="context">{'default_type': 'sale', 'type': 'sale'}</field>
+            <field name="search_view_id" ref="view_search_retention"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Pulse para añadir una nueva retención en venta
@@ -23,6 +43,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('type', '=', 'purchase')]</field>
             <field name="context">{'default_type': 'purchase', 'type': 'purchase'}</field>
+            <field name="search_view_id" ref="view_search_retention"/>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     Pulse para añadir una nueva retención en compra.

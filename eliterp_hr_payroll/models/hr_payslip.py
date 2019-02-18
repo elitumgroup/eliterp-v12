@@ -90,7 +90,7 @@ class Payslip(models.Model):
         """
         for line in self:
             if line.state != 'draft':
-                raise ValidationError(_("No podemos borar roles realizados o cancelados."))
+                raise ValidationError(_("No podemos borar roles realizados o anulados."))
         return super(Payslip, self).unlink()
 
     @api.multi

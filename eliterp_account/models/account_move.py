@@ -93,6 +93,6 @@ class Move(models.Model):
     date = fields.Date(required=True, readonly=True, states={'draft': [('readonly', False)]}, index=True, default=fields.Date.context_today)  # CM
     state = fields.Selection([('draft', 'Borrador'),
                               ('posted', 'Contabilizado'),
-                              ('cancel', 'Cancelado')],
+                              ('cancel', 'Anulado')],
                              string='Estado', required=True, readonly=True, copy=False, default='draft')  # CM
     reversed = fields.Boolean('Reversado?', default=False, copy=False)

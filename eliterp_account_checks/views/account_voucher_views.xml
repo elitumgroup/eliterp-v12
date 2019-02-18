@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+        <!--Search Purchase-->
+        <record id="view_search_voucher_purchase_checks" model="ir.ui.view">
+            <field name="name">view_search_voucher_purchase_checks</field>
+            <field name="model">account.voucher</field>
+            <field name="inherit_id" ref="eliterp_treasury.view_search_voucher_purchase"/>
+            <field name="arch" type="xml">
+                <field name="bank_journal_id" position="after">
+                    <field name="check_number"/>
+                </field>
+
+            </field>
+        </record>
+
         <!--Voucher Sale-->
         <record id="view_form_voucher_sale_checks" model="ir.ui.view">
             <field name="name">view_form_voucher_sale_checks</field>

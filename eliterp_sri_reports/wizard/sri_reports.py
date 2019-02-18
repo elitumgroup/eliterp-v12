@@ -418,7 +418,7 @@ class Ats(models.TransientModel):
         ats.codEstab = '001'
         ats.ventasEstab = '%.2f' % self._get_total_sales(period)
         ats.ivaComp = '0.00'
-        # Cancelados
+        # Anulados
         ats.anulados = self._get_canceled(period)
         # Proceso del archivo a exportar
         ats_rendered = self._render_xml(ats)

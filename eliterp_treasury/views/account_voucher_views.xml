@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-        <!--TODO: Pendiente búsqueda de comprobantes de ingreso, Searchs-->
         <record id="view_search_voucher_purchase" model="ir.ui.view">
             <field name="name">view_search_voucher_purchase</field>
             <field name="model">account.voucher</field>
             <field name="arch" type="xml">
                 <search>
-                    <field name="beneficiary" string="Beneficiario"/>
-                    <field name="bank_journal_id" string="Banco" widget="selection"/>
-                    <!--
+                    <field string="Referencia de pago" name="name" filter_domain="['|', ('name','ilike',self), ('beneficiary','ilike',self)]"/>
+                    <field name="bank_journal_id" string="Banco"/>
                     <separator/>
-                    <filter string="Borrador" domain="[('state','=','draft')]"/>
-                    <filter string="Contabilizado" domain="[('state','=','posted')]"/>
-                    <group expand="0" string="Agrupar por">
-                        <filter string="Proveedor" domain="[]" context="{'group_by':'partner_id'}"/>
-                        <filter string="Banco" domain="[]" context="{'group_by':'bank_journal_id'}"/>
-                        <filter string="Fecha de comprobante" domain="[]" context="{'group_by':'date'}"/>
+                    <filter string="Contabilizado" name="state_posted" domain="[('state','=','posted')]"/>
+                    <filter string="Anulado" name="state_cancel" domain="[('state','=','cancel')]"/>
+                   <group expand="0" string="Group By">
+                        <filter string="Proveedor" name="groupby_partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Banco" name="groupby_bank" domain="[]" context="{'group_by':'bank_journal_id'}"/>
+                        <filter string="Fecha de comprobante" name="groupby_date" domain="[]" context="{'group_by':'date'}"/>
                     </group>
-                    -->
+                </search>
+            </field>
+        </record>
+
+        <record id="view_search_voucher_sale" model="ir.ui.view">
+            <field name="name">view_search_voucher_sale</field>
+            <field name="model">account.voucher</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field string="Referencia de pago" name="name"/>
+                    <separator/>
+                    <filter string="Contabilizado" name="state_posted" domain="[('state','=','posted')]"/>
+                    <filter string="Anulado" name="state_cancel" domain="[('state','=','cancel')]"/>
+                   <group expand="0" string="Group By">
+                        <filter string="Cliente" name="groupby_partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <filter string="Fecha de comprobante" name="groupby_date" domain="[]" context="{'group_by':'date'}"/>
+                    </group>
                 </search>
             </field>
         </record>
@@ -31,6 +45,7 @@
             <field name="view_mode">tree,form</field>
             <field name="domain">[('voucher_type', '=', 'sale')]</field>
             <field name="context">{'default_voucher_type': 'sale', 'voucher_type': 'sale'}</field>
+            <field name="search_view_id" ref="view_search_voucher_sale"/>
             <field name="help" type="html">
                 <p>
                     Se registran los cobros de clientes correspondientes a facturas.
