@@ -104,7 +104,7 @@ class BankReconciliation(models.Model):
         # caso contrario se coje los datos de la última conciliación validada
         if not reconciliation_ids:
             beginning_balance = self.env['account.account']._account_balance(
-                False,
+                account,
                 account,
                 '2000-01-01',
                 self.date_from
