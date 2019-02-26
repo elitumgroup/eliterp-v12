@@ -103,12 +103,7 @@ class BankReconciliation(models.Model):
         # Saldo inicial de cuenta contable si no existe conciliación alguna previa
         # caso contrario se coje los datos de la última conciliación validada
         if not reconciliation_ids:
-            beginning_balance = self.env['account.account']._account_balance(
-                account,
-                account,
-                '2000-01-01',
-                self.date_from
-            )[2]
+            beginning_balance = account._get_beginning_balance(self.date_from)
         else:
             reconciliation = reconciliation_ids[0]
             beginning_balance = reconciliation.account_balance
