@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_account_checks,account.checks,model_account_checks,account.group_account_user,1,1,1,0
+access_account_checks_user,account.checks user,model_account_checks,account.group_account_user,1,1,1,0
+access_account_checks_manager,account.checks,model_account_checks,account.group_account_manager,1,1,1,1
 
 access_account_deposit_line_collected_check_manager,account.deposit.line.collected.check,model_account_deposit_line_collected_check,account.group_account_user,1,1,1,1
