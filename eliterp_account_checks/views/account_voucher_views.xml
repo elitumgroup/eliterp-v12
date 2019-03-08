@@ -56,9 +56,17 @@
             <field name="model">account.voucher</field>
             <field name="inherit_id" ref="eliterp_treasury.view_form_voucher_purchase"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@name='print_voucher']" position="after">
+                    <button name="print_check_xlsx" type="object"
+                            attrs="{'invisible':['|', ('type_egress', '!=', 'check'), ('state','!=','posted')]}"
+                            string="Imprimir cheque"/>
+                </xpath>
                 <xpath expr="//field[@name='transfer_code']" position="before">
                     <field name="check_number"
                            attrs="{'required':[('type_egress', '=', 'check')], 'invisible':[('type_egress', '!=', 'check')]}"/>
+                    <field name="file_name" invisible="1"/>
+                    <field name="file"
+                           attrs="{'invisible':[('file', '=', False)]}" filename="file_name" nolabel="1" readonly="1"/>
                 </xpath>
             </field>
         </record>
