@@ -77,7 +77,7 @@
                                     <group>
                                         <group string="Nómina">
                                             <field name="wage" string="Sueldo"
-                                                   attrs="{'readonly':[('state_customize', '!=', 'draft')]}"/>
+                                                   attrs="{'readonly':[('state_customize', '=', 'finalized')]}"/>
                                         </group>
                                         <group string="Duración de contrato">
                                             <field name="test_days" invisible="1"/><!--Día de prueba-->

@@ -12,6 +12,7 @@ try:
 except ImportError:
     _logger.debug(_('No se puede importar librería xlsxwriter.'))
 
+
 class CollectionLine(models.Model):
     _inherit = "account.collection.line"
 
@@ -100,7 +101,7 @@ class Voucher(models.Model):
                 self.move_id.update({'ref': new_ref})
         return result
 
-    def generate_xlsx_report(self, workbook, context):
+    def _generate_xlsx_report(self, workbook, context):
         # Formatos
         money_format = workbook.add_format({'num_format': '$#,##0.00', 'bold': 1})
         bold = workbook.add_format({'bold': 1})
@@ -234,7 +235,7 @@ class Voucher(models.Model):
     def create_xlsx_report(self, name, context=None):
         name = name + '.xlsx'
         workbook = xlsxwriter.Workbook(name, self.get_workbook_options())
-        self.generate_xlsx_report(workbook, context)
+        self._generate_xlsx_report(workbook, context)
         workbook.close()
         with open(name, "rb") as file:
             file = base64.b64encode(file.read())
