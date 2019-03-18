@@ -479,7 +479,7 @@ class PayslipRun(models.Model):
 
     # Ordenes de pago
     @api.one
-    @api.depends('pay_order_line.state')
+    @api.depends('pay_order_line.state', 'line_ids.residual')
     def _compute_customize_amount(self):
         """
         Calculamos el saldo pendiente de las órdenes de pago

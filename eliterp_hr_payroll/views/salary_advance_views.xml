@@ -171,6 +171,11 @@
                         <group>
                             <field name="date"/>
                             <field name="period"/>
+                            <label for="advance_percentage" string="Porcentaje de anticipo"/>
+                            <div class="o_row">
+                                <field name="advance_percentage"/>
+                                <span>%</span>
+                            </div>
                             <field name="move_id" readonly="1"
                                    attrs="{'invisible':[('state', '!=', 'posted')]}"/>
                             <field name="approval_user" readonly="1" attrs="{'invisible':[('state', '!=', 'posted')]}"/>

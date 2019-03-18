@@ -55,7 +55,7 @@ class PayOrder(models.Model):
                 'origin': salary_advance.name,
                 'salary_advance_id': salary_advance.id,
                 'company_id': self.env.user.company_id.id,
-                'beneficiary': '*'
+                'beneficiary': '/'
             })
         if active_model == 'hr.payslip.run':
             payslip_run = self.env['hr.payslip.run'].browse(active_ids)[0]
@@ -68,7 +68,7 @@ class PayOrder(models.Model):
                 'origin': payslip_run.move_id.name,
                 'payslip_run_id': payslip_run.id,
                 'company_id': self.env.user.company_id.id,
-                'beneficiary': '*'
+                'beneficiary': '/'
             })
         return vals
 
@@ -77,9 +77,15 @@ class PayOrder(models.Model):
         res = super(PayOrder, self).create(vals)
         if res.type in ['salary advance', 'payslip run']:
             if res.salary_advance_id:
-                res['employee_ids'] = self._salary_advance_employee_ids(res.salary_advance_id)
+                employees = self._salary_advance_employee_ids(res.salary_advance_id)
+                res['employee_ids'] = employees
+
             else:
-                res['employee_ids'] = self._pasylip_run_employee_ids(res.payslip_run_id)
+                employees = self._pasylip_run_employee_ids(res.payslip_run_id)
+                res['employee_ids'] = employees
+            if len(employees) == 1:
+                employee = self.env['hr.employee'].browse(employees[0][2]['name']   )
+                res['beneficiary'] = employee.name
         return res
 
     def _salary_advance_employee_ids(self, salary_advance):
@@ -121,8 +127,18 @@ class Voucher(models.Model):
         :return:
         """
         salary_advance = self.pay_order_id.salary_advance_id
+        company = salary_advance.company_id.id
+        if company in [1, 2]:
+            code = '2.1.6.1'
+        account = self.env['account.account'].search([('code', '=', code), ('company_id', '=', company)])
+        list_accounts = []
+        if account:
+            list_accounts.append([0, 0, {'account_id': account.id,
+                                     'amount': self.amount_cancel,
+                                     }])
         return self.update({
-            'beneficiary': '*',
+            'account_line': list_accounts,
+            'beneficiary': self.pay_order_id.beneficiary,
             'reference': salary_advance.name
         })
 
@@ -133,8 +149,18 @@ class Voucher(models.Model):
         :return:
         """
         payslip_run_id = self.pay_order_id.payslip_run_id
+        company = payslip_run_id.company_id.id
+        if company in [1, 2]:
+            code = '2.1.6.1'
+        account = self.env['account.account'].search([('code', '=', code), ('company_id', '=', company)])
+        list_accounts = []
+        if account:
+            list_accounts.append([0, 0, {'account_id': account.id,
+                                     'amount': self.amount_cancel,
+                                     }])
         return self.update({
-            'beneficiary': '*',
+            'account_line': list_accounts,
+            'beneficiary': self.pay_order_id.beneficiary,
             'reference': payslip_run_id.move_id.name
         })
 

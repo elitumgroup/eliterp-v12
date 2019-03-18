@@ -13,7 +13,7 @@ class SalaryAdvanceLine(models.Model):
     _order = "employee_id"
     _description = _('Línea de anticipo de sueldo')
 
-    @api.depends('pay_order_ids.pay_order_id.state', 'pay_order_ids.amount')
+    @api.depends('pay_order_ids.pay_order_id.state', 'pay_order_ids.amount', 'amount_advance')
     def _compute_amount(self):
         """
         Calculamos los pagos del empleado asignado en las órdenes
@@ -112,7 +112,7 @@ class SalaryAdvance(models.Model):
         for employee in self.env['hr.employee'].search([]):
             contract_id = employee.contract_id
             if contract_id:
-                amount_advance = round(float((contract_id.wage * 40) / 100), 2)
+                amount_advance = round(float((contract_id.wage * self.advance_percentage) / 100), 3)
                 line_ids.append([0, 0, {
                     'employee_id': employee.id,
                     'amount_advance': amount_advance,
@@ -261,7 +261,7 @@ class SalaryAdvance(models.Model):
 
     # Ordenes de pago
     @api.one
-    @api.depends('pay_order_line.state')
+    @api.depends('pay_order_line.state', 'line_ids.residual')
     def _compute_customize_amount(self):
         """
         Calculamos el saldo pendiente de las órdenes de pago
@@ -346,3 +346,6 @@ class SalaryAdvance(models.Model):
     pay_order_line = fields.One2many('account.pay.order', 'salary_advance_id', string='Órdenes de pago')
     pay_orders_count = fields.Integer('# Ordenes de pago', compute='_compute_pay_orders', store=True)
     total_pay_order = fields.Float('Total a pagar', compute='_compute_total_pay_order')
+    advance_percentage = fields.Float('Porcentaaje de anticipo', default=40.00, readonly=True,
+                                      help="Porcentaje de anticipo calculado con el sueldo de cada empleado.",
+                                      states={'draft': [('readonly', False)]})
