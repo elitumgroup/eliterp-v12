@@ -43,6 +43,20 @@ class PayOrderAbstract(models.AbstractModel):
 class Voucher(models.Model):
     _inherit = "account.voucher"
 
+    @api.multi
+    @api.returns('self')
+    def _create_voucher_purchase(self, record):
+        """
+        ME: Si es cheque y diario tiene secuencia se crea automáticamente el número de cheque
+        :param record:
+        :return: self
+        """
+        voucher = super(Voucher, self)._create_voucher_purchase(record)
+        if voucher.type_egress == 'check' and voucher.bank_journal_id.check_sequence_id:
+            sequence = voucher.bank_journal_id.check_sequence_id.number_next_actual
+            voucher.check_number = str(sequence).zfill(voucher.bank_journal_id.check_padding)
+        return voucher
+
     def _create_move_sale(self, move_id):
         """
         ME: Creamos cheques recaudados
@@ -96,6 +110,8 @@ class Voucher(models.Model):
         result = super(Voucher, self).post_voucher()
         if self.voucher_type == 'purchase':
             if self.type_egress == 'check':
+                sequence = self.bank_journal_id.check_sequence_id
+                self.check_number = sequence.next_by_id()
                 self._create_check()
                 new_ref = self.move_id.ref + " - Cheque: " + self.check_number
                 self.move_id.update({'ref': new_ref})

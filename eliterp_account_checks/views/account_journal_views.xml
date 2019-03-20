@@ -13,6 +13,10 @@
                        attrs="{'invisible': [('check_printing_payment_method_selected', '=', False)],
                     'required': [('check_printing_payment_method_selected', '=', True)]}"/>
             </xpath>
+            <xpath expr="//field[@name='check_sequence_id']" position="replace">
+                <field name="check_sequence_id"
+                       groups="base.group_erp_manager"/>
+            </xpath>
         </field>
     </record>
 </odoo>
