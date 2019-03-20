@@ -25,7 +25,8 @@ class Journal(models.Model):
 
     start_check = fields.Integer('Inicio de cheques', default=1, copy=False)
     check_padding = fields.Integer('Dígitos', default=6, help="Cantidad de dígitos en el talonario de la chequera.")
-    # TODO: Revisar qué al cambiar no tengamos cheques realizados
+    check_sequence_id = fields.Many2one('ir.sequence', 'Secuencia del cheque', readonly=False, copy=False,
+                                        help="Secuencia automática al generar cheques de la compañía.")
 
 
 class Checks(models.Model):
