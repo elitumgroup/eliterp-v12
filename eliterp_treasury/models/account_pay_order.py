@@ -18,6 +18,15 @@ class PayOrderAbstract(models.AbstractModel):
             raise ValidationError(
                 _("Monto mayor al del saldo por pagar del documento (%.2f)." % self.default_amount))
 
+    @api.one
+    @api.constrains('date')
+    def _check_date(self):
+        """
+        Verificamos la fecha de la orden de pago no sea menor a la del documento
+        """
+        if self.date < self.default_date:
+            raise ValidationError(_("Fecha de la orden de pago no puede ser menor a la del documento."))
+
     @api.model
     def _compute_amount(self, invoice_ids):
         total = 0
@@ -167,6 +176,7 @@ class PayOrder(models.Model):
     type_egress = fields.Selection(track_visibility='onchange')
     voucher_id = fields.Many2one('account.voucher', string='Comprobante de egreso', readonly=True)
     comment = fields.Text(track_visibility='onchange')
+
 
 class AccountVoucher(models.Model):
     _inherit = 'account.voucher'
