@@ -59,7 +59,7 @@
     <act_window id="action_pay_order_from_invoices"
         name="Generar orden de pago"
         src_model="account.invoice"
-        res_model="account.pay.order.wizard"
+        res_model="account.pay.order"
         view_type="form"
         view_mode="form"
                 multi="True"

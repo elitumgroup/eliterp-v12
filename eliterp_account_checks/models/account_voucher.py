@@ -34,8 +34,8 @@ class CollectionLine(models.Model):
                                   , default='current')
 
 
-class PayOrder(models.Model):
-    _inherit = 'account.pay.order'
+class PayOrderAbstract(models.AbstractModel):
+    _inherit = 'account.pay.order.abstract'
 
     type_egress = fields.Selection(selection_add=[('check', 'Cheque')])
 
