@@ -54,7 +54,7 @@ class PayOrderAbstract(models.AbstractModel):
                     raise UserError("Soló se puede generar orden de pago de facturas con la misma cuenta por pagar.")
             vals.update({
                 # Fecha del día
-                'date': fields.Date.today(),
+                'date': fields.Date.today() if len(invoice_ids) > 1 else invoice_ids[0].date_invoice,
                 'default_date': fields.Date.today(),
                 'type': 'invoice',
                 'amount': self._compute_amount(invoice_ids),
