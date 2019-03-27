@@ -30,6 +30,14 @@ class VoucherCancel(models.TransientModel):
 
     description = fields.Text('Descripción', required=True)
 
+    def _other_actions_cancel(self, voucher):
+        """
+        Dejamos método para futuras aplicaciones
+        :param voucher:
+        :return:
+        """
+        return
+
     @api.multi
     def confirm_cancel(self):
         """
@@ -37,6 +45,7 @@ class VoucherCancel(models.TransientModel):
         :return:
         """
         voucher = self.env['account.voucher'].browse(self._context['active_id'])
+        self._other_actions_cancel(voucher)
         move = voucher.move_id
         move.reverse_moves(move.date, move.journal_id or False)
         move.write({

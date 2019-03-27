@@ -40,6 +40,18 @@ class PayOrderAbstract(models.AbstractModel):
     type_egress = fields.Selection(selection_add=[('check', 'Cheque')])
 
 
+class VoucherCancel(models.TransientModel):
+    _inherit = 'account.voucher.cancel'
+
+    def _other_actions_cancel(self, voucher):
+        res = super(VoucherCancel, self)._other_actions_cancel(voucher)
+        if voucher.type_egress == 'check':
+            search_check = self.env['account.checks'].search([('voucher_id', '=', voucher.id)])
+            if search_check:
+                search_check.update({'state': 'protested'})
+        return res
+
+
 class Voucher(models.Model):
     _inherit = "account.voucher"
 
