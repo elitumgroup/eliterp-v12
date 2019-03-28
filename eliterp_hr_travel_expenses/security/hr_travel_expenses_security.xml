@@ -7,6 +7,12 @@
             <field name="category_id" ref="base.module_category_usability"/>
         </record>
 
+        <record id="group_travel_expenses_liquidation" model="res.groups">
+            <field name="name">Aprobación liquidación de viático</field>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="category_id" ref="base.module_category_usability"/>
+        </record>
+
         <!-- Multi-company -->
         <record model="ir.rule" id="travel_destinations_multicompany">
             <field name="name">Travel Destinations multi-company</field>
@@ -27,6 +33,14 @@
         <record model="ir.rule" id="travel_expenses_request_multicompany">
             <field name="name">Travel Expenses Request multi-company</field>
             <field name="model_id" ref="model_hr_travel_expenses_request"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]
+            </field>
+        </record>
+
+        <record model="ir.rule" id="travel_expenses_liquidation_multicompany">
+            <field name="name">Travel Expenses Liquidation multi-company</field>
+            <field name="model_id" ref="model_hr_travel_expenses_liquidation"/>
             <field name="global" eval="True"/>
             <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]
             </field>

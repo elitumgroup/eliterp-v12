@@ -17,7 +17,8 @@
         'security/hr_travel_expenses_security.xml',
         'security/ir.model.access.csv',
         'report/travel_expenses_reports.xml',
-        'views/hr_travel_expenses_views.xml'
+        'views/hr_travel_expenses_views.xml',
+        'views/travel_expenses_liquidation_views.xml'
     ],
     'init_xml': [],
     'update_xml': [],

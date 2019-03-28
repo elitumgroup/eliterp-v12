@@ -5,6 +5,9 @@ access_travel_concepts_manager,hr.travel.concepts,model_hr_travel_concepts,accou
 access_travel_expenses_request_manager,hr.travel.expenses.request,model_hr_travel_expenses_request,base.group_user,1,1,1,1
 access_travel_concepts_line_manager,hr.travel.concepts.line,model_hr_travel_concepts_line,base.group_user,1,1,1,1
 
+access_travel_expenses_liquidation_manager,hr.travel.expenses.liquidation,model_hr_travel_expenses_liquidation,base.group_user,1,1,1,1
+access_voucher_expenses_liquidation_manager,hr.voucher.expenses.liquidation,model_hr_voucher_expenses_liquidation,base.group_user,1,1,1,1
+
 
 
 

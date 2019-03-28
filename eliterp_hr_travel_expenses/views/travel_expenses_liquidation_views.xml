@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!--Searchs-->
+    <record id="view_search_expenses_liquidation" model="ir.ui.view">
+        <field name="name">eliterp_view_search_liquidation_settlement</field>
+        <field name="model">hr.travel.expenses.liquidation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"
+                       filter_domain="['|', ('name','ilike',self), ('travel_request_id','ilike',self)]"/>
+                <field name="beneficiary"/>
+                <separator/>
+                <filter name="approve" string="Aprobada" domain="[('state','=','approve')]"/>
+                <filter name="liquidated" string="Liquidada" domain="[('state', '=', 'liquidated')]"/>
+
+                <group expand="1" string="Agrupar por">
+                    <filter string="Estado de pago" name="groupby_state_pay_order" domain="[]"
+                            context="{'group_by': 'state_pay_order'}"/>
+                    <filter string="Beneficiario" name="groupby_beneficiary"
+                            context="{'group_by': 'beneficiary'}"/>
+                    <filter string="Fecha de documento" name="date" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--Actions-->
+    <record id="action_invoice_viaticum" model="ir.actions.act_window">
+        <field name="name">Facturas de proveedor (viáticos)</field>
+        <field name="res_model">account.invoice</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+        <field eval="False" name="view_id"/>
+        <field name="domain">[('type','=','in_invoice'), ('viaticum', '=', True)]</field>
+        <field name="context">{'default_type':'in_invoice', 'type':'in_invoice', 'journal_type': 'purchase',
+            'default_viaticum': True}
+        </field>
+        <field name="search_view_id" ref="account.view_account_invoice_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear nueva factura de proveedor (viático).
+            </p>
+        </field>
+    </record>
+    <record id="action_expenses_liquidation" model="ir.actions.act_window">
+        <field name="name">Liquidación de viático</field>
+        <field name="res_model">hr.travel.expenses.liquidation</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva liquidación de viático.
+            </p>
+        </field>
+        <field name="search_view_id" ref="view_search_expenses_liquidation"/>
+    </record>
+
+    <record id="action_expenses_liquidation_pay_order" model="ir.actions.act_window">
+        <field name="name">Crear orden de pago</field>
+        <field name="res_model">account.pay.order</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="context">{'default_expenses_liquidation_id': [(4, active_id, None)]}
+        </field>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menus-->
+    <menuitem id="action_invoice_viaticum"
+              action="action_invoice_viaticum"
+              parent="eliterp_hr_travel_expenses.menu_travel_expenses"
+              sequence="10"/>
+
+    <menuitem id="menu_expenses_liquidation"
+              action="action_expenses_liquidation"
+              parent="eliterp_hr_travel_expenses.menu_travel_expenses"
+              sequence="15"/>
+
+    <!--Views-->
+    <!--Pay Order-->
+    <record id="view_form_pay_order_travel_expenses_wizard" model="ir.ui.view">
+        <field name="name">view_form_pay_order_travel_expenses_wizard</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order_wizard"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="expenses_liquidation_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_form_pay_order_travel_expenses" model="ir.ui.view">
+        <field name="name">view_form_pay_order_travel_expenses</field>
+        <field name="model">account.pay.order</field>
+        <field name="inherit_id" ref="eliterp_treasury.view_form_pay_order"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='purchase_order_id']" position="after">
+                <field name="expenses_liquidation_id"
+                       attrs="{'readonly':[('state', '!=', 'draft')], 'invisible': [('expenses_liquidation_id', '=', False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_tree_expenses_liquidation" model="ir.ui.view">
+        <field name="name">eliterp_view_tree_liquidation_settlement</field>
+        <field name="model">hr.travel.expenses.liquidation</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state=='liquidated'"
+                  decoration-bf="state=='liquidated'"
+                  decoration-info="state=='draft'"
+                  decoration-muted="state == 'deny'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="beneficiary"/>
+                <field name="travel_request_id"/>
+                <field name="application_date"/>
+                <field name="amount_total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_form_expenses_liquidation" model="ir.ui.view">
+        <field name="name">view_form_expenses_liquidation</field>
+        <field name="model">hr.travel.expenses.liquidation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state"
+                           statusbar_visible="draft,approve,liquidated"
+                           widget="statusbar"
+                           modifiers="{'readonly': true}"/>
+                    <button name="action_print" type="object"
+                            class="oe_highlight" string="Imprimir liquidación"/>
+                    <button name="action_to_approve"
+                            states="draft"
+                            string="Solicitar aprobación"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_approve"
+                            states="to_approve"
+                            string="Aprobar"
+                            groups="eliterp_hr_travel_expenses.group_travel_expenses_liquidation"
+                            type="object"
+                            class="oe_highlight"/>
+                    <button name="action_deny"
+                            states="to_approve"
+                            string="Negar"
+                            groups="eliterp_hr_travel_expenses.group_travel_expenses_liquidation"
+                            type="object"/>
+                    <button name="action_liquidate"
+                            string="Liquidar"
+                            type="object"
+                            states="approve"
+                            groups="account.group_account_user"
+                            class="oe_highlight"/>
+
+                    <field name="state_pay_order" invisible="1"/>
+                    <button string="Generar orden de pago"
+                            type="action"
+                            name="%(action_expenses_liquidation_pay_order)d"
+                            attrs="{'invisible':['|', ('state','!=', 'liquidated'), ('state_pay_order', '=', 'paid')]}"
+                            class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pay_orders" class="oe_stat_button" icon="fa-list" type="object">
+                            <field name="pay_orders_count" widget="statinfo" string="Pagos"/>
+                        </button>
+                    </div>
+                    <div class="oe_title" attrs="{'invisible': [('state','=', 'draft')]}">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group col="4">
+                        <group>
+                            <field name="date"/>
+                            <field name="with_request"/>
+                            <field name="travel_request_id"
+                                   options="{'no_create': True}"
+                                   attrs="{'invisible': [('with_request','=', False)], 'required': [('with_request','=', True)]}"
+                            />
+                        </group>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="amount_total"/>
+                            <field name="improved_pay_order"/>
+                            <field name="residual_pay_order" string="Saldo" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                    <group string="Información" col="4">
+                        <field name="application_date"/>
+                        <field name="trip_date"/>
+                        <field name="return_date"/>
+                        <field name="beneficiary"/>
+                        <field name="destination_id"/>
+                        <field name="reason" placeholder="p.e Supervisar obra, nuevo proyecto, etc."/>
+
+                        <field name="number_days" attrs="{'invisible': [('with_request','=', True)]}"/>
+                        <field name="number_of_people" attrs="{'invisible': [('with_request','=', True)]}"/>
+                        <field name="move_id" groups="account.group_account_user" readonly="1"
+                               attrs="{'invisible':[('state', '!=', 'liquidated')]}"/>
+                    </group>
+                    <!--Documentos-->
+                    <group string="Líneas de comprobante" col="1">
+                        <field name="line_ids"
+                               attrs="{'readonly':[('state', '==', 'liquidated')]}"
+                               nolabel="1">
+                            <tree editable="bottom" decoration-info="type_validation == 'charge'">
+                                <field name="type_voucher"/>
+                                <field name="invoice_id"
+                                       attrs="{'required':[('type_voucher', '=', 'invoice')], 'readonly':[('type_voucher', '=', 'vale')]}"
+                                       context="{
+                                           'default_type': 'in_invoice',
+                                           'type': 'in_invoice',
+                                           'journal_type': 'purchase',
+                                    'form_view_ref': 'account.invoice_supplier_form',
+                                    'default_viaticum': True
+                                    }"/>
+                                <field name="travel_concept_id"
+                                       attrs="{'required':[('type_voucher', '!=', 'invoice')], 'readonly':[('type_voucher', '!=', 'vale')]}"
+                                       options="{'no_open':True,'no_create':True}"/>
+                                <field name="date"
+                                       string="Fecha de documento" required="1"/>
+                                <field name="name"
+                                       placeholder="p.e Referencia del documento (vale)"/>
+                                <field name="amount_total" sum="Total" required="1"/>
+                                <field name="type_validation" required="1"/>
+                                <field name="account_id" options="{'no_open':True,'no_create':True}"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <h1 attrs="{'invisible': [('with_request','=', False)]}">
+                        <label for="difference" string="Diferencia:"/>
+                        <field name="difference" readonly="1"/>
+                    </h1>
+                    <group string="Notas">
+                        <field name="comment" placeholder="Notas internas..." nolabel="1"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+</odoo>
