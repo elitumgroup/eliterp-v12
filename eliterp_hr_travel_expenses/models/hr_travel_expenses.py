@@ -267,6 +267,7 @@ class TravelExpensesLiquidation(models.Model):
     @api.multi
     def action_print(self):
         self.ensure_one()
+        return self.env.ref('eliterp_hr_travel_expenses.action_report_travel_expenses_liquidate').report_action(self)
 
     @api.multi
     def action_deny(self):
