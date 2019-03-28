@@ -296,14 +296,13 @@ class TravelExpensesLiquidation(models.Model):
     def _compute_difference(self):
         """
         Calculamos la diferencia entre total de solicitud y registro de documentos
+        # TODO: Pendiente CON SOLICITUD
         """
         for record in self:
-            if record.with_request:
-                amount_total = sum(line['amount_total'] for line in record.line_ids)
-                difference = record.travel_allowance_request_id.amount_total - amount_total
+            record.amount_total = sum(line['amount_total'] for line in record.line_ids)
+            if record.with_request and record.travel_request_id:
+                difference = record.travel_request_id.amount_total - record.amount_total
                 record.difference = round(difference, 2)
-            else:
-                record.amount_total = sum(line['amount_total'] for line in record.line_ids)
 
     @api.multi
     def action_liquidate(self):

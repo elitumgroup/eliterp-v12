@@ -194,7 +194,7 @@ class Voucher(models.Model):
                 'name': self.partner_id.name,
                 'journal_id': journal_id.id,
                 'partner_id': self.partner_id.id,
-                'account_id': account_credit,
+                'account_id': self.advance_account_id.id,
                 'move_id': move.id,
                 'credit': balance,
                 'debit': 0.0,
@@ -465,6 +465,10 @@ class Voucher(models.Model):
                                         track_visibility='onchange')
     amount_invoice = fields.Monetary('Total de facturas', compute='_compute_total_invoice')
     advance = fields.Boolean('Es anticipo?', default=False, readonly=True, states={'draft': [('readonly', False)]})
+
+    advance_account_id = fields.Many2one('account.account', string="Cuenta de anticipo", readonly=True,
+                                         states={'draft': [('readonly', False)]},
+                                         help="Cuenta para crear línea de anticipo por defecto trae la del cliente.")
     # Otros campos para comprobantes
     in_invoice_line = fields.One2many('account.voucher.invoice.line',
                                       'voucher_id',
