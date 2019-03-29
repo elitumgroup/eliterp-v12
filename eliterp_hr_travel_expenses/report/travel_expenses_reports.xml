@@ -91,5 +91,135 @@
                 print_report_name="'Solicitud de viático %s' % (object.name or '/')"
                 paperformat="eliterp_core.my_paperformat_a5_landscape"
         />
+
+        <!--Travel Expenses Liquidate-->
+        <template id="report_travel_expenses_liquidate">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">TESO-003-VLQL-V1</t>
+                    <t t-set="report_title">LIQUIDACIÓN DE VIÁTICO</t>
+                    <t t-set="flag">0</t>
+                    <t t-set="name" t-value="doc.name"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-xs-3">
+                                    <strong>Fecha de documento:</strong>
+                                    <p t-field="doc.date"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Destino:</strong>
+                                    <p t-field="doc.destination_id"/>
+                                </div>
+                                <div class="col-6">
+                                    <strong>Beneficiario:</strong>
+                                    <p t-field="doc.beneficiary"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Fecha</th>
+                                        <th class="text-center">Tipo de Documento</th>
+                                        <th class="text-center">No. Documento</th>
+                                        <th class="text-center">Concepto</th>
+                                        <th class="text-center">Validación</th>
+                                        <th class="text-right">Monto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="doc.line_ids" t-as="line">
+                                        <td>
+                                            <span t-field="line.date"/>
+                                        </td>
+                                        <td>
+                                            <span t-field="line.type_voucher"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-if="line.type_voucher == 'vale'" t-field="line.travel_concept_id"/>
+                                            <span t-if="line.type_voucher != 'vale'" t-field="line.invoice_id.concept"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.type_validation"/>
+                                        </td>
+                                        <td class="text-right">
+                                            <span t-field="line.amount_total"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="clearfix">
+                                <div class="row">
+                                    <div class="col-4 pull-right">
+                                        <table class="table table-condensed">
+                                            <tr class="border-black">
+                                                <td>
+                                                    <strong>Total</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="doc.amount_total"/>
+                                                </td>
+                                            </tr>
+                                            <tr t-if="doc.with_request" class="border-black" style="background: red;">
+                                                <td>
+                                                    <strong>Diferencia</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <span t-field="doc.difference"/>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div t-if="doc.comment">
+                                <h6 class="text-center">Notas y comentarios</h6>
+                                <div class="mb4">
+                                    <span t-field="doc.comment"/>
+                                </div>
+                            </div>
+                            <table t-if="doc.state == 'liquidated'" class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center col-6">
+                                            <strong>POR REEMBOLSAR</strong>
+                                        </th>
+                                        <th class="text-center col-6">
+                                            <strong>CON CARGO A EMPRESA</strong>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center col-6">
+                                            <span t-esc='"%.2f" % sum(line.amount_total for line in doc.line_ids.filtered(lambda x: x.type_validation=="reimburse"))'/>
+                                        </td>
+                                        <td class="text-center col-6">
+                                            <span t-esc='"%.2f" % sum(line.amount_total for line in doc.line_ids.filtered(lambda x: x.type_validation=="charge"))'/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_travel_expenses_liquidate"
+                model="hr.travel.expenses.liquidation"
+                string="Liquidación de viático"
+                report_type="qweb-pdf"
+                name="eliterp_hr_travel_expenses.report_travel_expenses_liquidate"
+                file="eliterp_hr_travel_expenses.report_travel_expenses_liquidate"
+                print_report_name="'Liquidación de viático %s' % (object.name or '/')"
+                paperformat="eliterp_core.my_paperformat_a4_portrait"
+        />
     </data>
 </odoo>
