@@ -67,7 +67,7 @@
     </record>
 
     <!--Menus-->
-    <menuitem id="action_invoice_viaticum"
+    <menuitem id="menu_invoice_viaticum"
               action="action_invoice_viaticum"
               parent="eliterp_hr_travel_expenses.menu_travel_expenses"
               sequence="10"/>
