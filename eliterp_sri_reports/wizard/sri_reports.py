@@ -448,7 +448,7 @@ class Ats(models.TransientModel):
                 'error_file': out_error,
                 'error_file_name': 'Errores.txt'
             })
-        self.write(data2save)
+        self.sudo().write(data2save)
         return {
             'name': 'ATS',
             'type': 'ir.actions.act_window',
