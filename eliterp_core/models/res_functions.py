@@ -2,7 +2,7 @@
 
 from odoo import models, tools, _
 import babel
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import math
 
@@ -98,3 +98,38 @@ class Functions(models.AbstractModel):
                 return (self.Numero_a_Texto(Arreglo[0]) + 'con ' + '00/100').capitalize()
         except ValueError:
             return "Cero"
+
+    @staticmethod
+    def _get_month_name(month):
+        if month == 1:
+            return "Enero"
+        if month == 2:
+            return "Febrero"
+        if month == 3:
+            return "Marzo"
+        if month == 4:
+            return "Abril"
+        if month == 5:
+            return "Mayo"
+        if month == 6:
+            return "Junio"
+        if month == 7:
+            return "Julio"
+        if month == 8:
+            return "Agosto"
+        if month == 9:
+            return "Septiembre"
+        if month == 10:
+            return "Octubre"
+        if month == 11:
+            return "Noviembre"
+        if month == 12:
+            return "Diciembre"
+
+    def _get_date_format_contract(self, date):
+        month = self._get_month_name(int(date.month))
+        return '%s de %s del %s' % (date.day, month, date.year)
+
+    def get_date_format_invoice1(self, date):
+        month = self._get_month_name(int(date.month))
+        return '%s días del mes de %s del año %s' % (date.day, month, date.year)

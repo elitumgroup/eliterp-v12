@@ -13,7 +13,8 @@
         'security/hr_contract_security.xml',
         'data/sequences.xml',
         'views/res_config_settings_views.xml',
-        'views/contract_views.xml'
+        'views/contract_views.xml',
+        'reports/hr_reports.xml'
     ],
     'init_xml': [],
     'update_xml': [],

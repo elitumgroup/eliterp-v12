@@ -17,7 +17,10 @@ class Employee(models.Model):
         """
         Contract = self.env['hr.contract']
         for employee in self:
-            employee.contract_id = Contract.search([('employee_id', '=', employee.id), ('state_customize', '=', 'active')], order='date_start desc', limit=1)
+            employee.contract_id = Contract.search(
+                [('employee_id', '=', employee.id), ('state_customize', '=', 'active')], order='date_start desc',
+                limit=1)
+
 
 class Contract(models.Model):
     _inherit = 'hr.contract'
@@ -99,6 +102,19 @@ class Contract(models.Model):
                 _("No está definida la secuencia con código 'hr.contract' para compañía: %s") % company.name)
         return sequence
 
+    @api.model
+    def _get_date_format(self):
+        return self.env['res.functions']._get_date_format_contract(self.date_start)
+
+    @api.model
+    def _get_date_format1(self):
+        return self.env['res.functions']._get_date_format_contract(self.date_end)
+
+    @api.model
+    def _get_date_format2(self):
+        date1 = fields.Date.context_today(self)
+        return self.env['res.functions']._get_date_format_contract(date1)
+
     @api.multi
     def active_contract(self):
         """
@@ -106,12 +122,27 @@ class Contract(models.Model):
         :return:
         """
         number = self._get_name().split('-')
-        date_string =  self.date_start.strftime('%Y-%m-%d')
+        date_string = self.date_start.strftime('%Y-%m-%d')
         new_name = "%s-%s-%s-%s" % (number[0], date_string[:4], date_string[5:7], number[1])  # Nuevo nombre de contrato
         return self.write({
             'name': new_name,
             'state_customize': 'active'
         })
+
+    @api.multi
+    def imprimir_certificate(self):
+        """
+        Imprimimo certificado
+        """
+        contract = self.state_customize
+        if contract == 'active':
+            self.ensure_one()
+            return self.env.ref('eliterp_hr_contract.eliterp_action_report_employee_certificate_active').report_action(
+                self)
+        else:
+            self.ensure_one()
+            return self.env.ref(
+                'eliterp_hr_contract.eliterp_action_report_employee_certificate_inactive').report_action(self)
 
     @api.multi
     def unlink(self):
@@ -143,6 +174,6 @@ class Contract(models.Model):
         ('finalized', 'Finalizado')
     ], 'Estado', default='draft', track_visibility="onchange")
     wage = fields.Monetary('Wage', digits=(16, 2), required=True, track_visibility="onchange",
-                           help="Salario bruto mensual del empleado.") # Configuración RRHH
+                           help="Salario bruto mensual del empleado.")  # Configuración RRHH
     document = fields.Binary('Documento', attachment=True)
     document_name = fields.Char('Nombre de documento')

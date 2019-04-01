@@ -48,6 +48,10 @@
                                     groups="hr_contract.group_hr_contract_manager"
                                     attrs="{'invisible':[('state_customize', '!=', 'draft')]}"
                                     class="oe_highlight"/>
+                            <button name="imprimir_certificate"
+                                    string="Imprimir certificado"
+                                    type="object"
+                                    class="oe_highlight"/>
                         </header>
                         <sheet>
                             <div class="oe_title" attrs="{'invisible': [('state_customize', '=', 'draft')]}">
