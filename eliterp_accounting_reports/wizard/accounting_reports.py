@@ -338,7 +338,7 @@ class FinancialSituationPdf(models.AbstractModel):
         :param accounts:
         :return:
         """
-        accounts_order = sorted(accounts, key=lambda k: int(k['code']))
+        accounts_order = sorted(accounts, key=lambda k: int(k['code'].replace('.', '')))
         return accounts_order
 
     def _get_report(self, type, context):
