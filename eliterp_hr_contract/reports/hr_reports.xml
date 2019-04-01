@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+    <data>
+        <!--Formato de certificado activo MAEQ-->
+        <template id="eliterp_report_employee_certificate_active">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_title">Certificado laboral</t>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="clearfix text-center">
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <h1>CERTIFICADO</h1>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                            </div>
+                            <div class="clearfix text-justify">
+                                <h3>
+                                    <p>
+                                        <font size="1">
+                                            Por este medio certifico que el Sr (a).
+                                            <strong>
+                                                <span t-field="doc.employee_id"/>,
+                                            </strong>
+                                            con documento de identidad No.
+                                            <strong>
+                                                <span t-field="doc.employee_id.identification_id"/>;
+                                            </strong>
+                                            labora en la empresa como
+                                            <font style="text-transform: uppercase;">
+                                                <strong>
+                                                    <span t-field="doc.job_id"/>
+                                                </strong>
+                                            </font>
+                                            desde el
+                                            <strong>
+                                                <span t-esc="doc._get_date_format()"/>,
+                                            </strong>
+                                            percibiendo como remuneración bruta mensual el valor de
+                                            <strong>
+                                                <span t-field="doc.wage"/>.
+                                            </strong>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            Guayaquil,<span t-esc="doc._get_date_format2()"/>.
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                        </font>
+                                    </p>
+                                </h3>
+                            </div>
+                            <div class="clearfix">
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <p>_______________</p>
+                                        <p>
+                                            <strong>Gerente General</strong>
+                                        </p>
+                                        <p>
+                                            <strong>RUC <span t-esc="doc.company_id.vat"/></strong>
+                                        </p>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="eliterp_action_report_employee_certificate_active"
+                model="hr.contract"
+                string="Certificado empleado"
+                report_type="qweb-pdf"
+                menu="False"
+                name="eliterp_hr_contract.eliterp_report_employee_certificate_active"
+                file="eliterp_hr_contract.eliterp_report_employee_certificate_active"
+                print_report_name="'Certificado - %s' % (object.name or '/')"
+                paperformat="eliterp_core.eliterp_paperformat_a4_portrait3"
+        />
+        <!--Formato de certificado inactivo MAEQ-->
+        <template id="eliterp_report_employee_certificate_inactive">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div class="clearfix text-center">
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <h1>CERTIFICADO</h1>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                            </div>
+                            <div class="clearfix text-justify">
+                                <h3>
+                                    <p class="parrafo">
+                                        Por este medio certifico que el Sr (a).
+                                        <strong>
+                                            <span t-field="doc.employee_id"/>,
+                                        </strong>
+                                        con documento de identidad No.
+                                        <strong>
+                                            <span t-field="doc.employee_id.identification_id"/>,
+                                        </strong>
+                                        &amp;nbsp;laboró en la empresa como
+                                        <font style="text-transform: uppercase;">
+                                            <strong>
+                                                <span t-field="doc.job_id"/>
+                                            </strong>
+                                        </font>
+                                        desde el
+                                        <strong>
+                                            <span t-esc="doc._get_date_format()"/>,
+                                        </strong>
+                                        hasta el
+                                        <strong>
+                                            <span t-esc="doc._get_date_format1()"/>.
+                                        </strong>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        Guayaquil,<span t-esc="doc._get_date_format2()"/>.
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                    </p>
+                                </h3>
+                            </div>
+                            <div class="clearfix">
+                                <div class="row">
+                                    <div class="col-xs-12 text-center">
+                                        <p>_______________</p>
+                                        <p>
+                                            <strong>Gerente General</strong>
+                                        </p>
+                                        <p>
+                                            <strong>RUC 0992898542001</strong>
+                                        </p>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="eliterp_action_report_employee_certificate_inactive"
+                model="hr.contract"
+                string="Certificado empleado inactivo"
+                report_type="qweb-pdf"
+                menu="False"
+                name="eliterp_hr_contract.eliterp_report_employee_certificate_inactive"
+                file="eliterp_hr_contract.eliterp_report_employee_certificate_inactive"
+                print_report_name="'Certificado - %s' % (object.name or '/')"
+                paperformat="eliterp_core.eliterp_paperformat_a4_portrait3"
+        />
+    </data>
+</odoo>
+
