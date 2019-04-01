@@ -297,234 +297,7 @@ class StatusResults(models.TransientModel):
 
 class FinancialSituationPdf(models.AbstractModel):
     _name = 'report.eliterp_accounting_reports.report_financial_situation'
-
-    # TODO: Mejorar reporte muchas líneas en el código
-
-    def _get_status_results(self, context):
-        """
-        Estado de resultados en estado de situación financiera
-        :param start_date:
-        :param end_date:
-        :return:
-        """
-        help_functions = self.env['account.report.help.functions']
-        accounts_base = self.env['account.account'].search([('company_id', '=', context.company_id.id)], order="code")
-        accounts = []
-        parent = False
-        accounts_4 = accounts_base.filtered(lambda x: (x.code.split("."))[0] == '4')
-        accounts_5 = accounts_base.filtered(lambda x: (x.code.split("."))[0] == '5')
-        for account in accounts_4:
-            if not accounts:
-                accounts.append({'code': self.env['account.account'].search([('code', '=', '4')])[0].code,
-                                 'name': 'INGRESOS',
-                                 'type': 'parent',
-                                 'subaccounts': [],
-                                 'amount': 0.00,
-                                 'account': self.env['account.account'].search([('code', '=', '4')])[0],
-                                 'parent': parent})
-            else:
-                if account.internal_type == 'view':
-                    parent = help_functions._query_parent(account)
-                    accounts = help_functions._update_amount(accounts)
-                    accounts.append({'code': account.code,
-                                     'type': 'view',
-                                     'subaccounts': [],
-                                     'name': account.name,
-                                     'amount': 0.00,
-                                     'account': account,
-                                     'parent': parent})
-                else:
-                    balance_account = self.env[
-                        'report.eliterp_accounting_reports.report_status_results']._get_account_balance(account,
-                                                                                                        '4', context)
-                    parent = help_functions._query_parent(account)
-                    index = list(map(lambda x: x['code'], accounts)).index(parent)
-                    accounts[index]['subaccounts'].append({'code': account.code,
-                                                           'type': 'movement',
-                                                           'name': account.name,
-                                                           'amount': balance_account})
-                    accounts[index]['amount'] = accounts[index]['amount'] + balance_account
-        accounts = help_functions._update_amount(accounts)
-        total_income = accounts[0]['amount']
-        accounts = []
-        parent = False
-        for account in accounts_5:
-            if accounts == []:
-                accounts.append({'code': self.env['account.account'].search([('code', '=', '5')])[0].code,
-                                 'name': 'GASTOS',
-                                 'type': 'parent',
-                                 'subaccounts': [],
-                                 'amount': 0.00,
-                                 'account': self.env['account.account'].search([('code', '=', '5')])[0],
-                                 'parent': parent})
-            else:
-                if account.internal_type == 'view':
-                    parent = help_functions._query_parent(account)
-                    accounts = help_functions._update_amount(accounts)
-                    accounts.append({'code': account.code,
-                                     'type': 'view',
-                                     'subaccounts': [],
-                                     'name': account.name,
-                                     'amount': 0.00,
-                                     'account': account,
-                                     'parent': parent})
-                else:
-                    balance_account = self.env[
-                        'report.eliterp_accounting_reports.report_status_results']._get_account_balance(account,
-                                                                                                        '5', context)
-                    parent = help_functions._query_parent(account)
-                    index = list(map(lambda x: x['code'], accounts)).index(parent)
-                    accounts[index]['subaccounts'].append({'code': account.code,
-                                                           'type': 'movement',
-                                                           'name': account.name,
-                                                           'amount': balance_account})
-                    accounts[index]['amount'] = accounts[index]['amount'] + balance_account
-        accounts = help_functions._update_amount(accounts)
-        total_spends = accounts[0]['amount']
-        return total_income - total_spends
-
-    def _get_account_balance(self, account, type, context):
-        """
-        Obtenemos el saldo de la cuenta
-        :param account:
-        :param type:
-        :param context:
-        :return:
-        """
-        moves = self.env['account.move.line'].search([
-            ('account_id', '=', account.id),
-            ('date', '>=', context.start_date),
-            ('date', '<=', context.end_date)
-        ])
-        credit = 0.00
-        debit = 0.00
-        if account.code == '3.3':  # TODO: Revisar para qué es esto
-            final_date = context.end_date.replace(year=context.end_date.year - 1)
-            move = self.env['account.move.line'].search([
-                ('account_id', '=', account.id),
-                ('date', '=', str(final_date))
-            ])
-            moves = moves | move
-        for line in moves:
-            credit += line.credit
-            debit += line.debit
-        balance = account._get_balance_nature_account(type, debit, credit)
-
-        if account.code != '3.3':
-            balance = balance + account._get_beginning_balance(context.start_date)
-        return balance
-
-    def _get_report(self, type, context):
-        """
-        Reporte de estado de situación financiera
-        :param type:
-        :param context:
-        :return:
-        """
-        help_functions = self.env['account.report.help.functions']
-        accounts_base = self.env['account.account'].search([
-            ('company_id', '=', context.company_id.id)], order="code")
-        accounts = []
-        parent = False
-        for account in accounts_base:
-            if (account.code.split("."))[0] == type:
-                if accounts == []:
-                    # Cuentas Principales (Sin Movimiento)
-                    if type == '1':
-                        name = "ACTIVOS"
-                    if type == '2':
-                        name = "PASIVOS"
-                    if type == '3':
-                        name = "PATRIMONIO NETO"
-                    accounts.append({'code': self.env['account.account'].search([('code', '=', type)])[0].code,
-                                     'name': name,
-                                     'type': 'principal',
-                                     'subaccounts': [],
-                                     'amount': 0.00,
-                                     'account': self.env['account.account'].search([('code', '=', type)])[0],
-                                     'parent': parent})
-                else:
-                    if account.internal_type == 'view':
-                        # Cuentas vistas
-                        parent = help_functions._query_parent(account)
-                        accounts = help_functions._update_amount(accounts)
-                        accounts.append({'code': account.code,
-                                         'type': 'view',
-                                         'subaccounts': [],
-                                         'name': account.name,
-                                         'amount': 0.00,
-                                         'account': account,
-                                         'parent': parent})
-                    else:
-                        # Cuentas movimientos
-                        if account.user_type_id.type == 'bank':
-                            bank_reconciliation = self.env['account.bank.reconciliation'].search(
-                                [('start_date', '=', context.start_date),
-                                 ('end_date', '=', context.end_date),
-                                 ('account_id', '=', account.id)])
-                            if not bank_reconciliation:
-                                balance_account = bank_reconciliation[0].total
-                            else:
-                                balance_account = self._get_account_balance(account, type, context)
-                        else:
-                            balance_account = self._get_account_balance(account, type, context)
-                        parent = help_functions._query_parent(account)
-                        index = list(map(lambda x: x['code'], accounts)).index(parent)
-                        accounts[index]['subaccounts'].append({'code': account.code,
-                                                               'type': 'movement',
-                                                               'name': account.name,
-                                                               'amount': round(balance_account, 2)})
-                        accounts[index]['amount'] = accounts[index]['amount'] + balance_account
-            accounts = help_functions._update_amount(accounts)
-        if type == '1':
-            TOTALS.append({'total_assets': accounts[0]['amount']})
-        if type == '2':
-            TOTALS.append({'total_liabilities': accounts[0]['amount']})
-        if type == '3':
-            # TODO: Revisar está parte
-            moves = []
-            account_result = list(filter(lambda x: x['code'] == '3.3', accounts))
-            if account_result:
-                if account_result[0]['amount'] != 0.00:
-                    amount = self._get_total_state_result(context)
-                    internal_movement = {}
-                    if amount >= 0:
-                        internal_movement['code'] = '3.3.1.1'
-                        internal_movement['type'] = 'movement'
-                        internal_movement['name'] = 'GANANCIA NETA DEL PERÍODO'
-                        internal_movement['amount'] = amount
-                    else:
-                        internal_movement['code'] = '3.3.2.1'
-                        internal_movement['type'] = 'movement'
-                        internal_movement['name'] = '(-) PÉRDIDA NETA DEL PERÍODO'
-                        internal_movement['amount'] = amount
-                    for account in accounts:
-                        if account['code'] == '3.3':
-                            account['subaccounts'].append(internal_movement)
-                    TOTALS.append({'total_equity': accounts[0]['amount'] + amount})
-                    return accounts
-            # TODO: Si Estado de resultados es igual a 0
-            amount = self._get_status_results(context)
-            if amount >= 0:
-                moves.append({'code': '3.3.1.1',
-                              'type': 'movement',
-                              'name': 'GANANCIA NETA DEL PERÍODO',
-                              'amount': amount})
-            else:
-                moves.append({'code': '3.3.2.1',
-                              'type': 'movement',
-                              'name': '(-) PERDIDA NETA DEL PERÍODO',
-                              'amount': amount})
-            accounts.append({'code': '3.3',
-                             'type': 'view',
-                             'subaccounts': moves,
-                             'name': 'RESULTADO DEL EJERCICIO',
-                             'amount': amount,
-                             'account': False,
-                             'parent': False})
-            accounts[0]['amount'] = accounts[0]['amount'] + amount
-            TOTALS.append({'total_equity': accounts[0]['amount']})
-        return accounts
+    _inherit = 'account.report.help.functions'
 
     @staticmethod
     def _get_total_assets():
@@ -565,8 +338,24 @@ class FinancialSituationPdf(models.AbstractModel):
         :param accounts:
         :return:
         """
-        accounts_order = sorted(accounts, key=lambda k: int(k['code'].replace('.', '')))
+        accounts_order = sorted(accounts, key=lambda k: int(k['code']))
         return accounts_order
+
+    def _get_report(self, type, context):
+        accounts = self._get_lines_type(context, type)
+        if type == '1':
+            TOTALS.append({'total_assets': accounts[0]['amount']})
+        if type == '2':
+            TOTALS.append({'total_liabilities': accounts[0]['amount']})
+        if type == '3':
+            # Status Result, TODO: Mejorar
+            accounts_4 = self._get_lines_type(context, '4')
+            total_income = accounts_4[0]['amount']
+            accounts_5 = self._get_lines_type(context, '5')
+            total_spends = accounts_5[0]['amount']
+            equity = round(total_income - total_spends, 3)
+            TOTALS.append({'total_equity': accounts[0]['amount'] + equity})
+        return accounts
 
     @api.model
     def _get_report_values(self, docids, data=None):
@@ -584,11 +373,167 @@ class FinancialSituationPdf(models.AbstractModel):
             'get_accounts_order': self._get_accounts_order,
         }
 
-
 class FinancialSituation(models.TransientModel):
     _name = 'account.financial.situation'
-
     _description = _("Ventana para estado de situación financiera")
+
+    def generate_xlsx_report(self, workbook, context):
+        lines_1 = self._get_lines_type(context, '1')
+        lines_2 = self._get_lines_type(context, '2')
+        lines_3 = self._get_lines_type(context, '3')
+        sheet = workbook.add_worksheet('Estado de situación financiera')
+        # Columnas
+        sheet.set_column("A:A", 15)
+        sheet.set_column("B:B", 50)
+        sheet.set_column("C:C", 10)
+        sheet.set_column("D:D", 15)
+        sheet.autofilter('A3:D3')
+        # Formatos
+        title = workbook.add_format({
+            'bold': True,
+            'border': 1
+        })
+        heading = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D3D3D3',
+            'align': 'center',
+            'border': 1
+        })
+        heading_1 = workbook.add_format({
+            'bold': True,
+            'font_size': 11
+        })
+        heading_1_number = workbook.add_format({
+            'bold': True,
+            'font_size': 11,
+            'num_format': '#,##0.00'
+        })
+        heading_2 = workbook.add_format({
+            'font_size': 9,
+            'bold': True,
+        })
+        heading_2_number = workbook.add_format({
+            'font_size': 9,
+            'bold': True,
+            'num_format': '#,##0.00'
+        })
+        heading_3 = workbook.add_format({
+            'font_size': 8,
+        })
+        heading_3_number = workbook.add_format({
+            'font_size': 8,
+            'num_format': '#,##0.00'
+        })
+        # Formatos de celda
+        sheet.write('A1', 'ESTADO DE SITUACIÓN FINANCIERA', title)
+        columns = [
+            'CÓDIGO', 'NOMBRE DE CUENTA', 'TIPO', 'BALANCE'
+        ]
+        row = 2
+        col = 0
+        for column in columns:
+            sheet.write(row, col, column, heading)
+            col += 1
+        # 1
+        row += 1
+        for line in lines_1:
+            if line['type'] == 'principal':
+                sheet.write(row, 0, line['code'], heading_1)
+                sheet.write(row, 1, line['name'], heading_1)
+                sheet.write(row, 3, line['amount'], heading_1_number)
+                row += 1
+            else:
+                sheet.write(row, 0, line['code'], heading_2)
+                sheet.write(row, 1, line['name'], heading_2)
+                sheet.write(row, 2, 'VISTA', heading_2)
+                sheet.write(row, 3, line['amount'], heading_2_number)
+                if line['subaccounts']:
+                    for lsb in line['subaccounts']:
+                        if float_is_zero(lsb['amount'], precision_rounding=0.01):
+                            continue
+                        row += 1
+                        sheet.write(row, 0, lsb['code'], heading_3)
+                        sheet.write(row, 1, lsb['name'], heading_3)
+                        sheet.write(row, 2, 'MOVIMIENTO', heading_3)
+                        sheet.write(row, 3, lsb['amount'], heading_3_number)
+                row += 1
+        # 2
+        for line in lines_2:
+            if line['type'] == 'principal':
+                sheet.write(row, 0, line['code'], heading_1)
+                sheet.write(row, 1, line['name'], heading_1)
+                sheet.write(row, 3, line['amount'], heading_1_number)
+                row += 1
+            else:
+                sheet.write(row, 0, line['code'], heading_2)
+                sheet.write(row, 1, line['name'], heading_2)
+                sheet.write(row, 2, 'VISTA', heading_2)
+                sheet.write(row, 3, line['amount'], heading_2_number)
+                if line['subaccounts']:
+                    for lsb in line['subaccounts']:
+                        if float_is_zero(lsb['amount'], precision_rounding=0.01):
+                            continue
+                        row += 1
+                        sheet.write(row, 0, lsb['code'], heading_3)
+                        sheet.write(row, 1, lsb['name'], heading_3)
+                        sheet.write(row, 2, 'MOVIMIENTO', heading_3)
+                        sheet.write(row, 3, lsb['amount'], heading_3_number)
+                row += 1
+        # 3
+        for line in lines_3:
+            if line['type'] == 'principal':
+                sheet.write(row, 0, line['code'], heading_1)
+                sheet.write(row, 1, line['name'], heading_1)
+                sheet.write(row, 3, line['amount'], heading_1_number)
+                row += 1
+            else:
+                sheet.write(row, 0, line['code'], heading_2)
+                sheet.write(row, 1, line['name'], heading_2)
+                sheet.write(row, 2, 'VISTA', heading_2)
+                sheet.write(row, 3, line['amount'], heading_2_number)
+                if line['subaccounts']:
+                    for lsb in line['subaccounts']:
+                        if float_is_zero(lsb['amount'], 3):
+                            continue
+                        row += 1
+                        sheet.write(row, 0, lsb['code'], heading_3)
+                        sheet.write(row, 1, lsb['name'], heading_3)
+                        sheet.write(row, 2, 'MOVIMIENTO', heading_3)
+                        sheet.write(row, 3, lsb['amount'], heading_3_number)
+                row += 1
+        row += 1
+
+        # Status Result
+        accounts_4 = self._get_lines_type(context, '4')
+        total_income = accounts_4[0]['amount']
+        accounts_5 = self._get_lines_type(context, '5')
+        total_spends = accounts_5[0]['amount']
+        equity = round(total_income - total_spends, 3)
+        sheet.write(row, 1, 'PATRIMONIO + PASIVO', heading_1)
+        sheet.write(row, 3, lines_2[0]['amount'] + equity, heading_1_number)
+
+    @api.multi
+    def print_report_xlsx(self):
+        """
+        Imprimimos reporte en xlsx
+        :return:
+        """
+        context = dict(
+            company_id=self.company_id,
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+        self.write(self.create_xlsx_report('Estado de situación financiera', context))
+        return {
+            'name': "Estado de situación financiera",
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.financial.situation',
+            'view_mode': ' form',
+            'view_type': ' form',
+            'res_id': self.id,
+            'views': [(False, 'form')],
+            'target': 'new',
+        }
 
     @api.multi
     def print_report_pdf(self):
@@ -602,7 +547,7 @@ class FinancialSituation(models.TransientModel):
     start_date = fields.Date('Fecha inicio', required=True)
     end_date = fields.Date('Fecha fin', required=True)
     # Análisis de gastos
-    company_division_id = fields.Many2one('account.company.division', string='División', required=True)
+    company_division_id = fields.Many2one('account.company.division', string='División')
     project_id = fields.Many2one('account.project', string='Proyecto')
     account_analytic_id = fields.Many2one('account.analytic.account', 'Centro de costo')
     company_id = fields.Many2one('res.company', string="Compañía", default=lambda self: self.env.user.company_id)
