@@ -9,7 +9,7 @@ class ReportHelpFunctions(models.AbstractModel):
     _name = 'account.report.help.functions'
     _description = _("Funciones de ayuda para reportes contables")
 
-    def _get_account_balance(self, account, type, context):
+    def _get_account_balance(self, account, type, context, include_initial):
         """
         Obtenemos el balance de cuenta
         :param account:
@@ -19,10 +19,12 @@ class ReportHelpFunctions(models.AbstractModel):
         """
         args = [
             ('account_id', '=', account.id),
-            ('date', '>=', context['start_date']),
+            ('date', '>=', context['start_date'] if context['start_date'] else '2000-01-01'),
             ('date', '<=', context['end_date'])
         ]
-        beginning_balance = account._get_beginning_balance(context['start_date'])
+        beginning_balance = 0.00
+        if not include_initial:
+            beginning_balance = account._get_beginning_balance(context['start_date'])
         moves = self.env['account.move.line'].search(args)
         credit = 0.00
         debit = 0.00
@@ -53,7 +55,7 @@ class ReportHelpFunctions(models.AbstractModel):
                     'type': 'principal',
                     'subaccounts': [],
                     'amount':
-                        list(object_account._account_balance(account, childs, context['start_date'],
+                        list(object_account._account_balance(account, childs, context['start_date'] if context['start_date'] else '2000-01-01',
                                                              context['end_date']))[2],
                     'account': False,
                     'parent': False
@@ -70,7 +72,7 @@ class ReportHelpFunctions(models.AbstractModel):
                         'type': 'view',
                         'subaccounts': [],
                         'amount': list(
-                            object_account._account_balance(account, childs, context['start_date'],
+                            object_account._account_balance(account, childs, context['start_date'] if context['start_date'] else '2000-01-01',
                                                             context['end_date']))[2],
                         'account': account,
                         'parent': parent
@@ -81,11 +83,11 @@ class ReportHelpFunctions(models.AbstractModel):
                         'code': account.code,
                         'type': 'movement',
                         'name': account.name,
-                        'amount': self._get_account_balance(account, type, context)
+                        'amount': self._get_account_balance(account, type, context, True if self._context.get('no_initial', False) else False)
                     })
         return accounts
 
-    start_date = fields.Date('Fecha inicio', required=True)
+    start_date = fields.Date('Fecha inicio')
     end_date = fields.Date('Fecha fin', required=True)
     company_id = fields.Many2one('res.company', string="Compañía", default=lambda self: self.env.user.company_id)
 
@@ -114,7 +116,7 @@ class StatusResultsPdf(models.AbstractModel):
             return False
 
     def _get_lines(self, context, type):
-        accounts = self._get_lines_type(context, type)
+        accounts = self.with_context(no_initial=True)._get_lines_type(context, type)
         if type == '4':
             TOTALS.append({'total_income': accounts[0]['amount']})
         else:
@@ -342,16 +344,16 @@ class FinancialSituationPdf(models.AbstractModel):
         return accounts_order
 
     def _get_report(self, type, context):
-        accounts = self._get_lines_type(context, type)
+        accounts = self.with_context(no_initial=True)._get_lines_type(context, type)
         if type == '1':
             TOTALS.append({'total_assets': accounts[0]['amount']})
         if type == '2':
             TOTALS.append({'total_liabilities': accounts[0]['amount']})
         if type == '3':
             # Status Result, TODO: Mejorar
-            accounts_4 = self._get_lines_type(context, '4')
+            accounts_4 = self.with_context(no_initial=True)._get_lines_type(context, '4')
             total_income = accounts_4[0]['amount']
-            accounts_5 = self._get_lines_type(context, '5')
+            accounts_5 = self.with_context(no_initial=True)._get_lines_type(context, '5')
             total_spends = accounts_5[0]['amount']
             equity = round(total_income - total_spends, 3)
             TOTALS.append({'total_equity': accounts[0]['amount'] + equity})
@@ -376,6 +378,7 @@ class FinancialSituationPdf(models.AbstractModel):
 class FinancialSituation(models.TransientModel):
     _name = 'account.financial.situation'
     _description = _("Ventana para estado de situación financiera")
+    _inherit = ['report.report_xlsx.abstract', 'account.report.help.functions']
 
     def generate_xlsx_report(self, workbook, context):
         lines_1 = self._get_lines_type(context, '1')
@@ -544,8 +547,6 @@ class FinancialSituation(models.TransientModel):
         self.ensure_one()
         return self.env.ref('eliterp_accounting_reports.action_report_financial_situation').report_action(self)
 
-    start_date = fields.Date('Fecha inicio', required=True)
-    end_date = fields.Date('Fecha fin', required=True)
     # Análisis de gastos
     company_division_id = fields.Many2one('account.company.division', string='División')
     project_id = fields.Many2one('account.project', string='Proyecto')
