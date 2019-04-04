@@ -210,13 +210,7 @@
                                 <field name="type_voucher"/>
                                 <field name="invoice_id"
                                        attrs="{'required':[('type_voucher', '=', 'invoice')], 'readonly':[('type_voucher', '=', 'vale')]}"
-                                       context="{
-                                           'default_type': 'in_invoice',
-                                           'type': 'in_invoice',
-                                           'journal_type': 'purchase',
-                                    'form_view_ref': 'account.invoice_supplier_form',
-                                    'default_viaticum': True
-                                    }"/>
+                                       options="{'no_create':True}"/>
                                 <field name="travel_concept_id"
                                        attrs="{'required':[('type_voucher', '!=', 'invoice')], 'readonly':[('type_voucher', '!=', 'vale')]}"
                                        options="{'no_open':True,'no_create':True}"/>

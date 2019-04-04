@@ -293,7 +293,7 @@ class TravelExpensesLiquidation(models.Model):
             'state': 'to_approve'
         })
 
-    @api.depends('line_ids', 'with_request')
+    @api.depends('line_ids.amount_total', 'with_request')
     def _compute_difference(self):
         """
         Calculamos la diferencia entre total de solicitud y registro de documentos
