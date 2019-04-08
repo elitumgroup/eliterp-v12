@@ -91,8 +91,8 @@ class Invoice(models.Model):
         """
         if self.type in self.ISSUANCE_DOCUMENTS:
             return
-        if self.authorization and len(self.authorization) not in [10, 35, 49]:
-            raise ValidationError('Debe ingresar 10, 35 o 49 dígitos según el tipo de autorización.')
+        if self.authorization and len(self.authorization) not in [10, 37, 49]:
+            raise ValidationError('Debe ingresar 10, 37 o 49 dígitos según el tipo de autorización.')
 
     @api.one
     @api.depends('amount_total')
