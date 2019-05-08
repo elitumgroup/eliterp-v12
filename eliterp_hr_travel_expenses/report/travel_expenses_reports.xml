@@ -103,7 +103,7 @@
                     <t t-call="web.external_layout">
                         <div class="page">
 
-                            <div id="informations" class="row mt32 mb32">
+                            <div id="informations" class="row mt32">
                                 <div class="col-xs-3">
                                     <strong>Fecha de documento:</strong>
                                     <p t-field="doc.date"/>
@@ -115,6 +115,17 @@
                                 <div class="col-6">
                                     <strong>Beneficiario:</strong>
                                     <p t-field="doc.beneficiary"/>
+                                </div>
+                            </div>
+
+                            <div id="informations" class="row mb32">
+                                <div class="col-3" t-if="doc.company_division_id">
+                                    <strong>División:</strong>
+                                    <p t-field="doc.company_division_id"/>
+                                </div>
+                                <div class="col-3" t-if="doc.project_id">
+                                    <strong>Proyecto:</strong>
+                                    <p t-field="doc.project_id"/>
                                 </div>
                             </div>
 

@@ -165,6 +165,7 @@ class TravelExpensesRequest(models.Model):
     company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
                                           states={'draft': [('readonly', False)]}, track_visibility='onchange')
     reason = fields.Char('Motivo de viaje', required=True, track_visibility='onchange')
+    project_id = fields.Many2one('account.project', string='Proyecto')
     amount_total = fields.Float(compute='_compute_amount_total', string="Monto total", store=True)
     approval_user = fields.Many2one('res.users', 'Aprobado por')
     line_ids = fields.One2many('hr.travel.concepts.line', 'travel_expenses_request_id',
@@ -336,7 +337,9 @@ class TravelExpensesLiquidation(models.Model):
         move_id = self.env['account.move'].create({
             'journal_id': self.journal_id.id,
             'date': self.date,
-            'ref': _('Liquidación :%s') % self.reason
+            'ref': _('Liquidación :%s') % self.reason,
+            'company_division_id': self.company_division_id.id if self.company_division_id else False,
+            'project_id': self.project_id.id if self.project_id else False
         })
         for register in list_accounts:
             # Gastos de viáticos (Debe)
@@ -449,6 +452,9 @@ class TravelExpensesLiquidation(models.Model):
     approval_user = fields.Many2one('res.users', 'Aprobado por')
     move_id = fields.Many2one('account.move', string='Asiento contable')
     journal_id = fields.Many2one('account.journal', string="Diario", default=_default_journal)
+    company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
+                                         states={'draft': [('readonly', False)]}, track_visibility='onchange')
+    project_id = fields.Many2one('account.project', string='Proyecto')
     reason_deny = fields.Text('Negado por')
     comment = fields.Text('Notas y comentarios')
     state = fields.Selection([

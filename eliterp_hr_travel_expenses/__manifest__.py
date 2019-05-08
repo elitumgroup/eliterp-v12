@@ -10,7 +10,8 @@
         'mail',
         'eliterp_hr_employee',
         'eliterp_start',
-        'eliterp_treasury'
+        'eliterp_treasury',
+        'eliterp_account_project'
     ],
     'data': [
         'data/sequences.xml',
