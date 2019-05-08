@@ -206,6 +206,7 @@
                                required="1" options="{'no_open': True, 'no_create': True}"/>
                         <field name="move_id" groups="account.group_account_user" readonly="1"
                                attrs="{'invisible':[('state', '!=', 'liquidated')]}"/>
+                        <field name="company_id" invisible="1"/>
                     </group>
                     <!--Documentos-->
                     <group string="Líneas de comprobante" col="1">
