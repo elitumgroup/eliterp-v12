@@ -198,6 +198,12 @@
 
                         <field name="number_days" attrs="{'invisible': [('with_request','=', True)]}"/>
                         <field name="number_of_people" attrs="{'invisible': [('with_request','=', True)]}"/>
+                        <field name="company_division_id" required="1"
+                               context="{'default_company_id': company_id}"
+                               domain="[('company_id', '=', company_id)]"/>
+                        <field name="project_id"
+                               domain="[('company_division_id', '=', company_division_id)]"
+                               required="1" options="{'no_open': True, 'no_create': True}"/>
                         <field name="move_id" groups="account.group_account_user" readonly="1"
                                attrs="{'invisible':[('state', '!=', 'liquidated')]}"/>
                     </group>
