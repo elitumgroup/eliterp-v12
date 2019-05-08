@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
 import re
+from odoo import fields, models, api, _
+import base64
+import logging
 
+_logger = logging.getLogger(__name__)
+
+try:
+    import xlsxwriter
+except ImportError:
+    _logger.debug(_('No se puede importar librería xlsxwriter.'))
 
 class Invoice(models.Model):
     _inherit = 'account.invoice'
@@ -182,6 +190,64 @@ class Invoice(models.Model):
         payment_forms_ids = self.env['sri.payment.forms'].search([], limit=1)
         return payment_forms_ids
 
+
+    def _generate_xlsx_report(self, workbook):
+        # Formatos
+        money_format = workbook.add_format({'num_format': '$#,##0.00', 'bold': 1})
+        sheet = workbook.add_worksheet('Factura')
+        amount_words = self.env['res.functions'].get_amount_to_word(self.amount_total).upper()
+        ruc = self.company_id.vat # Por empresa
+        if ruc == '0992968168001':
+            sheet.write(7, 1, self.partner_id.name)
+            sheet.write(7, 8, self.partner_id.documentation_number)
+            sheet.write(8, 1, self.partner_id.street)
+            sheet.write(9, 2, self.date_invoice)
+            sheet.write(9, 9, self.payment_term_id.name if self.payment_term_id else 'Contado')
+            row = 12
+            for line in self.invoice_line_ids:
+                sheet.write(row, 1, line.quantity)
+                sheet.write(row, 3, line.name)
+                sheet.write(row, 5, line.price_unit, money_format)
+                sheet.write(row, 7, line.price_subtotal, money_format)
+                row += 1
+            sheet.write(22, 10, self.amount_untaxed, money_format)
+            sheet.write(23, 1, amount_words)
+            sheet.write(24, 3, self.payment_form_id.name)
+            sheet.write(24, 9, ("12"))
+            sheet.write(24, 10, self.amount_tax, money_format)
+            sheet.write(25, 10, self.amount_total, money_format)
+        else:
+            return
+
+    @api.multi
+    def print_out_invoice_xlsx(self):
+        """
+        Imprimimos factura en xlsx
+        :return:
+        """
+        self.ensure_one()
+        self.write(self.create_xlsx_report('Factura', None))
+
+    def create_xlsx_report(self, name, context=None):
+        name = name + '.xlsx'
+        workbook = xlsxwriter.Workbook(name, self.get_workbook_options())
+        self._generate_xlsx_report(workbook)
+        workbook.close()
+        with open(name, "rb") as file:
+            file = base64.b64encode(file.read())
+        data = {
+            'file_invoice': file,
+            'file_invoice_name': name
+        }
+        return data
+
+    def get_workbook_options(self):
+        return {'in_memory': True}
+
+    def generate_xlsx_report(self, workbook, context):
+        # TODO: Revisar está función
+        pass
+
     invoice_number = fields.Char('Secuencial', readonly=True, states={'draft': [('readonly', False)]},
                                  help="Número de factura de la compañía según el tipo.", copy=False, size=9)  # CM
     validate_payment_form = fields.Boolean('Validación forma de pago', compute='_compute_validate_payment_form')
@@ -203,3 +269,5 @@ class Invoice(models.Model):
     is_electronic = fields.Boolean(string='Es electrónica?',
                                    default=False)  # Dejar para futuras implementaciones de F.E.
     concept = fields.Char('Concepto', readonly=True, states={'draft': [('readonly', False)]})
+    file_invoice = fields.Binary('Factura (.xlsx)')
+    file_invoice_name = fields.Char('Nombre de archivo', readonly=True)
