@@ -38,6 +38,13 @@
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="account.invoice_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_invoice_sent']" position="after">
+                    <button name="print_out_invoice_xlsx"
+                            string="Imprimir factura física"
+                            type="object"
+                            attrs="{'invisible': ['|', '|', ('is_electronic', '=', True), ('type', '=', 'out_refund'), ('state', 'not in', ['open', 'paid'])]}"
+                           />
+                </xpath>
                 <xpath expr="//field[@name='payment_term_id']" position="before"><!--Plazos de pago-->
                     <field name="is_electronic" invisible="1"/>
                     <field name="reference" invisible="1"/>
@@ -55,6 +62,9 @@
                     <field name="sri_authorization_id"
                            attrs="{'invisible':[('is_electronic', '=', True)], 'required':[('is_electronic', '=', False)]}"
                            options="{'no_open': True, 'no_create': True}"/>
+                    <field name="file_invoice_name" invisible="1"/>
+                    <field name="file_invoice"
+                           attrs="{'invisible':[('file_invoice', '=', False)]}" filename="file_invoice_name" nolabel="1" readonly="1"/>
                 </xpath>
                 <xpath expr="//field[@name='date_due']" position="after"><!--Fecha vencimiento-->
                     <field name="validate_payment_form" invisible="1"/>
