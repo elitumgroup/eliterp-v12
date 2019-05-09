@@ -21,8 +21,7 @@ class Move(models.Model):
 class Invoice(models.Model):
     _inherit = 'account.invoice'
 
-    project_id = fields.Many2one('account.project', string='Proyecto', readonly=True,
-                                 states={'draft': [('readonly', False)]}, track_visibility='onchange')
+    project_id = fields.Many2one('account.project', string='Proyecto', track_visibility='onchange')
 
 
 class CompanyDivision(models.Model):

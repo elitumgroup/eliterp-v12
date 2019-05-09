@@ -31,8 +31,7 @@ class Invoice(models.Model):
         company_division_ids = self.env['account.company.division'].search([('company_id', '=', company)], limit=1)
         return company_division_ids
 
-    company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
-                                          states={'draft': [('readonly', False)]}, track_visibility='onchange',
+    company_division_id = fields.Many2one('account.company.division', string='División', track_visibility='onchange',
                                           default=_default_company_division)
 
 

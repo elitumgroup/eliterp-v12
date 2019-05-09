@@ -162,8 +162,7 @@ class TravelExpensesRequest(models.Model):
                                   states={'draft': [('readonly', False)]})
     destination_id = fields.Many2one('hr.travel.destinations', string='Destino', required=True, readonly=True,
                                      states={'draft': [('readonly', False)]})
-    company_division_id = fields.Many2one('account.company.division', string='División', readonly=True,
-                                          states={'draft': [('readonly', False)]}, track_visibility='onchange')
+    company_division_id = fields.Many2one('account.company.division', string='División', track_visibility='onchange')
     reason = fields.Char('Motivo de viaje', required=True, track_visibility='onchange')
     project_id = fields.Many2one('account.project', string='Proyecto')
     amount_total = fields.Float(compute='_compute_amount_total', string="Monto total", store=True)
