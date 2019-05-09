@@ -321,7 +321,12 @@ class Retention(models.Model):
         """
         if not self.retention_lines:
             raise ValidationError(_("Debe crear alguna línea de retención."))
-        journal_id = self.env.ref("eliterp_treasury.journal_retention_customer")
+        journal_id = self.env['account.journal'].search([
+            ('name', '=', 'Retención a cliente'),
+            ('company_id', '=', self.company_id.id)
+        ])
+        if not journal_id:
+            raise ValidationError(_("No existe diario Retención a cliente para compania en curso!"))
         move_id = self.env['account.move'].create({
             'journal_id': journal_id.id,
             'ref': _("Retención de factura: ") + "%s" % (self.invoice_id.reference),
