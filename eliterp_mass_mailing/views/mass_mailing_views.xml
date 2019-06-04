@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Root-->
+        <menuitem id="mass_mailing.mass_mailing_menu_root"
+                  web_icon="eliterp_mass_mailing,static/description/icon.png"/>
+
+    </data>
+</odoo>
+
+

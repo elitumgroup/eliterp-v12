@@ -3,10 +3,7 @@
     <data>
         <!--Root-->
         <menuitem id="website.menu_website_configuration"
-                  name="Sitio Web"
-                  groups="base.group_user"
-                  web_icon="eliterp_website,static/description/icon.png"
-                  sequence="9"/>
+                  web_icon="eliterp_website,static/description/icon.png"/>
 
     </data>
 </odoo>
