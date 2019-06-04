@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Root-->
+        <menuitem id="helpdesk.menu_helpdesk_root"
+                  web_icon="eliterp_helpdesk,static/description/icon.png"/>
+
+    </data>
+</odoo>
+
+

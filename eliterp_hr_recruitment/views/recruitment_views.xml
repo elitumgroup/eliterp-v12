@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Root-->
+        <menuitem id="hr_recruitment.menu_hr_recruitment_root"
+                  web_icon="eliterp_hr_recruitment,static/description/icon.png"/>
+
+    </data>
+</odoo>
+
+
