@@ -232,8 +232,9 @@ class PayslipRun(models.Model):
         provision_tenth_3 = []
         provision_tenth_4 = []
         provision_reserve_funds = 0.00
+        reserve_funds = 0.00
         advances = []
-        reserve_funds = False  # Bandera para fondos de reserva
+        flag_reserve_funds = False  # Bandera para fondos de reserva
         for role in self.line_ids:  # Comenzamos a sumar los roles individuales para creación del consolidado
             wage += round(role.wage, 3)
             other_income += round(role.other_income, 3)
