@@ -323,19 +323,6 @@ class Voucher(models.Model):
                         'analytic_account_id': self.account_analytic_id.id
                         # Soló en está línea le mandamos centro de costo
                     })
-                sum_invoices = sum(line.amount_payable for line in self.in_invoice_line)
-                if sum_invoices != self.amount_cancel:
-                    diff = self.amount_cancel - sum_invoices
-                    self.env['account.move.line'].with_context(check_move_validity=False).create({
-                        'name': '/',
-                        'journal_id': move_id.journal_id.id,
-                        'partner_id': self.partner_id.id,
-                        'account_id': account_payable,
-                        'move_id': move_id.id,
-                        'credit': 0.0,
-                        'debit': diff,
-                        'date': self.date
-                    })
                 for line in self.in_invoice_line:
                     number_invoices -= 1
                     if number_invoices == 0:
