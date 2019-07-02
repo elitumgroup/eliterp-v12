@@ -15,13 +15,13 @@ from operator import itemgetter
 
 STD_FORMAT = '%d/%m/%Y'
 
-ID_CUSTOMER = {
+ID_SUPPLIER = {
     '0': '01',
     '1': '02',
     '2': '03'
 }
 
-ID_SUPPLIER = {
+ID_CUSTOMER = {
     '0': '04',
     '1': '05',
     '2': '06'
