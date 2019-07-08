@@ -18,14 +18,6 @@ class PayOrderAbstract(models.AbstractModel):
             raise ValidationError(
                 _("Monto mayor al del saldo por pagar del documento (%.2f)." % self.default_amount))
 
-    # TODO
-    """
-    @api.one
-    @api.constrains('date')
-    def _check_date(self):
-        if self.date < self.default_date:
-            raise ValidationError(_("Fecha de la orden de pago no puede ser menor a la del documento."))
-    """
 
     @api.model
     def _compute_amount(self, invoice_ids):

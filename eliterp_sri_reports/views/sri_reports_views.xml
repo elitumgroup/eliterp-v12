@@ -21,7 +21,7 @@
                   sequence="1"/>
 
         <record id="action_retention_summary_report" model="ir.actions.act_window">
-            <field name="name">Resumen de retenciones</field>
+            <field name="name">Resumen de impuestos</field>
             <field name="res_model">sri.retention.summary</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>

@@ -7,11 +7,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-try:
-    import xlsxwriter
-except ImportError:
-    _logger.debug(_('No se puede importar librería xlsxwriter.'))
-
 
 class CollectionLine(models.Model):
     _inherit = "account.collection.line"
@@ -129,157 +124,6 @@ class Voucher(models.Model):
                 self.move_id.update({'ref': new_ref})
         return result
 
-    def _generate_xlsx_report(self, workbook, context):
-        # Formatos
-        money_format = workbook.add_format({'num_format': '$#,##0.00', 'bold': 1})
-        bold = workbook.add_format({'bold': 1})
-        sheet = workbook.add_worksheet('Cheque')
-        amount_words = self.env['res.functions'].get_amount_to_word(self.amount_cancel).upper()
-        bic = self.bank_journal_id.bank_id.bic  # Me sirve para referencia el banco del cheque
-        date = self.bank_date.strftime('%Y/%m/%d')
-        if bic == '13':
-            # Pichincha
-            sheet.set_margins(left=0.18, right=0.7, top=0.0, bottom=0.75)
-            # Columnas
-            sheet.set_column("A:A", 7.29)
-            sheet.set_column("B:B", 10.71)
-            sheet.set_column("C:C", 10.71)
-            sheet.set_column("D:D", 10.71)
-            sheet.set_column("F:F", 12.8)
-            sheet.set_column("E:E", 13.14)
-            # Filas
-            sheet.set_default_row(15)
-            sheet.set_row(0, 10.50)
-            sheet.set_row(3, 19.50)
-            sheet.set_row(4, 10.50)
-            sheet.set_row(5, 13.50)
-            sheet.set_row(7, 18)
-            # Datos
-            sheet.write(3, 1, self.beneficiary, bold)
-            sheet.write(3, 5, self.amount_cancel, money_format)
-            sheet.write(5, 1, amount_words, bold)
-            sheet.write(7, 0, 'GUAYAQUIL, %s' % date, bold)
-        elif bic == '100':
-            # Internacional
-            sheet.set_margins(left=0.04, right=0.7, top=0.0, bottom=0.75)
-            # Columnas
-            sheet.set_column("A:A", 8.14)
-            sheet.set_column("B:B", 10.71)
-            sheet.set_column("C:C", 10.71)
-            sheet.set_column("D:D", 10.71)
-            sheet.set_column("E:E", 10.71)
-            sheet.set_column("F:F", 0.33)
-            sheet.set_column("G:G", 11.57)
-            # Filas
-            sheet.set_default_row(15)
-            sheet.set_row(0, 8.25)
-            sheet.set_row(1, 18)
-            sheet.set_row(2, 18)
-            sheet.set_row(3, 8.25)
-            sheet.set_row(7, 6)
-            sheet.set_row(8, 13.50)
-            # Datos
-            sheet.write(4, 1, self.beneficiary, bold)
-            sheet.write(4, 6, self.amount_cancel, money_format)
-            sheet.write(5, 1, amount_words, bold)
-            sheet.write(8, 0, 'GUAYAQUIL, %s' % date, bold)
-        elif bic == 'XXX':
-            # Margins
-            sheet.set_margins(left=0.0, right=0.0, top=0.0, bottom=0.0)
-            # Columnas
-            sheet.set_column("A:A", 1.86)
-            sheet.set_column("B:B", 8.64)
-            sheet.set_column("C:C", 10.71)
-            sheet.set_column("D:D", 10.71)
-            sheet.set_column("E:E", 10.71)
-            sheet.set_column("F:F", 12.43)
-            sheet.set_column("G:G", 11.57)
-            # Filas
-            sheet.set_default_row(15)
-            sheet.set_row(0, 10.50)
-            sheet.set_row(3, 20.25)
-            sheet.set_row(4, 6)
-            sheet.set_row(5, 13.50)
-            sheet.set_row(7, 18)
-            # Datos
-            sheet.write(3, 2, self.beneficiary, bold)
-            sheet.write(3, 6, self.amount_cancel, money_format)
-            sheet.write(5, 2, amount_words, bold)
-            sheet.write(7, 1, 'GUAYAQUIL, %s' % date, bold)
-        elif bic == 'XX':
-            # Margins
-            sheet.set_margins(left=0.18, right=0.7, top=0.0, bottom=0.75)
-            # Columnas
-            sheet.set_column("A:A", 7.29)
-            sheet.set_column("B:B", 10.71)
-            sheet.set_column("C:C", 10.71)
-            sheet.set_column("D:D", 10.71)
-            sheet.set_column("F:F", 12.86)
-            sheet.set_column("E:E", 13.14)
-            # Filas
-            sheet.set_default_row(15)
-            sheet.set_row(0, 12)
-            sheet.set_row(3, 19.50)
-            sheet.set_row(4, 3.75)
-            sheet.set_row(5, 16.50)
-            sheet.set_row(6, 19.50)
-            sheet.set_row(7, 18.00)
-            # Datos
-            sheet.write(3, 1, self.beneficiary, bold)
-            sheet.write(3, 5, self.amount_cancel, bold)
-            sheet.write(5, 1, amount_words, bold)
-            sheet.write(7, 0, 'GUAYAQUIL, %s' % date, bold)
-
-        elif bic == '40':
-            # Margins
-            sheet.set_margins(left=0.18, right=0.7, top=0.73, bottom=0.75)
-            # Columnas
-            sheet.set_column("A:A", 7.50)
-            sheet.set_column("B:B", 10.71)
-            sheet.set_column("C:C", 10.71)
-            sheet.set_column("D:D", 10.71)
-            sheet.set_column("E:E", 7)
-            sheet.set_column("F:F", 11.57)
-            # Filas
-            sheet.set_default_row(15)
-            sheet.set_row(3, 11.25)
-            sheet.set_row(4, 13.50)
-            # Datos
-            sheet.write(0, 1, self.beneficiary, bold)
-            sheet.write(0, 6, self.amount_cancel, money_format)
-            sheet.write(1, 1, amount_words, bold)
-            sheet.write(4, 0, 'GUAYAQUIL, %s' % date, bold)
-        else:
-            return
-
-    @api.multi
-    def print_check_xlsx(self):
-        """
-        Imprimimos cheque en xlsx
-        :return:
-        """
-        self.write(self.create_xlsx_report('Cheque', None))
-
-    def create_xlsx_report(self, name, context=None):
-        name = name + '.xlsx'
-        workbook = xlsxwriter.Workbook(name, self.get_workbook_options())
-        self._generate_xlsx_report(workbook, context)
-        workbook.close()
-        with open(name, "rb") as file:
-            file = base64.b64encode(file.read())
-        data = {
-            'file': file,
-            'file_name': name
-        }
-        return data
-
-    def get_workbook_options(self):
-        return {'in_memory': True}
-
-    def generate_xlsx_report(self, workbook, context):
-        # TODO: Revisar está función
-        pass
-
     @api.onchange('check_number')
     def _onchange_check_number(self):
         """
@@ -293,5 +137,134 @@ class Voucher(models.Model):
     type_egress = fields.Selection(selection_add=[('check', 'Cheque')])
     check_number = fields.Char('No. Cheque', readonly=True, states={'draft': [('readonly', False)]},
                                track_visibility='onchange')
-    file = fields.Binary('Cheque (.xlsx)')
-    file_name = fields.Char('Nombre de archivo', readonly=True)
+
+
+class CheckXlsx(models.AbstractModel):
+    _name = 'report.report_xlsx.voucher_check_xlsx'
+    _inherit = 'report.report_xlsx.abstract'
+
+    def generate_xlsx_report(self, workbook, data, checks):
+        # Formatos
+        money_format = workbook.add_format({'num_format': '$#,##0.00', 'bold': 1})
+        bold = workbook.add_format({'bold': 1})
+        count = 1
+        for check in checks.filtered(lambda x: x.voucher_type == 'purchase' and x.type_egress == 'check'):
+            sheet = workbook.add_worksheet('Cheque (%s)' % str(count))
+            count += 1
+            amount_words = self.env['res.functions'].get_amount_to_word(check.amount_cancel).upper()
+            bic = check.bank_journal_id.bank_id.bic  # Me sirve para referencia el banco del cheque
+            date = check.bank_date.strftime('%Y/%m/%d')
+            if bic == '13':
+                # Pichincha
+                sheet.set_margins(left=0.18, right=0.7, top=0.0, bottom=0.75)
+                # Columnas
+                sheet.set_column("A:A", 7.29)
+                sheet.set_column("B:B", 10.71)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("F:F", 12.8)
+                sheet.set_column("E:E", 13.14)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(0, 10.50)
+                sheet.set_row(3, 19.50)
+                sheet.set_row(4, 10.50)
+                sheet.set_row(5, 13.50)
+                sheet.set_row(7, 18)
+                # Datos
+                sheet.write(3, 1, check.beneficiary, bold)
+                sheet.write(3, 5, check.amount_cancel, money_format)
+                sheet.write(5, 1, amount_words, bold)
+                sheet.write(7, 0, 'GUAYAQUIL, %s' % date, bold)
+            elif bic == '100':
+                # Internacional
+                sheet.set_margins(left=0.04, right=0.7, top=0.0, bottom=0.75)
+                # Columnas
+                sheet.set_column("A:A", 8.14)
+                sheet.set_column("B:B", 10.71)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("E:E", 10.71)
+                sheet.set_column("F:F", 0.33)
+                sheet.set_column("G:G", 11.57)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(0, 8.25)
+                sheet.set_row(1, 18)
+                sheet.set_row(2, 18)
+                sheet.set_row(3, 8.25)
+                sheet.set_row(7, 6)
+                sheet.set_row(8, 13.50)
+                # Datos
+                sheet.write(4, 1, check.beneficiary, bold)
+                sheet.write(4, 6, check.amount_cancel, money_format)
+                sheet.write(5, 1, amount_words, bold)
+                sheet.write(8, 0, 'GUAYAQUIL, %s' % date, bold)
+            elif bic == 'XXX':
+                # Margins
+                sheet.set_margins(left=0.0, right=0.0, top=0.0, bottom=0.0)
+                # Columnas
+                sheet.set_column("A:A", 1.86)
+                sheet.set_column("B:B", 8.64)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("E:E", 10.71)
+                sheet.set_column("F:F", 12.43)
+                sheet.set_column("G:G", 11.57)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(0, 10.50)
+                sheet.set_row(3, 20.25)
+                sheet.set_row(4, 6)
+                sheet.set_row(5, 13.50)
+                sheet.set_row(7, 18)
+                # Datos
+                sheet.write(3, 2, check.beneficiary, bold)
+                sheet.write(3, 6, check.amount_cancel, money_format)
+                sheet.write(5, 2, amount_words, bold)
+                sheet.write(7, 1, 'GUAYAQUIL, %s' % date, bold)
+            elif bic == 'XX':
+                # Margins
+                sheet.set_margins(left=0.18, right=0.7, top=0.0, bottom=0.75)
+                # Columnas
+                sheet.set_column("A:A", 7.29)
+                sheet.set_column("B:B", 10.71)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("F:F", 12.86)
+                sheet.set_column("E:E", 13.14)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(0, 12)
+                sheet.set_row(3, 19.50)
+                sheet.set_row(4, 3.75)
+                sheet.set_row(5, 16.50)
+                sheet.set_row(6, 19.50)
+                sheet.set_row(7, 18.00)
+                # Datos
+                sheet.write(3, 1, check.beneficiary, bold)
+                sheet.write(3, 5, check.amount_cancel, bold)
+                sheet.write(5, 1, amount_words, bold)
+                sheet.write(7, 0, 'GUAYAQUIL, %s' % date, bold)
+
+            elif bic == '40':
+                # Margins
+                sheet.set_margins(left=0.18, right=0.7, top=0.73, bottom=0.75)
+                # Columnas
+                sheet.set_column("A:A", 7.50)
+                sheet.set_column("B:B", 10.71)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("E:E", 7)
+                sheet.set_column("F:F", 11.57)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(3, 11.25)
+                sheet.set_row(4, 13.50)
+                # Datos
+                sheet.write(0, 1, check.beneficiary, bold)
+                sheet.write(0, 6, check.amount_cancel, money_format)
+                sheet.write(1, 1, amount_words, bold)
+                sheet.write(4, 0, 'GUAYAQUIL, %s' % date, bold)
+            else:
+                return

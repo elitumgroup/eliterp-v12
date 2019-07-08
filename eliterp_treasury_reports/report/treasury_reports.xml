@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>        
+        <!--Accounts Receivable-->
+        <template id="report_accounts_receivable">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="report_code">REPO-TESO-001-V1</t>
+                    <t t-set="report_title">REPORTE DE CUENTAS POR COBRAR</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-4">
+                                    <strong>Fecha de inicio:</strong>
+                                    <p t-field="o.start_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha Fin:</strong>
+                                    <p t-field="o.end_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Emisión:</strong>
+                                    <p t-field="o.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th colspan="7">&amp;nbsp;</th>
+                                        <th colspan="5" class="text-center">VALORES POR VENCER</th>
+                                        <th colspan="5" class="text-right">VALORES VENCIDOS</th>
+                                    </tr>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th colspan="7">&amp;nbsp;</th>
+                                        <th colspan="5" class="text-center">ANTIGÜEDAD DE CARTERA (DÍAS)</th>
+                                        <th colspan="5" class="text-right">ANTIGÜEDAD DE CARTERA (DÍAS)</th>
+                                    </tr>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">CLIENTE</th>
+                                        <th class="text-center">NO. FACTURA</th>
+                                        <th class="text-center">VALOR</th>
+                                        <th class="text-center">SALDO PENDIENTE</th>
+                                        <th class="text-center">FECHA EMISIÓN</th>
+                                        <th class="text-center">FECHA VENCIMIENTO</th>
+                                        <th class="text-center">MOROSIDAD</th>
+                                        <th class="text-center">1-30</th>
+                                        <th class="text-center">31-90</th>
+                                        <th class="text-center">91-180</th>
+                                        <th class="text-center">181-360</th>
+                                        <th class="text-center">Mayor a</th>
+                                        <th class="text-center">1-30</th>
+                                        <th class="text-center">31-90</th>
+                                        <th class="text-center">91-180</th>
+                                        <th class="text-center">181-360</th>
+                                        <th class="text-center">Mayor a</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="get_lines(o)" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="line['partner']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['number']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['amount']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['outstanding_balance']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['expedition_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['expiration_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['delinquency']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_30']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_90']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_180']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_360']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_mayor']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_30']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_90']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_180']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_360']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_mayor']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_accounts_receivable"
+                model="accounts.receivable.report"
+                string="Reporte de cuentas por cobrar"
+                report_type="qweb-pdf"
+                name="eliterp_treasury_reports.report_accounts_receivable"
+                file="eliterp_treasury_reports.report_accounts_receivable"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+        <!--Accounts Payable-->
+        <template id="report_accounts_payable">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="report_code">REPO-TESO-002-V1</t>
+                    <t t-set="report_title">REPORTE DE CUENTAS POR PAGAR</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-4">
+                                    <strong>Fecha de inicio:</strong>
+                                    <p t-field="o.start_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha Fin:</strong>
+                                    <p t-field="o.end_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Emisión:</strong>
+                                    <p t-field="o.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th colspan="11">&amp;nbsp;</th>
+                                        <th colspan="5" class="text-center">VALORES POR VENCER</th>
+                                        <th colspan="5" class="text-right">VALORES VENCIDOS</th>
+                                    </tr>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th colspan="5">&amp;nbsp;</th>
+                                        <th colspan="2">&amp;nbsp;</th>
+                                        <th colspan="4">&amp;nbsp;</th>
+                                        <th colspan="5" class="text-center">ANTIGÜEDAD DE CARTERA (DÍAS)</th>
+                                        <th colspan="5" class="text-right">ANTIGÜEDAD DE CARTERA (DÍAS)</th>
+                                    </tr>
+                                </thead>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">PROVEEDOR</th>
+                                        <th class="text-center">NO. FACTURA</th>
+                                        <th class="text-center">SUBTOTAL</th>
+                                        <th class="text-center">IVA</th>
+                                        <th class="text-center">TOTAL</th>
+                                        <th class="text-center">NC</th>
+                                        <th class="text-center">PAGADO</th>
+                                        <th class="text-center">SALDO PENDIENTE</th>
+                                        <th class="text-center">FECHA EMISIÓN</th>
+                                        <th class="text-center">FECHA VENCIMIENTO</th>
+                                        <th class="text-center">MOROSIDAD</th>
+                                        <th class="text-center">1-30</th>
+                                        <th class="text-center">31-90</th>
+                                        <th class="text-center">91-180</th>
+                                        <th class="text-center">181-360</th>
+                                        <th class="text-center">Mayor a</th>
+                                        <th class="text-center">1-30</th>
+                                        <th class="text-center">31-90</th>
+                                        <th class="text-center">91-180</th>
+                                        <th class="text-center">181-360</th>
+                                        <th class="text-center">Mayor a</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="get_lines(o)" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="line['provider']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['number']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['subtotal']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['iva']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['amount']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['amount_credit_note']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['pays']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['outstanding_balance']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['broadcast_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['expiration_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['delinquency']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_30']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_90']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_180']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_360']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['overcome_mayor']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_30']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_90']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_180']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_360']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['defeated_mayor']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_accounts_payable"
+                model="accounts.payable.report"
+                string="Reporte de cuentas por pagar"
+                report_type="qweb-pdf"
+                name="eliterp_treasury_reports.report_accounts_payable"
+                file="eliterp_treasury_reports.report_accounts_payable"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+        <!--Excel-->
+        <report
+                id="action_report_accounts_payable_xlsx"
+                model="accounts.payable.report"
+                string="Cuentas por pagar"
+                report_type="xlsx"
+                name="eliterp_treasury_reports.report_accounts_payable_xlsx"
+                file="eliterp_treasury_reports.report_accounts_payable_xlsx"
+                print_report_name="Reporte de cuentas por pagar"
+                attachment_use="False"
+        />
+        <report
+                id="action_report_accounts_receivable_xlsx"
+                model="accounts.receivable.report"
+                string="Cuentas por cobrar"
+                report_type="xlsx"
+                name="eliterp_treasury_reports.report_accounts_receivable_xlsx"
+                file="eliterp_treasury_reports.report_accounts_receivable_xlsx"
+                print_report_name="Reporte de cuentas por cobrar"
+                attachment_use="False"
+        />
+    </data>
+</odoo>

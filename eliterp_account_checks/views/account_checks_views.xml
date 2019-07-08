@@ -218,5 +218,17 @@
             <field name="view_id" ref="view_form_checks_issued"/>
             <field name="act_window_id" ref="action_checks_issued"/>
         </record>
+
+         <!--Excel-->
+        <report
+                id="action_report_voucher_check_xlsx"
+                model="account.voucher"
+                string="Cheque"
+                report_type="xlsx"
+                name="report_xlsx.voucher_check_xlsx"
+                file="account_voucher"
+                print_report_name="Cheque"
+                attachment_use="False"
+        />
     </data>
 </odoo>

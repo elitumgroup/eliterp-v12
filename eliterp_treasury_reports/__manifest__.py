@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 
 {
-    'name': "Reportes Contables Eliterp",
+    'name': "Reportes Tesorería Eliterp",
     'author': "Elitumdevelop S.A.",
     'category': "Personalization",
     'license': "LGPL-3",
     'version': "1.0",
     'depends': [
-        'eliterp_account',
-        'eliterp_treasury',
-        'report_xlsx'
+        'report_xlsx',
+        'eliterp_accounting_reports'
     ],
     'data': [
-        'wizard/accounting_reports_wizard_views.xml',
-        'views/accounting_reports_views.xml',
-        'report/accounting_reports.xml'
+        'wizard/treasury_reports_wizard_views.xml',
+        'views/treasury_reports_views.xml',
+        'report/treasury_reports.xml'
     ],
     'init_xml': [],
     'update_xml': [],

@@ -62,17 +62,13 @@
                 <form>
                     <group>
                         <separator
-                                string="Resumen de retenciones (103, 104), para formularios del SRI."
+                                string="Resumen de impuestos (103, 104), para formularios del SRI."
                                 colspan="4"/>
                         <group>
                             <field name="year_accounting" options="{'no_open': True, 'no_create': True}"/>
                             <field name="period_id" options="{'no_open': True, 'no_create': True}"
                                    domain="[('period_id','=', year_accounting)]"/>
                         </group>
-                    </group>
-                    <group string="Archivo (.xlsx)" attrs="{'invisible': [('file', '=', False)]}">
-                        <field name="file_name" invisible="1"/>
-                        <field name="file" filename="file_name" nolabel="1" readonly="1"/>
                     </group>
                     <footer>
                         <button name="print_report_xlsx"
@@ -84,5 +80,17 @@
                 </form>
             </field>
         </record>
+
+        <!--Excel-->
+        <report
+                id="action_report_taxes_summary_xlsx"
+                model="account.status.results"
+                string="Resumen de impuestos"
+                report_type="xlsx"
+                name="eliterp_sri_reports.report_taxes_summary_xlsx"
+                file="eliterp_sri_reports.report_taxes_summary_xlsx"
+                print_report_name="Resumen de impuestos"
+                attachment_use="False"
+        />
     </data>
 </odoo>
