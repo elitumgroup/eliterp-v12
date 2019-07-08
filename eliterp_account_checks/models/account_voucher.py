@@ -141,7 +141,7 @@ class Voucher(models.Model):
 
 class CheckXlsx(models.AbstractModel):
     _name = 'report.report_xlsx.voucher_check_xlsx'
-    # _inherit = 'report.report_xlsx.abstract'
+    _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, checks):
         # Formatos

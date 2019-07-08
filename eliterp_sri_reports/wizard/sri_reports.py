@@ -521,7 +521,7 @@ class Ats(models.TransientModel):
 
 class RetentionSummaryExcel(models.TransientModel):
     _name = 'report.eliterp_sri_reports.report_taxes_summary_xlsx'
-    # _inherit = 'report.report_xlsx.abstract'
+    _inherit = 'report.report_xlsx.abstract'
 
     def _get_lines_sales(self, context):
         """
