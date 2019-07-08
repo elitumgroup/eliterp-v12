@@ -140,7 +140,7 @@ class StatusResultsPdf(models.AbstractModel):
 
 class StatusResultsExcel(models.TransientModel):
     _name = 'report.eliterp_accounting_reports.report_status_results_xlsx'
-    # _inherit = 'report.report_xlsx.abstract'
+    _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, context):
         lines_4 = self.env['report.eliterp_accounting_reports.report_status_results']._get_lines_type(context, '4')
@@ -595,7 +595,7 @@ class GeneralLedgerReportPdf(models.AbstractModel):
 
 class GeneralLedgerReportExcel(models.TransientModel):
     _name = 'report.eliterp_accounting_reports.report_general_ledger_xlsx'
-    # _inherit = 'report.report_xlsx.abstract'
+    _inherit = 'report.report_xlsx.abstract'
 
     def generate_xlsx_report(self, workbook, data, context):
         object = self.env['report.eliterp_accounting_reports.report_general_ledger']
