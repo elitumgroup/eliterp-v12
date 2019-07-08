@@ -138,14 +138,13 @@ class StatusResultsPdf(models.AbstractModel):
         }
 
 
-class StatusResults(models.TransientModel):
-    _name = 'account.status.results'
-    _inherit = ['report.report_xlsx.abstract', 'account.report.help.functions']
-    _description = _("Ventana para estado de resultados")
+class StatusResultsExcel(models.TransientModel):
+    _name = 'report.eliterp_accounting_reports.report_status_results_xlsx'
+    _inherit = 'report.report_xlsx.abstract'
 
-    def generate_xlsx_report(self, workbook, context):
-        lines_4 = self._get_lines_type(context, '4')
-        lines_5 = self._get_lines_type(context, '5')
+    def generate_xlsx_report(self, workbook, data, context):
+        lines_4 = self.env['report.eliterp_accounting_reports.report_status_results']._get_lines_type(context, '4')
+        lines_5 = self.env['report.eliterp_accounting_reports.report_status_results']._get_lines_type(context, '5')
         sheet = workbook.add_worksheet('Estado de resultados')
         # Columnas
         sheet.set_column("A:A", 15)
@@ -259,35 +258,19 @@ class StatusResults(models.TransientModel):
         else:
             sheet.write(row, 3, amount_total, heading_result_number)
 
+
+class StatusResults(models.TransientModel):
+    _name = 'account.status.results'
+    _inherit = 'account.report.help.functions'
+    _description = _("Ventana para estado de resultados")
+
     @api.multi
     def print_report_xlsx(self):
-        """
-        Imprimimos reporte en xlsx
-        :return:
-        """
-        context = dict(
-            company_id=self.company_id,
-            start_date=self.start_date,
-            end_date=self.end_date
-        )
-        self.write(self.create_xlsx_report('Estado de resultados', context))
-        return {
-            'name': "Estado de resultados",
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.status.results',
-            'view_mode': ' form',
-            'view_type': ' form',
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'new',
-        }
+        self.ensure_one()
+        return self.env.ref('eliterp_accounting_reports.action_report_status_results_xlsx').report_action(self)
 
     @api.multi
     def print_report_pdf(self):
-        """
-        Imprimimos reporte en pdf
-        :return:
-        """
         self.ensure_one()
         return self.env.ref('eliterp_accounting_reports.action_report_status_results').report_action(self)
 
@@ -375,15 +358,16 @@ class FinancialSituationPdf(models.AbstractModel):
             'get_accounts_order': self._get_accounts_order,
         }
 
-class FinancialSituation(models.TransientModel):
-    _name = 'account.financial.situation'
-    _description = _("Ventana para estado de situación financiera")
-    _inherit = ['report.report_xlsx.abstract', 'account.report.help.functions']
 
-    def generate_xlsx_report(self, workbook, context):
-        lines_1 = self._get_lines_type(context, '1')
-        lines_2 = self._get_lines_type(context, '2')
-        lines_3 = self._get_lines_type(context, '3')
+class FinancialSituationExcel(models.AbstractModel):
+    _name = 'report.eliterp_accounting_reports.report_fs_xlsx'
+    _inherit = ['report.report_xlsx.abstract']
+
+    def generate_xlsx_report(self, workbook, data, context):
+        lines_1 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '1')
+        lines_2 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '2')
+        lines_3 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '3')
+
         sheet = workbook.add_worksheet('Estado de situación financiera')
         # Columnas
         sheet.set_column("A:A", 15)
@@ -515,35 +499,19 @@ class FinancialSituation(models.TransientModel):
         sheet.write(row, 1, 'PATRIMONIO + PASIVO', heading_1)
         sheet.write(row, 3, lines_2[0]['amount'] + equity, heading_1_number)
 
+
+class FinancialSituation(models.TransientModel):
+    _name = 'account.financial.situation'
+    _description = _("Ventana para estado de situación financiera")
+    _inherit = 'account.report.help.functions'
+
     @api.multi
     def print_report_xlsx(self):
-        """
-        Imprimimos reporte en xlsx
-        :return:
-        """
-        context = dict(
-            company_id=self.company_id,
-            start_date=self.start_date,
-            end_date=self.end_date
-        )
-        self.write(self.create_xlsx_report('Estado de situación financiera', context))
-        return {
-            'name': "Estado de situación financiera",
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.financial.situation',
-            'view_mode': ' form',
-            'view_type': ' form',
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'new',
-        }
+        self.ensure_one()
+        return self.env.ref('eliterp_accounting_reports.action_report_financial_situation_xlsx').report_action(self)
 
     @api.multi
     def print_report_pdf(self):
-        """
-        Imprimimos reporte en pdf
-        :return:
-        """
         self.ensure_one()
         return self.env.ref('eliterp_accounting_reports.action_report_financial_situation').report_action(self)
 
@@ -625,13 +593,11 @@ class GeneralLedgerReportPdf(models.AbstractModel):
         }
 
 
-class GeneralLedgerReport(models.TransientModel):
-    _name = 'account.general.ledger.report'
-    _inherit = ['report.report_xlsx.abstract', 'account.report.help.functions']
+class GeneralLedgerReportExcel(models.TransientModel):
+    _name = 'report.eliterp_accounting_reports.report_general_ledger_xlsx'
+    _inherit = 'report.report_xlsx.abstract'
 
-    _description = _("Ventana para reporte de libro mayor")
-
-    def generate_xlsx_report(self, workbook, context):
+    def generate_xlsx_report(self, workbook, data, context):
         object = self.env['report.eliterp_accounting_reports.report_general_ledger']
         data = object._get_lines(context)
         sheet = workbook.add_worksheet('Libro mayor')
@@ -690,36 +656,19 @@ class GeneralLedgerReport(models.TransientModel):
             sheet.write(row, 4, line['total_credit'], heading_number)
             sheet.write(row, 5, line['total_balance'], heading_number)
 
+
+class GeneralLedgerReport(models.TransientModel):
+    _name = 'account.general.ledger.report'
+    _inherit = 'account.report.help.functions'
+    _description = _("Ventana para reporte de libro mayor")
+
     @api.multi
     def print_report_xlsx(self):
-        """
-        Imprimimos reporte en xlsx
-        :return:
-        """
-        context = dict(
-            company_id=self.company_id,
-            start_date=self.start_date,
-            end_date=self.end_date,
-            account_ids=self.account_ids
-        )
-        self.write(self.create_xlsx_report('Libro mayor', context))
-        return {
-            'name': "Libro mayor",
-            'type': 'ir.actions.act_window',
-            'res_model': 'account.general.ledger.report',
-            'view_mode': ' form',
-            'view_type': ' form',
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'new',
-        }
+        self.ensure_one()
+        return self.env.ref('eliterp_accounting_reports.action_report_general_ledger_xlsx').report_action(self)
 
     @api.multi
     def print_report_pdf(self):
-        """
-        Imprimimos reporte en pdf
-        :return:
-        """
         self.ensure_one()
         return self.env.ref('eliterp_accounting_reports.action_report_general_ledger').report_action(self)
 

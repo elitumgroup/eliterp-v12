@@ -562,5 +562,39 @@
                 file="eliterp_accounting_reports.report_general_ledger"
                 paperformat="eliterp_core.my_paperformat_a4_landscape"
         />
+
+        <!--Excel-->
+        <report
+                id="action_report_status_results_xlsx"
+                model="account.status.results"
+                string="Estado de resultados"
+                report_type="xlsx"
+                name="eliterp_accounting_reports.report_status_results_xlsx"
+                file="eliterp_accounting_reports.report_status_results_xlsx"
+                print_report_name="Estado de resultados"
+                attachment_use="False"
+        />
+
+        <report
+                id="action_report_financial_situation_xlsx"
+                model="account.financial.situation"
+                string="Estado de situación financiera"
+                report_type="xlsx"
+                name="eliterp_accounting_reports.report_fs_xlsx"
+                file="eliterp_accounting_reports.report_fs_xlsx"
+                print_report_name="Estado de situación financiera"
+                attachment_use="False"
+        />
+
+        <report
+                id="action_report_general_ledger_xlsx"
+                model="account.general.ledger.report"
+                string="Libro mayor"
+                report_type="xlsx"
+                name="eliterp_accounting_reports.report_general_ledger_xlsx"
+                file="eliterp_accounting_reports.report_general_ledger_xlsx"
+                print_report_name="Libro mayor"
+                attachment_use="False"
+        />
     </data>
 </odoo>

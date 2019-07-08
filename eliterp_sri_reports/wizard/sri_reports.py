@@ -519,10 +519,9 @@ class Ats(models.TransientModel):
     )
 
 
-class RetentionSummary(models.TransientModel):
-    _name = 'sri.retention.summary'
-    _inherit = ['report.report_xlsx.abstract', 'sri.ats']
-    _description = _("Ventana para reporte de resumen de retenciones")
+class RetentionSummaryExcel(models.TransientModel):
+    _name = 'report.eliterp_sri_reports.report_taxes_summary_xlsx'
+    _inherit = 'report.report_xlsx.abstract'
 
     def _get_lines_sales(self, context):
         """
@@ -532,8 +531,9 @@ class RetentionSummary(models.TransientModel):
         """
         data = []
         arg = []
-        arg.append(('period_id', '>=', context['period_id'].id))
+        arg.append(('period_id', '=', context['period_id'][0]))
         arg.append(('state', 'not in', ('draft', 'cancel')))
+        arg.append(('company_id', '=', context['company_id'][0]))
         arg.append(('type', '=', 'out_invoice'))
         invoices = self.env['account.invoice'].search(arg)
         count = 0
@@ -606,8 +606,9 @@ class RetentionSummary(models.TransientModel):
         """
         data = []
         arg = []
-        arg.append(('period_id', '>=', context['period_id'].id))
+        arg.append(('period_id', '=', context['period_id'][0]))
         arg.append(('state', 'not in', ('draft', 'cancel')))
+        arg.append(('company_id', '=', context['company_id'][0]))
         arg.append(('type', '=', 'in_invoice'))
         invoices = self.env['account.invoice'].search(arg)
         count = 0
@@ -747,7 +748,7 @@ class RetentionSummary(models.TransientModel):
             data[-1][22] = invoice.amount_total
         return data
 
-    def generate_xlsx_report(self, workbook, context):
+    def generate_xlsx_report(self, workbook, context, data):
         global RETENTIONS  # Variable global para suma total de retenciones por código
         RETENTIONS = []
         sales = self._get_lines_sales(context)  # Lista de factura de ventas
@@ -865,23 +866,14 @@ class RetentionSummary(models.TransientModel):
         sum_retentions = '=SUM(C%s:C%s)' % (str(sum_row), str(row))
         sheet.write(row, 2, sum_retentions, money_format)
 
+
+class RetentionSummary(models.TransientModel):
+    _name = 'sri.retention.summary'
+    _inherit = 'sri.ats'
+    _description = _("Ventana para reporte de resumen de impuestos")
+
     @api.multi
     def print_report_xlsx(self):
-        """
-        Imprimimos reporte en xlsx
-        :return:
-        """
-        context = dict(
-            period_id=self.period_id
-        )
-        self.write(self.create_xlsx_report('Resumen de retenciones', context))
-        return {
-            'name': "Resumen de retenciones",
-            'type': 'ir.actions.act_window',
-            'res_model': 'sri.retention.summary',
-            'view_mode': ' form',
-            'view_type': ' form',
-            'res_id': self.id,
-            'views': [(False, 'form')],
-            'target': 'new',
-        }
+        self.ensure_one()
+        [data] = self.read()
+        return self.env.ref('eliterp_sri_reports.action_report_taxes_summary_xlsx').report_action(self, data)

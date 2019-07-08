@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="action_accounts_receivable_report" model="ir.actions.act_window">
+            <field name="name">Cuentas por cobrar</field>
+            <field name="res_model">accounts.receivable.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury_reports.view_form_accounts_receivable_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <record id="action_accounts_payable_report" model="ir.actions.act_window">
+            <field name="name">Cuentas por pagar</field>
+            <field name="res_model">accounts.payable.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_treasury_reports.view_form_accounts_payable_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_accounts_receivable_report"
+                  parent="eliterp_accounting_reports.menu_treasury_reports"
+                  action="action_accounts_receivable_report"
+                  sequence="1"/>
+        <menuitem id="menu_accounts_payable_report"
+                  parent="eliterp_accounting_reports.menu_treasury_reports"
+                  action="action_accounts_payable_report"
+                  sequence="5"/>
+    </data>
+</odoo>

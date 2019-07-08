@@ -22,10 +22,6 @@
                                groups="analytic.group_analytic_accounting"/>
                         <field name="company_id" invisible="1"/>
                     </group>
-                    <group string="Archivo (.xlsx)" attrs="{'invisible': [('file', '=', False)]}">
-                        <field name="file_name" invisible="1"/>
-                        <field name="file" filename="file_name" nolabel="1" readonly="1"/>
-                    </group>
                     <footer>
                         <button name="print_report_xlsx"
                                 type="object"
@@ -62,10 +58,6 @@
                                groups="analytic.group_analytic_accounting"/>
                         <field name="company_id" invisible="1"/>
                     </group>
-                    <group string="Archivo (.xlsx)" attrs="{'invisible': [('file', '=', False)]}">
-                        <field name="file_name" invisible="1"/>
-                        <field name="file" filename="file_name" nolabel="1" readonly="1"/>
-                    </group>
                     <footer>
                         <button name="print_report_xlsx"
                                 type="object"
@@ -101,10 +93,6 @@
                                widget="many2many_tags"
                                domain="[('company_id', '=', company_id)]"
                                options="{'no_create': True, 'no_open': True}"/>
-                    </group>
-                    <group string="Archivo (.xlsx)" attrs="{'invisible': [('file', '=', False)]}">
-                        <field name="file_name" invisible="1"/>
-                        <field name="file" filename="file_name" nolabel="1" readonly="1"/>
                     </group>
                     <footer>
                         <button name="print_report_xlsx"
