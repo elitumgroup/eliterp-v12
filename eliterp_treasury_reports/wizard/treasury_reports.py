@@ -234,8 +234,9 @@ class AccountsPayableReportPDF(models.AbstractModel):
                     overcome = True
                     days_expire = (expiration_date - fields.date.today()).days
             amount = invoice.amount_total
+            retention = -1 * invoice.amount_retention if invoice.retention_id else 0.00
             amount_pays = self._get_payments(invoice, doc['start_date'], doc['end_date'])
-            residual =  amount - amount_pays
+            residual =  amount - (amount_pays + retention)
             if expiration_date > fields.date.today():
                 delinquency = fields.date.today() - expiration_date
             data.append({
@@ -245,7 +246,7 @@ class AccountsPayableReportPDF(models.AbstractModel):
                 'iva': invoice.amount_tax,
                 'amount': amount,
                 'amount_credit_note': sum(line.amount_untaxed for line in refunds) if refunds else 0.00,
-                'amount_retention': invoice.amount_retention if invoice.retention_id else 0.00,
+                'amount_retention': retention,
                 'pays': amount_pays,
                 'outstanding_balance': residual,
                 'broadcast_date': invoice.date_invoice,
