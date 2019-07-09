@@ -111,11 +111,11 @@ class Ats(models.TransientModel):
         for inv in self.env['account.invoice'].search(domain):
             auth = inv.sri_authorization_id
             detalleanulados = {
-                'tipoComprobante': auth.code,
-                'establecimiento': auth.establishment,
-                'puntoEmision': auth.emission_point,
-                'secuencialInicio': inv.reference[:9],
-                'secuencialFin': inv.reference[:9],
+                'tipoComprobante': auth.authorized_voucher_id.code,
+                'establecimiento': inv.point_printing_id.shop_id.establishment,
+                'puntoEmision': inv.point_printing_id.emission_point,
+                'secuencialInicio': inv.invoice_number,
+                'secuencialFin': inv.invoice_number,
                 'autorizacion': auth.authorization
             }
             canceled.append(detalleanulados)
@@ -130,11 +130,11 @@ class Ats(models.TransientModel):
         for ret in self.env['account.retention'].search(domain_retention):
             authorization = ret.sri_authorization_id
             detalleanulados = {
-                'tipoComprobante': authorization.code,
-                'establecimiento': authorization.establishment,
-                'puntoEmision': authorization.emission_point,
-                'secuencialInicio': ret.withhold_number[8:17],
-                'secuencialFin': ret.withhold_number[8:17],
+                'tipoComprobante': '01',
+                'establecimiento': ret.point_printing_id.shop_id.establishment,
+                'puntoEmision': ret.point_printing_id.emission_point,
+                'secuencialInicio': ret.reference,
+                'secuencialFin': ret.reference,
                 'autorizacion': authorization.authorization
             }
             canceled.append(detalleanulados)
