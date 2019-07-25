@@ -385,9 +385,15 @@ class FinancialSituationExcel(models.AbstractModel):
 
     def generate_xlsx_report(self, workbook, data, context):
         reportObject = self.env['report.eliterp_accounting_reports.report_financial_situation']
+        # Status Result
+        accounts_4 = reportObject._get_lines_type(context, '4')
+        total_income = accounts_4[0]['amount']
+        accounts_5 = reportObject._get_lines_type(context, '5')
+        total_spends = accounts_5[0]['amount']
+        equity = round(total_income - total_spends, 3)
         lines_1 = reportObject._get_lines_type(context, '1')
         lines_2 = reportObject._get_lines_type(context, '2')
-        lines_3 = reportObject._get_lines_type(context, '3')
+        lines_3 = reportObject._get_lines_type(context, '3', equity)
 
         sheet = workbook.add_worksheet('Estado de situación financiera')
         # Columnas
@@ -510,13 +516,6 @@ class FinancialSituationExcel(models.AbstractModel):
                         sheet.write(row, 3, lsb['amount'], heading_3_number)
                 row += 1
         row += 1
-
-        # Status Result
-        accounts_4 = reportObject._get_lines_type(context, '4')
-        total_income = accounts_4[0]['amount']
-        accounts_5 = reportObject._get_lines_type(context, '5')
-        total_spends = accounts_5[0]['amount']
-        equity = round(total_income - total_spends, 3)
         sheet.write(row, 1, 'PATRIMONIO + PASIVO', heading_1)
         sheet.write(row, 3, lines_2[0]['amount'] + equity, heading_1_number)
 
