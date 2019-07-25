@@ -517,7 +517,7 @@ class FinancialSituationExcel(models.AbstractModel):
                 row += 1
         row += 1
         sheet.write(row, 1, 'PATRIMONIO + PASIVO', heading_1)
-        sheet.write(row, 3, lines_2[0]['amount'] + equity, heading_1_number)
+        sheet.write(row, 3, lines_2[0]['amount'] + lines_3[0]['amount'] + equity, heading_1_number)
 
 
 class FinancialSituation(models.TransientModel):
