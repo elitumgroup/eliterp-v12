@@ -170,6 +170,18 @@
                     <t t-set="is_report" t-value="True"/>
                     <t t-call="web.external_layout">
                         <div class="page">
+                            <style>
+                                .table_reduce {
+                                    font-size: 9px;
+                                    border: 0px;
+                                    tr{ height:1px; }
+                                    tr:last-child { height:auto; }
+                                    td { vertical-align:top; }
+                                }
+                                .table_reduce > tbody > tr:last-child {
+                                    background-color: transparent !important;
+                                }
+                            </style>
                             <div class="oe_structure"/>
 
                             <div id="informations" class="row mt32 mb32">
@@ -189,7 +201,7 @@
 
                             <div class="row">
                                 <div class="col-6">
-                                    <table class="table table-sm" style="border: none; font-size: 12px;">
+                                    <table class="table table-sm table_reduce">
                                         <tbody>
                                             <t t-foreach="get_report('1',doc)" t-as="line">
                                                 <t t-if="line['amount']!=0.00">
@@ -232,8 +244,7 @@
                                                         </tr>
                                                     </t>
                                                     <t t-if="line['subaccounts'] != False">
-                                                        <t t-foreach="get_accounts_order(line['subaccounts'])"
-                                                           t-as="line_movement">
+                                                        <t t-foreach="get_accounts_order(line['subaccounts'])" t-as="line_movement">
                                                             <t t-if="abs(line_movement['amount'])!=0.00">
                                                                 <tr style="border: none;">
                                                                     <td style="border-right: none;">
@@ -255,7 +266,7 @@
                                         <tfoot>
                                             <tr style="font-size: 12pt; border: none;">
                                                 <td>
-                                                    <span></span>
+                                                    <span/>
                                                 </td>
                                                 <td>
                                                     <b>
@@ -270,7 +281,7 @@
                                     </table>
                                 </div>
                                 <div class="col-6">
-                                    <table class="table table-sm" style="border: none; font-size: 12px;">
+                                    <table class="table table-sm table_reduce">
                                         <tbody>
                                             <t t-foreach="get_report('2',doc)" t-as="line">
                                                 <t t-if="line['amount']!=0.00">
@@ -313,8 +324,7 @@
                                                         </tr>
                                                     </t>
                                                     <t t-if="line['subaccounts'] != False">
-                                                        <t t-foreach="get_accounts_order(line['subaccounts'])"
-                                                           t-as="line_movement">
+                                                        <t t-foreach="get_accounts_order(line['subaccounts'])" t-as="line_movement">
                                                             <t t-if="abs(line_movement['amount'])!=0.00">
                                                                 <tr style="border: none;">
                                                                     <td style="border-right: none;">
@@ -336,7 +346,7 @@
                                         <tfoot>
                                             <tr style="font-size: 12pt; border: none;">
                                                 <td>
-                                                    <span></span>
+                                                    <span/>
                                                 </td>
                                                 <td>
                                                     <b>
@@ -356,7 +366,7 @@
 
                             <div class="row justify-content-end">
                                 <div class="col-6">
-                                    <table class="table table-sm" style="border: none; font-size: 12px;">
+                                    <table class="table table-sm table_reduce">
                                         <tbody>
                                             <t t-foreach="get_report('3',doc)" t-as="line">
                                                 <t t-if="line['amount']!=0.00">
@@ -400,8 +410,7 @@
                                                         </tr>
                                                     </t>
                                                     <t t-if="line['subaccounts'] != False">
-                                                        <t t-foreach="get_accounts_order(line['subaccounts'])"
-                                                           t-as="line_movement">
+                                                        <t t-foreach="get_accounts_order(line['subaccounts'])" t-as="line_movement">
                                                             <t t-if="abs(line_movement['amount'])!=0.00">
                                                                 <tr style="border: none;">
                                                                     <td style="border-right: none;">
@@ -423,7 +432,7 @@
                                         <tfoot>
                                             <tr style="font-size: 12pt; border: none;">
                                                 <td>
-                                                    <span></span>
+                                                    <span/>
                                                 </td>
                                                 <td>
                                                     <b>

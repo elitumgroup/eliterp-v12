@@ -34,7 +34,34 @@ class ReportHelpFunctions(models.AbstractModel):
         balance = account._get_balance_nature_account(type, debit, credit)
         return round(balance + beginning_balance, 2)
 
-    def _get_lines_type(self, context, type):
+    def _get_equity(self, amount, accounts):
+        accounts.append({
+            'code': "3.3",
+            'type': "view",
+            'name': "RESULTADOS DEL EJERCICIO",
+            'subaccounts': [],
+            'amount': amount
+        })
+        detail = dict()
+        if amount > 0:
+            detail = {
+                'code': "3.3.1",
+                'name': "GANANCIA NETA DEL PERÍODO",
+                'type': "movement",
+                'amount': amount
+            }
+        else:
+            detail = {
+                'code': "3.3.2",
+                'name': "(-) PÉRDIDA NETA DEL PERÍODO",
+                'type': "movement",
+                'amount': amount
+            }
+        index = list(map(lambda x: x['code'], accounts)).index("3.3")
+        accounts[index]['subaccounts'].append(detail)
+        return accounts
+
+    def _get_lines_type(self, context, type, results=0):
         """
         Obtenemos líneas de reporte
         :param doc:
@@ -47,6 +74,7 @@ class ReportHelpFunctions(models.AbstractModel):
             ('company_id', '=', context['company_id'].id)
         ])
         for account in accounts_base:
+
             if not accounts:
                 childs = object_account.search([('id', 'child_of', [account.id])])
                 accounts.append({
@@ -85,6 +113,8 @@ class ReportHelpFunctions(models.AbstractModel):
                         'name': account.name,
                         'amount': self._get_account_balance(account, type, context, True if self._context.get('no_initial', False) else False)
                     })
+        if results != 0 and type == '3':
+            accounts = self._get_equity(results, accounts)
         return accounts
 
     start_date = fields.Date('Fecha inicio')
@@ -327,18 +357,19 @@ class FinancialSituationPdf(models.AbstractModel):
         return accounts_order
 
     def _get_report(self, type, context):
-        accounts = self.with_context(no_initial=True)._get_lines_type(context, type)
+        equity = 0
+        if type == '3':
+            accounts_4 = self._get_lines_type(context, '4')
+            total_income = accounts_4[0]['amount']
+            accounts_5 = self._get_lines_type(context, '5')
+            total_spends = accounts_5[0]['amount']
+            equity = round(total_income - total_spends, 3)
+        accounts = self._get_lines_type(context, type, equity)
         if type == '1':
             TOTALS.append({'total_assets': accounts[0]['amount']})
         if type == '2':
             TOTALS.append({'total_liabilities': accounts[0]['amount']})
         if type == '3':
-            # Status Result, TODO: Mejorar
-            accounts_4 = self.with_context(no_initial=True)._get_lines_type(context, '4')
-            total_income = accounts_4[0]['amount']
-            accounts_5 = self.with_context(no_initial=True)._get_lines_type(context, '5')
-            total_spends = accounts_5[0]['amount']
-            equity = round(total_income - total_spends, 3)
             TOTALS.append({'total_equity': accounts[0]['amount'] + equity})
         return accounts
 
