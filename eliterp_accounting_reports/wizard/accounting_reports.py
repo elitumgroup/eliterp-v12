@@ -35,14 +35,14 @@ class ReportHelpFunctions(models.AbstractModel):
         return round(balance + beginning_balance, 2)
 
     def _get_equity(self, amount, accounts):
-        accounts.append({
+        new_accounts = accounts
+        new_accounts.append({
             'code': "3.3",
             'type': "view",
             'name': "RESULTADOS DEL EJERCICIO",
             'subaccounts': [],
             'amount': amount
         })
-        detail = dict()
         if amount > 0:
             detail = {
                 'code': "3.3.1",
@@ -57,9 +57,9 @@ class ReportHelpFunctions(models.AbstractModel):
                 'type': "movement",
                 'amount': amount
             }
-        index = list(map(lambda x: x['code'], accounts)).index("3.3")
-        accounts[index]['subaccounts'].append(detail)
-        return accounts
+        index = list(map(lambda x: x['code'], new_accounts)).index("3.3")
+        new_accounts[index]['subaccounts'].append(detail)
+        return new_accounts
 
     def _get_lines_type(self, context, type, results=0):
         """
@@ -395,9 +395,10 @@ class FinancialSituationExcel(models.AbstractModel):
     _inherit = ['report.report_xlsx.abstract']
 
     def generate_xlsx_report(self, workbook, data, context):
-        lines_1 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '1')
-        lines_2 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '2')
-        lines_3 = self.env['report.eliterp_accounting_reports.report_financial_situation']._get_lines_type(context, '3')
+        reportObject = self.env['report.eliterp_accounting_reports.report_financial_situation']
+        lines_1 = reportObject._get_lines_type(context, '1')
+        lines_2 = reportObject._get_lines_type(context, '2')
+        lines_3 = reportObject._get_lines_type(context, '3')
 
         sheet = workbook.add_worksheet('Estado de situación financiera')
         # Columnas
@@ -522,9 +523,9 @@ class FinancialSituationExcel(models.AbstractModel):
         row += 1
 
         # Status Result
-        accounts_4 = self._get_lines_type(context, '4')
+        accounts_4 = reportObject._get_lines_type(context, '4')
         total_income = accounts_4[0]['amount']
-        accounts_5 = self._get_lines_type(context, '5')
+        accounts_5 = reportObject._get_lines_type(context, '5')
         total_spends = accounts_5[0]['amount']
         equity = round(total_income - total_spends, 3)
         sheet.write(row, 1, 'PATRIMONIO + PASIVO', heading_1)
