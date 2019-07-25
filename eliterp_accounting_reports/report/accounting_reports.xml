@@ -185,15 +185,11 @@
                             <div class="oe_structure"/>
 
                             <div id="informations" class="row mt32 mb32">
-                                <div class="col-4 bm-2">
+                                <div class="col-6 bm-2">
                                     <strong>Compañía:</strong>
                                     <p t-field="user.company_id.name"/>
                                 </div>
-                                <div class="col-4 bm-2">
-                                    <strong>Fecha inicio:</strong>
-                                    <p t-field="doc.start_date"/>
-                                </div>
-                                <div class="col-4 bm-2">
+                                <div class="col-6 bm-2">
                                     <strong>Fecha fin:</strong>
                                     <p t-field="doc.end_date"/>
                                 </div>
