@@ -40,25 +40,14 @@ class ReportHelpFunctions(models.AbstractModel):
             'code': "3.3",
             'type': "view",
             'name': "RESULTADOS DEL EJERCICIO",
-            'subaccounts': [],
+            'subaccounts': [{
+                'code': "3.3.1" if amount > 0 else "3.3.2",
+                'name': "GANANCIA NETA DEL PERÍODO" if amount > 0 else "(-) PÉRDIDA NETA DEL PERÍODO",
+                'type': "movement",
+                'amount': amount
+            }],
             'amount': amount
         })
-        if amount > 0:
-            detail = {
-                'code': "3.3.1",
-                'name': "GANANCIA NETA DEL PERÍODO",
-                'type': "movement",
-                'amount': amount
-            }
-        else:
-            detail = {
-                'code': "3.3.2",
-                'name': "(-) PÉRDIDA NETA DEL PERÍODO",
-                'type': "movement",
-                'amount': amount
-            }
-        index = list(map(lambda x: x['code'], new_accounts)).index("3.3")
-        new_accounts[index]['subaccounts'].append(detail)
         return new_accounts
 
     def _get_lines_type(self, context, type, results=0):
