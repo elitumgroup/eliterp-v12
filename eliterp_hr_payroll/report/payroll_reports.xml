@@ -99,8 +99,25 @@
                 <t t-foreach="docs" t-as="doc">
                     <t t-set="report_code">RRHH-001-ROL-V1</t>
                     <t t-set="report_title">ROL DE PAGO</t>
+                    <t t-value="doc.name" t-set="name"/>
                     <t t-set="flag">1</t>
                     <t t-call="web.external_layout">
+                      <style>
+                            tbody tr {
+                            height:1px;
+                            font-size: 9px;
+                            }
+                            tbody td {
+                            vertical-align:top;
+                            }
+                            tbody tr:first-child td:first-child {
+                            border-bottom: hidden;
+                            }
+                            tbody tr:first-child td:last-child{
+                            background-color: #E9ECEF;
+                            border-bottom: hidden;
+                            }
+                        </style>
                         <div class="page">
 
                             <div id="informations" class="row mt32 mb32" style="margin: 0; padding: 0; font-size: 9px;">
@@ -124,7 +141,7 @@
 
                             <div class="row" style="margin: 0; padding: 0;">
                                 <div class="col-6">
-                                    <table class="table table-condensed table_payslip">
+                                    <table class="table table-condensed table-sm">
                                         <thead>
                                             <tr style="border: none;">
                                                 <th colspan="2" class="text-center col-12">
@@ -139,7 +156,7 @@
                                                         <span t-field="line.name"/>
                                                     </td>
                                                     <td style="border-right: none;" class="text-right col-3">
-                                                        <span t-esc='"%.2f" % line.amount'/>
+                                                        <span t-esc="&quot;%.2f&quot; % line.amount"/>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -151,7 +168,7 @@
                                                 </td>
                                                 <td style="border-right: none;" class="text-right col-3">
                                                     <b>
-                                                        <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids)'/>
+                                                        <span t-esc="&quot;%.2f&quot; % sum(line.amount for line in doc.input_line_ids)"/>
                                                     </b>
                                                 </td>
                                             </tr>
@@ -159,11 +176,10 @@
                                     </table>
                                 </div>
                                 <div class="col-6">
-                                    <table class="table table-condensed table_payslip">
+                                    <table class="table table-condensed table-sm">
                                         <thead>
                                             <tr style="border: none;">
-                                                <th colspan="2" style="border-bottom: none;"
-                                                    class="text-center col-12">
+                                                <th colspan="2" style="border-bottom: none;" class="text-center col-12">
                                                     <strong>EGRESOS</strong>
                                                 </th>
                                             </tr>
@@ -175,7 +191,7 @@
                                                         <span t-field="line.name"/>
                                                     </td>
                                                     <td style="border-right: none;" class="text-right col-3">
-                                                        <span t-esc='"%.2f" % line.amount'/>
+                                                        <span t-esc="&quot;%.2f&quot; % line.amount"/>
                                                     </td>
                                                 </tr>
                                             </t>
@@ -187,7 +203,7 @@
                                                 </td>
                                                 <td style="border-right: none;" class="text-right col-3">
                                                     <b>
-                                                        <span t-esc='"%.2f" % sum(line.amount for line in doc.input_line_ids_2)'/>
+                                                        <span t-esc="&quot;%.2f&quot; % sum(line.amount for line in doc.input_line_ids_2)"/>
                                                     </b>
                                                 </td>
                                             </tr>
@@ -198,7 +214,7 @@
 
                             <h5 class="clearfix text-center">NETO A RECIBIR:&amp;nbsp;
                                 <strong>
-                                    <span t-esc='"%.2f" % doc.net_receive'/>
+                                    <span t-esc="&quot;%.2f&quot; % doc.net_receive"/>
                                 </strong>
                             </h5>
                         </div>
