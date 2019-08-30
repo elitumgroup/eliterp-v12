@@ -48,7 +48,6 @@ class FiscalYear(models.Model):
             ('name', '=', date.year),
             ('company_id', '=', self.env.user.company_id.id)
         ])
-        year_accounting = self.env['account.fiscal.year'].search([('name', '=', date.year)])
         if not year_accounting:
             raise UserError(_("No hay ningún período contable creado en el sistema."))
         period_id = year_accounting.period_lines.sudo().filtered(lambda x: x.code == date.month)
