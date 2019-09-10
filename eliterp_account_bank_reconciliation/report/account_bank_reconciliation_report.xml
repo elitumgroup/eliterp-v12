@@ -6,11 +6,16 @@
                 <t t-foreach="docs" t-as="doc">
                     <t t-set="report_code">CONT-005-CBC-V1</t>
                     <t t-set="report_title">CONCILIACIÓN BANCARIA</t>
+                    <t t-set="name" t-value="doc.name"/>
                     <t t-set="flag">0</t>
                     <t t-call="web.external_layout">
                         <div class="page">
-
-                            <div id="informations" class="row mt32">
+                            <style>
+                                tbody tr {
+                                font-size: 9px;
+                                }
+                            </style>
+                            <div id="informations" class="row mt16">
                                 <div class="col-4">
                                     <strong>Fecha Documento:</strong>
                                     <p t-field="doc.create_uid"/>
@@ -25,7 +30,7 @@
                                 </div>
                             </div>
 
-                            <div id="informations" class="row mb32">
+                            <div id="informations" class="row mb16">
                                 <div class="col-4">
                                     <strong>Banco:</strong>
                                     <p t-field="doc.journal_id"/>
@@ -40,7 +45,7 @@
                                 </div>
                             </div>
 
-                            <table class="table table-condensed">
+                            <table class="table table-condensed table-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">FECHA</th>
@@ -72,24 +77,24 @@
                                     </tr>
                                 </tbody>
                                 <tfoot>
-                                    <tr>
+                                    <tr style="border-top: 3px solid black; font-size:10px;">
                                         <td class="text-right" colspan="4">
                                             <span>TOTAL</span>
                                         </td>
                                         <td class="text-right col-xs-1">
-                                            <span t-esc='"%.2f" % doc.countable_balance'/>
+                                            <span t-esc="&quot;%.2f&quot; % doc.countable_balance"/>
                                         </td>
                                     </tr>
                                 </tfoot>
                             </table>
-                            <h4 class="text-center">RESUMEN DE CONCILACIÓN</h4>
-                            <table class="table table-condensed">
+                            <h6 class="text-center">RESUMEN DE CONCILACIÓN</h6>
+                            <table class="table table-condensed table-sm">
                                 <thead>
-                                    <th class="text-center col-1">
+                                    <th class="text-center col-auto">
                                         <strong>Saldo inicial</strong>
                                     </th>
                                     <t t-foreach="doc._get_data_journal()" t-as="line">
-                                        <th class="text-center col-1" colspan="2">
+                                        <th class="text-center col-auto" colspan="2">
                                             <strong>
                                                 <span t-esc="line['name']"/>
                                             </strong>
@@ -106,14 +111,14 @@
                                                 <span t-esc="line['quantity']"/>
                                             </td>
                                             <td class="text-center" style="border: 1px solid black">
-                                                <span t-esc='"$%.2f" %line["amount"]'/>
+                                                <span t-esc="&quot;$%.2f&quot; %line[&quot;amount&quot;]"/>
                                             </td>
                                         </t>
                                     </tr>
                                 </tbody>
                             </table>
-                            <h4 class="text-center">VALORES GIRADOS NO CONSIDERADOS EN ESTA CONCILACIÓN</h4>
-                            <table class="table table-condensed">
+                            <h6 class="text-center">VALORES GIRADOS NO CONSIDERADOS EN ESTA CONCILACIÓN</h6>
+                            <table class="table table-condensed table-sm">
                                 <thead>
                                     <tr>
                                         <th class="text-center">FECHA</th>
@@ -145,7 +150,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-
                             <div t-if="doc.comment">
                                 <h4 class="text-center">NOTAS Y COMENTARIOS</h4>
                                 <div class="mb4">
