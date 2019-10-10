@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_hr_reports"
+                  name="Reportes"
+                  parent="hr.menu_hr_root"
+                  groups="hr.group_hr_user"
+                  sequence='50'/>
+
+        <record id="action_employee_report" model="ir.actions.act_window">
+            <field name="name">Reporte de empleados</field>
+            <field name="res_model">hr.employee.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_hr_reports.view_form_employee_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+
+        <record id="action_holiday_report" model="ir.actions.act_window">
+            <field name="name">Reporte de vacaciones del personal</field>
+            <field name="res_model">hr.holiday.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_hr_reports.view_form_holiday_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_hr_employee_report"
+                  action="action_employee_report"
+                  parent="menu_hr_reports"
+                  sequence="5"/>
+
+        <menuitem id="menu_hr_holiday_report"
+                  action="action_holiday_report"
+                  parent="menu_hr_reports"
+                  sequence="10"/>
+    </data>
+</odoo>
