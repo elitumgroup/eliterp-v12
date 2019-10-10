@@ -62,7 +62,8 @@ class Leave(models.Model):
     _inherit = 'hr.leave'
     _order = "employee_id asc, date_from desc"
 
-    def _get_number_of_days(self, date_from, date_to, employee_id=None):
+    @staticmethod
+    def _get_number_of_days(date_from, date_to, employee_id=None):
         """
         MM: Cambiamos para qué genere días por fechas, y no por horas
         :param date_from:

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Employee Report-->
+        <template id="report_employee_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="report_code">REPO-RRHH-001-V1</t>
+                    <t t-set="report_title">REPORTE DE EMPLEADOS</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-6 bm-2">
+                                     <strong>Fecha inicio:</strong>
+                                    <p t-field="o.start_date"/>
+                                </div>
+                                <div class="col-6 bm-2">
+                                    <strong>Fecha fin:</strong>
+                                    <p t-field="o.end_date"/>
+                                </div>
+                            </div>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Nombres</th>
+                                        <th class="text-center">Cédula</th>
+                                        <th class="text-center">Edad</th>
+                                        <th class="text-center">Estado civil</th>
+                                        <th class="text-center">F. Ingreso</th>
+                                        <th class="text-center">Cargo</th>
+                                        <th class="text-center">Sueldo</th>
+                                        <th class="text-center">C. Bancaria</th>
+                                        <th class="text-center">E. Salarial</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="get_lines(o)" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="line['name']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['identification_id']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['age']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['civil_status']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['admission_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['job_id']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['wage']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['bank_account']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['struct_id']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_employee"
+                model="hr.employee.report"
+                string="Reporte de empleados"
+                report_type="qweb-pdf"
+                name="eliterp_hr_reports.report_employee_report"
+                file="eliterp_hr_reports.report_employee_report"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+
+        <!--Holiday Report-->
+        <template id="report_holiday_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="report_code">REPO-RRHH-004-V1</t>
+                    <t t-set="report_title">REPORTE DE VACACIONES</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row mt32 mb32">
+                                <div class="col-2">
+                                    <strong>Fecha inicio:</strong>
+                                    <p t-field="o.start_date"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Fecha fin:</strong>
+                                    <p t-field="o.end_date"/>
+                                </div>
+                                <div class="col-2">
+                                    <strong>Tipo de reporte:</strong>
+                                    <p t-field="o.type_report"/>
+                                </div>
+                                <div class="col-6" t-if="o.type_report != 'all'">
+                                    <strong>Empleado:</strong>
+                                    <p t-field="o.employee_id"/>
+                                </div>
+                            </div>
+                            <t t-foreach="get_lines(o)" t-as="employee">
+                                <caption class="text-center">
+                                    Empleado:&amp;nbsp;
+                                    <strong>
+                                        <span t-esc="employee['name']"/>
+                                    </strong>
+                                    , fecha de ingreso:
+                                    <span t-esc="employee['admission_date']"/>
+                                </caption>
+                                <table class="table table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Período</th>
+                                            <th class="text-center">Generadas</th>
+                                            <th class="text-center">Gozadas</th>
+                                            <th class="text-center">Disponibles</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="employee['holidays']" t-as="line">
+                                            <td>
+                                                <span t-esc="line['name']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['vacations_generated']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['vacations_taken']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['vacations_available']"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </t>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="action_report_holiday_report"
+                model="hr.holiday.report"
+                string="Reporte de vacaciones"
+                report_type="qweb-pdf"
+                name="eliterp_hr_reports.report_holiday_report"
+                file="eliterp_hr_reports.report_holiday_report"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+    </data>
+</odoo>
