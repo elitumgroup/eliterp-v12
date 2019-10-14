@@ -82,7 +82,7 @@
                                             <span>TOTAL</span>
                                         </td>
                                         <td class="text-right col-xs-1">
-                                            <span t-esc="&quot;%.2f&quot; % doc.countable_balance"/>
+                                            <span t-esc="&quot;%.2f&quot; % sum(line.amount for line in doc.bank_reconciliation_line.filtered(lambda x: x.check))"/>
                                         </td>
                                     </tr>
                                 </tfoot>

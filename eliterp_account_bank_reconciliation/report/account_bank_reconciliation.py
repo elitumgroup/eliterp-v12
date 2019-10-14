@@ -26,7 +26,7 @@ class BankReconciliation(models.Model):
         :return:
         """
         data = []
-        for line in self.bank_reconciliation_line:
+        for line in self.bank_reconciliation_line.filtered(lambda x: x.check):
             aggregate = any(d['journal'] == line.journal for d in data)
             if not aggregate:
                 data.append({
