@@ -61,7 +61,7 @@ class ReportHelpFunctions(models.AbstractModel):
         accounts_base = self.env['account.account'].search([
             ('code', '=ilike', type + '%'),
             ('company_id', '=', context['company_id'].id)
-        ])
+        ], order='code asc')
         for account in accounts_base:
 
             if not accounts:
