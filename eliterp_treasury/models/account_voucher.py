@@ -189,14 +189,13 @@ class Voucher(models.Model):
                 'date': move.date,
             })
         else:
-            # TODO: Si es anticipo se manda todo a la cuenta del cliente
             self.env['account.move.line'].with_context(check_move_validity=False).create({
                 'name': self.partner_id.name,
                 'journal_id': journal_id.id,
                 'partner_id': self.partner_id.id,
                 'account_id': self.advance_account_id.id,
                 'move_id': move.id,
-                'credit': balance,
+                'credit': credit,
                 'debit': 0.0,
                 'date': move.date,
             })
@@ -207,7 +206,7 @@ class Voucher(models.Model):
                 'account_id': account_debit,
                 'move_id': move.id,
                 'credit': 0.0,
-                'debit': balance,
+                'debit': debit,
                 'date': move.date,
             })
         return move
@@ -215,7 +214,7 @@ class Voucher(models.Model):
     def _create_move_sale(self, journal_id):
         """
         Creamos movimientos de comprobante de ingreso
-        :param move_id:
+        :param journal_id:
         :return list:
         """
         moves_voucher = []
