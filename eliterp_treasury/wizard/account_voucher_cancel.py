@@ -46,12 +46,21 @@ class VoucherCancel(models.TransientModel):
         """
         voucher = self.env['account.voucher'].browse(self._context['active_id'])
         self._other_actions_cancel(voucher)
-        move = voucher.move_id
-        move.reverse_moves(move.date, move.journal_id or False)
-        move.write({
-            'state': 'cancel',
-            'ref': self.description
-        })
-        voucher.pay_order_id.write({'state': 'cancel'})
+        if voucher.voucher_type == 'sale':
+            for p in voucher.collection_line:
+                move = p.move_id
+                move.reverse_moves(move.date, move.journal_id or False)
+                move.write({
+                    'state': 'cancel',
+                    'ref': self.description
+                })
+        else:
+            move = voucher.move_id
+            move.reverse_moves(move.date, move.journal_id or False)
+            move.write({
+                'state': 'cancel',
+                'ref': self.description
+            })
+            voucher.pay_order_id.write({'state': 'cancel'})
         voucher.write({'state': 'cancel'})
-        return
+        return True
