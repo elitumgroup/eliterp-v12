@@ -240,8 +240,8 @@ class Ats(models.TransientModel):
         """
         return {
             'docModificado': '01',
-            'estabModificado': invoice.establishment,
-            'ptoEmiModificado': invoice.emission_point,
+            'estabModificado': invoice.point_printing.shop_id.establishment,
+            'ptoEmiModificado': invoice.point_printing.emission_point,
             'secModificado': invoice.reference,
             'autModificado': invoice.authorization
         }
