@@ -389,9 +389,9 @@ class Ats(models.TransientModel):
                     detallecompras.update({'retencion': True})
                     detallecompras.update(self._get_retention(line.retention_id))
                 if line.type in ['out_refund', 'in_refund']:  # TODO
-                    if line.invoice_reference:
+                    if line.refund_invoice_id:
                         detallecompras.update({'es_nc': True})
-                        detallecompras.update(self._get_refund(line.invoice_reference))
+                        detallecompras.update(self._get_refund(line.refund_invoice_id))
                 ats_purchases.append(detallecompras)
         return ats_purchases
 
