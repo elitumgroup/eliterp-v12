@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Ventana emergente Reporte de cheque recibido-->
+        <record id="eliterp_view_form_checks_received_report_wizard" model="ir.ui.view">
+            <field name="name">eliterp_view_form_checks_received_report_wizard</field>
+            <field name="model">eliterp.checks.received.report</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="customer_type" widget="radio" options="{'horizontal': true}"/>
+                        <field name="partner" domain="[('customer','=',True)]"
+                               attrs="{'invisible':[('customer_type','!=','partner')], 'required': [('customer_type','==', 'partner')]}"
+                               options="{'no_create':True}"/>
+                        <field name="start_date" required="1"/>
+                        <field name="end_date" required="1"/>
+                    </group>
+                    <footer>
+                        <!--TODO
+                        <button name="print_report_xlsx"
+                                type="object"
+                                class="oe_highlight"
+                                string="XLSX"/>
+                        -->
+                        <button name="print_report_pdf"
+                                type="object"
+                                class="oe_highlight"
+                                string="PDF"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!--Ventana emergente Reporte de cheque emetido-->
+        <record id="eliterp_view_form_checks_issued_report_wizard" model="ir.ui.view">
+            <field name="name">eliterp_view_form_checks_issued_report_wizard</field>
+            <field name="model">eliterp.checks.issued.report</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="start_date" required="1"/>
+                        <field name="end_date" required="1"/>
+                        <field name="filter_date" options="{'horizontal': true}" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="bank_ids"
+                               domain="[('type', '=', 'bank')]"
+                               widget="many2many_tags"
+                               options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                    <footer>
+                        <button name="print_report_xlsx"
+                                type="object"
+                                class="oe_highlight"
+                                string="Excel"/>
+                        <button name="print_report_pdf"
+                                type="object"
+                                class="oe_highlight"
+                                string="PDF"/>
+                        <button string="Descartar" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

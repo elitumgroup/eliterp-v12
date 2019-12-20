@@ -13,11 +13,13 @@
     'data': [
         'security/account_checks_security.xml',
         'security/ir.model.access.csv',
+        'wizard/report.xml',
         'views/account_journal_views.xml',
         'views/account_checks_views.xml',
         'views/account_voucher_views.xml',
         'views/account_bank_records_views.xml',
-        'views/hide_menus.xml'
+        'views/hide_menus.xml',
+        'report/report_template.xml'
     ],
     'init_xml': [],
     'update_xml': [],

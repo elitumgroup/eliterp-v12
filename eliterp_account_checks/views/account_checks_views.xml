@@ -51,6 +51,25 @@
             </field>
         </record>
 
+        <record id="eliterp_action_checks_received_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cheques recibidos</field>
+            <field name="res_model">eliterp.checks.received.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_account_checks.eliterp_view_form_checks_received_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <record id="eliterp_action_checks_issued_report" model="ir.actions.act_window">
+            <field name="name">Reporte de cheques emitidos</field>
+            <field name="res_model">eliterp.checks.issued.report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="eliterp_account_checks.eliterp_view_form_checks_issued_report_wizard"/>
+            <field name="target">new</field>
+        </record>
+
         <!--Menus-->
         <menuitem id="menu_query_checks"
                   name="Consulta de cheques"
@@ -65,6 +84,20 @@
                   action="action_checks_issued"
                   sequence="2"/>
 
+        <menuitem id="eliterp_menu_treasury_checks"
+                  name="Cheques"
+                  parent="eliterp_accounting_reports.menu_treasury_reports"
+                  sequence='15'/>
+        <menuitem id="eliterp_menu_checks_received_report"
+                  name="Recibidos"
+                  action="eliterp_action_checks_received_report"
+                  parent="eliterp_menu_treasury_checks"
+                  sequence="1"/>
+        <menuitem id="eliterp_menu_checks_issued_report"
+                  name="Emitidos"
+                  action="eliterp_action_checks_issued_report"
+                  parent="eliterp_menu_treasury_checks"
+                  sequence="2"/>
         <!--Views-->
         <record id="view_tree_checks_receipts" model="ir.ui.view">
             <field name="name">view_tree_checks_receipts</field>
@@ -219,7 +252,7 @@
             <field name="act_window_id" ref="action_checks_issued"/>
         </record>
 
-         <!--Excel-->
+        <!--Excel-->
         <report
                 id="action_report_voucher_check_xlsx"
                 model="account.voucher"
