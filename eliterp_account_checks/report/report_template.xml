@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!--Reporte de cheque recibidos-->
+        <template id="eliterp_report_checksr">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">REPO-TESO-003-V1</t>
+                    <t t-set="report_title">REPORTE DE CHEQUES RECIBIDOS</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row">
+                                <div class="col-4">
+                                    <strong>Fecha de inicio:</strong>
+                                    <p t-field="doc.start_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Fecha Fin:</strong>
+                                    <p t-field="doc.end_date"/>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Emisión:</strong>
+                                    <p t-field="doc.create_date" t-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">FECHA INGRESO</th>
+                                        <th class="text-center">FECHA DOCUMENTO</th>
+                                        <th class="text-center">FECHA COBRO</th>
+                                        <th class="text-center">CLIENTE</th>
+                                        <th class="text-center">NO. FACTURA</th>
+                                        <th class="text-center">BANCO EMISOR</th>
+                                        <th class="text-center">NO. CHEQUE</th>
+                                        <th class="text-center">VALOR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="get_lines(doc)" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="line['date_received']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['document_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['credit_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['partner']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['facturas']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['issuing_bank']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['number_check']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['amount']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="eliterp_action_report_checks_received_report"
+                model="eliterp.checks.received.report"
+                string="Reporte de cheques recibidos"
+                report_type="qweb-pdf"
+                name="eliterp_account_checks.eliterp_report_checksr"
+                file="eliterp_account_checks.eliterp_report_checksr"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+        <!--Reporte de cheque emitidos-->
+        <template id="eliterp_report_checksi">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-set="report_code">REPO-TESO-004-V1</t>
+                    <t t-set="report_title">REPORTE DE CHEQUES EMITIDOS</t>
+                    <t t-set="is_report" t-value="True"/>
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <div id="informations" class="row">
+                                <div class="col-3">
+                                    <strong>Fecha de inicio:</strong>
+                                    <p t-field="doc.start_date"/>
+                                </div>
+                                <div class="col-3">
+                                    <strong>Fecha fin:</strong>
+                                    <p t-field="doc.end_date"/>
+                                </div>
+                                <div class="col-6" t-if="doc.bank_ids">
+                                    <strong>Bancos:</strong>
+                                    <p t-esc="', '.join(map( lambda x: x.name, doc.bank_ids))"/>
+                                </div>
+                            </div>
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">BANCO</th>
+                                        <th class="text-center">FECHA EMISIÓN</th>
+                                        <th class="text-center">FECHA PAGO</th>
+                                        <th class="text-center">TIPO</th>
+                                        <th class="text-center">NO. CHEQUE</th>
+                                        <th class="text-center">CONCEPTO</th>
+                                        <th class="text-center">BENEFICIARIO</th>
+                                        <th class="text-center">MONTO</th>
+                                        <th class="text-center">ESTADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="get_lines(doc)" t-as="line">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="line['bank_id']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['check_date']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['type']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['check_number']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['concept']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['beneficiary']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['amount']"/>
+                                            </td>
+                                            <td>
+                                                <span t-esc="line['state']"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+        <report
+                id="eliterp_action_report_checks_issued_report"
+                model="eliterp.checks.issued.report"
+                string="Reporte de cheques emitidos"
+                report_type="qweb-pdf"
+                name="eliterp_account_checks.eliterp_report_checksi"
+                file="eliterp_account_checks.eliterp_report_checksi"
+                paperformat="eliterp_core.my_paperformat_a4_landscape"
+        />
+        <report
+                id="eliterp_action_report_checks_issued_xlsx"
+                model="eliterp.checks.issued.report"
+                string="Reporte de cheques emitidos"
+                report_type="xlsx"
+                name="eliterp_account_checks.eliterp_report_checks_issued_xlsx"
+                file="eliterp_account_checks.eliterp_report_checks_issued_xlsx"
+                print_report_name="Reporte de cheques emitidos"
+                attachment_use="False"
+        />
+    </data>
+</odoo>
