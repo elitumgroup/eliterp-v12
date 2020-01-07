@@ -147,7 +147,7 @@ class Payslip(models.Model):
         local_dict = {
             'contract': contract,  # Último contrato de empleado
             'employee': employee_id,
-            'minimum_wage': 394.00,
+            'minimum_wage': 400.00,
             'payslip': self,
             'result': 0.00
         }
