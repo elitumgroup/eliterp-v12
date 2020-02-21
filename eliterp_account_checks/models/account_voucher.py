@@ -200,7 +200,7 @@ class CheckXlsx(models.AbstractModel):
                 sheet.write(4, 6, check.amount_cancel, money_format)
                 sheet.write(5, 1, amount_words, bold)
                 sheet.write(8, 0, 'GUAYAQUIL, %s' % date, bold)
-            elif bic == 'XXX':
+            elif bic == '310':
                 # Margins
                 sheet.set_margins(left=0.0, right=0.0, top=0.0, bottom=0.0)
                 # Columnas

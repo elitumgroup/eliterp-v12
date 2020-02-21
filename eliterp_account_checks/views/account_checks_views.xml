@@ -11,6 +11,7 @@
                     <field name="recipient" string="Beneficiario/Girador"/>
                     <separator/>
                     <filter name="delivered" string="Entregado" domain="[('state', '=', 'delivered')]"/>
+                    <filter name="charged" string="Cobrado" domain="[('state', '=', 'charged')]"/>
                     <filter name="protested" string="Anulado" domain="[('state', '=', 'cancel')]"/>
                     <separator/>
                     <filter name="deposited" string="Depositado" domain="[('state', '=', 'deposited')]"/>
@@ -170,7 +171,8 @@
                 <tree create="false"
                       edit="false"
                       decoration-danger="state=='protested'"
-                      decoration-bf="state=='delivered'">
+                      decoration-success="state=='charged'"
+                      decoration-bf="state in ('delivered', 'charged')">
                     <field name="name"/>
                     <field name="bank_journal_id"/>
                     <field name="recipient" string="Beneficiario"/>
@@ -188,8 +190,8 @@
             <field name="arch" type="xml">
                 <form create="false" edit="false">
                     <header>
-                        <field name="state" statusbar_visible="issued,delivered"
-                               states="issued,delivered"
+                        <field name="state" statusbar_visible="issued,delivered,charged"
+                               states="issued,delivered,charged"
                                widget="statusbar" clickable="True"/>
                     </header>
                     <sheet>
