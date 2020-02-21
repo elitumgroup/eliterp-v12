@@ -5,6 +5,35 @@ from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 
 
+class ChangeStateChecks(models.TransientModel):
+    _name = 'account.change.state.checks'
+    _description = 'Venta para cambio de estado de cheques'
+
+    checks = fields.Many2many('account.checks', string='Cheques emitidos')
+    state = fields.Selection([
+        ('issued', 'Emitido'),
+        ('delivered', 'Entregado'),
+        ('charged', 'Cobrado')
+    ], string='Estado de cambio', default='charged')
+
+    @api.model
+    def default_get(self, my_fields):
+        rec = super(ChangeStateChecks, self).default_get(my_fields)
+        active_ids = self._context.get('active_ids')
+        checks = self.env['account.checks'].browse(active_ids)
+        if any(check.state == 'protested' or check.type == 'receipts' for check in checks):
+            raise UserError("Soló se puede cambiar estado de cheques emitidos y no anulados!")
+        rec.update({
+            'checks': [(6, 0, checks.ids)],
+        })
+        return rec
+
+    @api.multi
+    def change_state_checks(self):
+        self.checks.update({'state': self.state})
+        return True
+
+
 class Journal(models.Model):
     _inherit = 'account.journal'
 
