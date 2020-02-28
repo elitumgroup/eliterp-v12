@@ -2,7 +2,7 @@
 
 
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 
 class ChangeStateChecks(models.TransientModel):
