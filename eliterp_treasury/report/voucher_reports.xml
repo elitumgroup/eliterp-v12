@@ -174,7 +174,6 @@
                     </t>
                     <t t-else="">
                         <t t-call="eliterp_treasury.report_voucher_sale"/>
-
                     </t>
                 </t>
             </t>
@@ -189,6 +188,18 @@
                 print_report_name="(object._get_report_filename())"
                 paperformat="eliterp_core.my_paperformat_a4_portrait"
         />
+
+        <report
+                id="action_report_voucher_sale"
+                model="account.voucher"
+                string="Comprobante (Ingreso)"
+                report_type="qweb-pdf"
+                name="eliterp_treasury.report_voucher"
+                file="eliterp_treasury.report_voucher"
+                print_report_name="(object._get_report_filename())"
+                paperformat="eliterp_core.my_paperformat_a5_landscape"
+        />
+
 
     </data>
 </odoo>
