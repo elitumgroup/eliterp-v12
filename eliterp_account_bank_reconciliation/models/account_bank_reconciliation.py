@@ -132,10 +132,7 @@ class BankReconciliation(models.Model):
 
     @api.multi
     def posted_conciliation(self):
-        """
-        Confirmamos la conciliación bancaria
-        :return:
-        """
+        """Confirmamos la conciliación bancaria"""
         self._set_reconcile()
         new_name = self._get_name()
         return self.write({
@@ -151,6 +148,7 @@ class BankReconciliation(models.Model):
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
             move = line.move_line_id.move_id
+            move.update({'my_reconcile': True})
             voucher = self.env['account.voucher'].search([
                 ('move_id', '=', move.id)
             ])
@@ -164,6 +162,7 @@ class BankReconciliation(models.Model):
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
             move = line.move_line_id.move_id
+            move.update({'my_reconcile': False})
             voucher = self.env['account.voucher'].search([
                 ('move_id', '=', move.id)
             ])
