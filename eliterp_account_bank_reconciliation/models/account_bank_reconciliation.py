@@ -148,7 +148,7 @@ class BankReconciliation(models.Model):
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
             move = line.move_line_id.move_id
-            move.update({'my_reconcile': True})
+            line.move_line_id.update({'my_reconcile': True})
             voucher = self.env['account.voucher'].search([
                 ('move_id', '=', move.id)
             ])
@@ -162,7 +162,7 @@ class BankReconciliation(models.Model):
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
             move = line.move_line_id.move_id
-            move.update({'my_reconcile': False})
+            line.move_line_id.update({'my_reconcile': False})
             voucher = self.env['account.voucher'].search([
                 ('move_id', '=', move.id)
             ])
