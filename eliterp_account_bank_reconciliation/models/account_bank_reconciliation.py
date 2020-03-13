@@ -6,6 +6,12 @@ from odoo.exceptions import ValidationError, UserError
 from odoo.tools import float_is_zero
 
 
+class MoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    my_reconcile = fields.Boolean('Conciliado', defualt=False)
+
+
 class Voucher(models.Model):
     _inherit = 'account.voucher'
 
@@ -94,11 +100,10 @@ class BankReconciliation(models.Model):
         account = self.journal_id.default_debit_account_id
         moves = self.env['account.move.line'].search([
             ('account_id', '=', account.id),
-            ('date', '>=', self.date_from),
+            ('my_reconcile', '=', False),
             ('date', '<=', self.date_to)
         ])
         move_lines = [(2, line.id, False) for line in self.bank_reconciliation_line]
-        beginning_balance = 0.00
         reconciliation_ids = self._get_bank_reconciliation(self.journal_id)
         # Saldo inicial de cuenta contable si no existe conciliación alguna previa
         # caso contrario se coje los datos de la última conciliación validada
@@ -107,9 +112,6 @@ class BankReconciliation(models.Model):
         else:
             reconciliation = reconciliation_ids[0]
             beginning_balance = reconciliation.account_balance
-            for line in reconciliation.bank_reconciliation_line:
-                if not line.check:
-                    move_lines.append([0, False, {'move_line_id': line.move_line_id.id}])
         for line in moves:
             if line.move_id.state == 'posted' and not line.move_id.reversed:
                 move_lines.append([0, False, {'move_line_id': line.id}])
@@ -159,7 +161,8 @@ class BankReconciliation(models.Model):
         Colocamos cómo no conciliados los documentos seleccionados al cancelar
         :return:
         """
-        for line in self.bank_reconciliation_line.filtered(lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
+        for line in self.bank_reconciliation_line.filtered(
+                lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
             move = line.move_line_id.move_id
             voucher = self.env['account.voucher'].search([
                 ('move_id', '=', move.id)
@@ -193,9 +196,9 @@ class BankReconciliation(models.Model):
                                                string='Líneas de conciliación bancaria', readonly=True,
                                                states={'draft': [('readonly', False)]})
     date_from = fields.Date('Fecha inicio', required=True, track_visibility='onchange', readonly=True,
-                                 states={'draft': [('readonly', False)]})
+                            states={'draft': [('readonly', False)]})
     date_to = fields.Date('Fecha fin', required=True, track_visibility='onchange', readonly=True,
-                                 states={'draft': [('readonly', False)]})
+                          states={'draft': [('readonly', False)]})
     beginning_balance = fields.Float('Saldo inicial', required=True, readonly=True,
                                      states={'draft': [('readonly', False)]})
     countable_balance = fields.Float('Saldo contable', compute='_compute_amount', store=True)
