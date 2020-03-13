@@ -145,7 +145,7 @@ class BankReconciliation(models.Model):
         Colocamos cómo conciliados los cheques del voucher seleccionados
         :return:
         """
-        for mline in self.bank_reconciliation_line.filtered(x.check):
+        for mline in self.bank_reconciliation_line.filtered(lambda x: x.check):
             mline.move_line_id.update({'my_reconcile': True})
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
@@ -160,7 +160,7 @@ class BankReconciliation(models.Model):
         Colocamos cómo no conciliados los documentos seleccionados al cancelar
         :return:
         """
-        for mline in self.bank_reconciliation_line.filtered(x.check):
+        for mline in self.bank_reconciliation_line.filtered(lambda x: x.check):
             mline.move_line_id.update({'my_reconcile': False})
         for line in self.bank_reconciliation_line.filtered(
                 lambda x: x.journal.name == 'Comprobante de egreso' and x.check):
