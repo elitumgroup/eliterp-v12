@@ -74,7 +74,7 @@ class Account(models.Model):
             if debit < credit:
                 if balance > 0:
                     balance = -1 * round(debit - credit, 2)
-        if type in ['2', '3', '4']:
+        if type in ['2', '3', '4', '6', '7']:
             if debit < credit:
                 if balance < 0:
                     balance = -1 * round(debit - credit, 2)
@@ -96,8 +96,7 @@ class Account(models.Model):
         debit = 0.00
         credit = 0.00
         balance = 0.00
-        arg = []
-        arg.append(('account_id', 'in', accounts.ids))
+        arg = [('account_id', 'in', accounts.ids)]
         if date_from and date_to:
             arg.append(('date', '>=', date_from))
             arg.append(('date', '<=', date_to))
@@ -118,13 +117,7 @@ class Account(models.Model):
         las cuenta padres suman los registros de las cuentas hijas.
         :return:
         """
-        for account in self:
-            # Colocamos contexto para no mostrar cuentas padres en transacciones
-            subaccounts = self.with_context({'show_parent_account': True}).search([('id', 'child_of', [account.id])])
-            data = list(self._account_balance(account, subaccounts))
-            account.debit = data[0]
-            account.credit = data[1]
-            account.balance = data[2]
+        pass
 
     @api.multi
     def write(self, vals):
@@ -133,7 +126,7 @@ class Account(models.Model):
         :param vals:
         :return:
         """
-        if ('user_type_id' in vals and self.user_type_id.id != vals['user_type_id']):
+        if 'user_type_id' in vals and self.user_type_id.id != vals['user_type_id']:
             user_type_id = self.env['account.account.type'].browse(vals['user_type_id'])
             # Soló cuando queremos cambiar a tipo vista verificamos no tenga movimientos
             if user_type_id.type == 'view':
@@ -219,7 +212,7 @@ class Tax(models.Model):
             if data.tax_type == 'retention' and data.code:
                 result.append((data.id, "%s [%s]" % (data.code, data.name)))
             else:
-                result.append((data.id, "%s" % (data.name)))
+                result.append((data.id, "%s" % data.name))
         return result
 
     @api.multi
@@ -227,7 +220,7 @@ class Tax(models.Model):
     def copy(self, default=None):
         default = default or {}
         if self.code:
-            default['code'] = _("%s (copia)") % (self.code)
+            default['code'] = _("%s (copia)") % self.code
         return super(Tax, self).copy(default=default)
 
     @api.model
