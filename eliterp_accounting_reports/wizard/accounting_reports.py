@@ -220,6 +220,8 @@ class StatusResultsExcel(models.TransientModel):
         # 4
         row += 1
         for line in lines_4:
+            if float_is_zero(line['amount'], precision_rounding=0.01):
+                continue
             if line['type'] == 'principal':
                 sheet.write(row, 0, line['code'], heading_1)
                 sheet.write(row, 1, line['name'], heading_1)
@@ -242,6 +244,8 @@ class StatusResultsExcel(models.TransientModel):
                 row += 1
         # 5
         for line in lines_5:
+            if float_is_zero(line['amount'], precision_rounding=0.01):
+                continue
             if line['type'] == 'principal':
                 sheet.write(row, 0, line['code'], heading_1)
                 sheet.write(row, 1, line['name'], heading_1)
@@ -451,6 +455,8 @@ class FinancialSituationExcel(models.AbstractModel):
         # 1
         row += 1
         for line in lines_1:
+            if float_is_zero(line['amount'], precision_rounding=0.01):
+                continue
             if line['type'] == 'principal':
                 sheet.write(row, 0, line['code'], heading_1)
                 sheet.write(row, 1, line['name'], heading_1)
@@ -473,6 +479,8 @@ class FinancialSituationExcel(models.AbstractModel):
                 row += 1
         # 2
         for line in lines_2:
+            if float_is_zero(line['amount'], precision_rounding=0.01):
+                continue
             if line['type'] == 'principal':
                 sheet.write(row, 0, line['code'], heading_1)
                 sheet.write(row, 1, line['name'], heading_1)
@@ -495,6 +503,8 @@ class FinancialSituationExcel(models.AbstractModel):
                 row += 1
         # 3
         for line in lines_3:
+            if float_is_zero(line['amount'], precision_rounding=0.01):
+                continue
             if line['type'] == 'principal':
                 sheet.write(row, 0, line['code'], heading_1)
                 sheet.write(row, 1, line['name'], heading_1)

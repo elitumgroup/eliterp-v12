@@ -32,9 +32,11 @@
                 </tree>
                 <field name="user_type_id" position="after">
                     <field name="internal_type" invisible="1"/>
+                    <!--
                     <field name="debit"/>
                     <field name="credit"/>
                     <field name="balance"/>
+                    -->
                 </field>
             </field>
         </record>
@@ -45,9 +47,11 @@
             <field name="arch" type="xml">
                 <field name="user_type_id" position="after">
                     <field name="parent_id" context="{'show_parent_account': True}"/>
+                    <!--
                     <field name="debit"/>
                     <field name="credit"/>
                     <field name="balance"/>
+                    -->
                 </field>
             </field>
         </record>
