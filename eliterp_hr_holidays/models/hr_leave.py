@@ -147,7 +147,6 @@ class Leave(models.Model):
         if not employee:
             return lines
         today = datetime.today().date()
-        days = 0
         admission_date = employee.admission_date
         years = today.year - admission_date.year
         if years == 0:
@@ -196,9 +195,12 @@ class Leave(models.Model):
                     lines.append(data)
             if years > 1:
                 for x in range(1, years):
+                    year = admission_date.year
+                    if x == 2:
+                        year = admission_date.year + 1
                     days = 15
                     data = {'employee_id': employee.id,
-                            'name': str(admission_date.year) + "-" + str(admission_date.year + x),
+                            'name': str(year) + "-" + str(admission_date.year + x),
                             'vacations_generated': days,
                             'vacations_taken': 0,
                             'vacations_available': 0, }
@@ -207,15 +209,19 @@ class Leave(models.Model):
                     days = int(float((datetime.combine(today, datetime.min.time()) - datetime.combine(
                         admission_date.replace(year=today.year - 1), datetime.min.time())).days) / float(24))
                     data = {'employee_id': employee.id,
-                            'name': str(admission_date.year + 1) + "-" + str(today.year),
+                            'name': str(admission_date.year + 2) + "-" + str(today.year),
                             'vacations_generated': days,
                             'vacations_taken': 0,
                             'vacations_available': 0, }
                     lines.append(data)
                 else:
                     days = 15
+                    if (today.year - admission_date.year) == 2:
+                        number = admission_date.year + 1
+                    else:
+                        number = admission_date.year + 2
                     data = {'employee_id': employee.id,
-                            'name': str(admission_date.year + 1) + "-" + str(today.year),
+                            'name': str(number) + "-" + str(today.year),
                             'vacations_generated': days,
                             'vacations_taken': 0,
                             'vacations_available': 0, }

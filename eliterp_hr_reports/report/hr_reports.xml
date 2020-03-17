@@ -160,7 +160,7 @@
                 report_type="qweb-pdf"
                 name="eliterp_hr_reports.report_holiday_report"
                 file="eliterp_hr_reports.report_holiday_report"
-                paperformat="eliterp_core.my_paperformat_a4_landscape"
+                paperformat="eliterp_core.my_paperformat_a4_portrait"
         />
     </data>
 </odoo>
