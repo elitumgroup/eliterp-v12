@@ -101,11 +101,44 @@ class HolidayReportPdf(models.AbstractModel):
         if doc['type_report'] != 'all':
             arg.append(('id', '=', doc['employee_id'].id))
         for employee in self.env['hr.employee'].search(arg).sorted(key=lambda r: r.name):
+            vacations_taken = employee.days_taken
+            lines = self.env['hr.leave']._get_holiday_lines(employee)
             data.append({
                 'name': employee.name,
                 'admission_date': employee.admission_date,
-                'holidays': self.env['hr.leave']._get_holiday_lines(employee)
+                'holidays': lines
             })
+            for line in lines:
+                if vacations_taken != 0:
+                    if vacations_taken == line['vacations_generated']:
+                        line.update({
+                            'vacations_taken': vacations_taken,
+                            'vacations_available': 0
+                        })
+                        vacations_taken = 0
+                        continue
+                    if vacations_taken - line['vacations_generated'] > 0:
+                        line.update({
+                            'vacations_taken': line['vacations_generated'],
+                            'vacations_available': 0
+                        })
+                        vacations_taken = vacations_taken - line['vacations_generated']
+                        continue
+                    if vacations_taken - line['vacations_generated'] < 0:
+                        line.update({
+                            'vacations_taken': vacations_taken,
+                            'vacations_available': abs(vacations_taken - line['vacations_generated'])
+                        })
+                        vacations_taken = 0
+                        continue
+                if vacations_taken == 0:
+                    line.update({
+                        'vacations_taken': 0,
+                        'vacations_available': line['vacations_generated']
+                    })
+            if vacations_taken != 0:
+                lines[-1].update(
+                    {'vacations_available': lines[-1]['vacations_generated'] - vacations_taken})
         return data
 
     @api.model
