@@ -89,15 +89,6 @@ class AccountLine(models.Model):
 class Voucher(models.Model):
     _inherit = "account.voucher"
 
-    @api.multi
-    def print_voucher(self):
-        """Imprimimos comprobante"""
-        self.ensure_one()
-        if self.voucher_type == 'purchase':
-            return self.env.ref('eliterp_treasury.action_report_voucher').report_action(self)
-        else:
-            return self.env.ref('eliterp_treasury.action_report_voucher_sale').report_action(self)
-
     @api.model
     def _default_journal(self):
         """
