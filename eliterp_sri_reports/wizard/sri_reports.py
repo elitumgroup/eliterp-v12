@@ -605,11 +605,8 @@ class RetentionSummaryExcel(models.TransientModel):
         :return: list
         """
         data = []
-        arg = []
-        arg.append(('period_id', '=', context['period_id'][0]))
-        arg.append(('state', 'not in', ('draft', 'cancel')))
-        arg.append(('company_id', '=', context['company_id'][0]))
-        arg.append(('type', '=', 'in_invoice'))
+        arg = [('period_id', '=', context['period_id'][0]), ('state', 'not in', ('draft', 'cancel')),
+               ('company_id', '=', context['company_id'][0]), ('type', '=', 'in_invoice')]
         invoices = self.env['account.invoice'].search(arg)
         count = 0
         for invoice in invoices:
@@ -617,41 +614,32 @@ class RetentionSummaryExcel(models.TransientModel):
             authorization = invoice.authorization
             establishment = invoice.serial_number[:3]
             emission_point = invoice.serial_number[4:]
+            if invoice.type == 'in_refund':
+                type_voucher = "NC"
+            elif invoice.type == 'in_invoice':
+                type_voucher = "F"
+            else:
+                type_voucher = "N"
             for line in invoice.invoice_line_ids:
-                register = []
-                register.append("F" if invoice.type == 'in_invoice' else "N")  # Tipo
-                register.append(establishment)  # Establecimiento
-                register.append(emission_point)  # P. Emisión
-                register.append(invoice.invoice_number)  # Secuencial
-                register.append(invoice.date_invoice.strftime(STD_FORMAT))  # Fecha
-                register.append(invoice.retention_number if invoice.retention_id else "-")  # No. Retención
-                register.append(line.name)  # Descripción
-                register.append(invoice.partner_id.name)  # Cliente
-                register.append(invoice.partner_id.documentation_number)  # No. Documento
-                register.append(authorization)  # Autorización
-                register.append(invoice.proof_support_id.code)  # S. Tributario
-                register.append(0.00)  # Base iva (11)
-                register.append(0.00)  # Base 0
-                register.append(0.00)  # ICE
-                register.append(0.00)  # Base no iva
-                register.append("-")  # C. Renta
-                register.append("-")  # P. Renta
-                register.append(0.00)  # Monto renta
-                register.append(invoice.amount_tax if count_invoice == 0 else 0.00)  # R. Base I.
-                register.append("-")  # C. Iva
-                register.append("-")  # P. Iva
-                register.append(0.00)  # Valor iva
-                register.append(0.00)  # Total de factura
+                register = [type_voucher, establishment, emission_point,
+                            invoice.invoice_number, invoice.date_invoice.strftime(STD_FORMAT),
+                            invoice.retention_number if invoice.retention_id else "-", line.name,
+                            invoice.partner_id.name, invoice.partner_id.documentation_number, authorization,
+                            invoice.proof_support_id.code, 0.00, 0.00, 0.00, 0.00, "-", "-", 0.00,
+                            invoice.amount_tax if count_invoice == 0 else 0.00, "-", "-", 0.00, 0.00]
                 data.append(register)
                 count_invoice = 1
                 if len(line.invoice_line_tax_ids) == 0:
-                    data[-1][14] = line.price_subtotal
+                    data[-1][14] = -1 * line.price_subtotal if invoice.type == 'in_refund' \
+                        else line.price_subtotal
                 else:
                     for tax in line.invoice_line_tax_ids:
                         if tax.amount > 0:
-                            data[-1][11] = line.price_subtotal
+                            data[-1][11] = -1 * line.price_subtotal if invoice.type == 'in_refund' \
+                                else line.price_subtotal
                         if tax.amount == 0:
-                            data[-1][12] = line.price_subtotal
+                            data[-1][12] = -1 * line.price_subtotal if invoice.type == 'in_refund' \
+                                else line.price_subtotal
             rent = []
             iva = []
             for retention_line in invoice.retention_id.retention_lines:
@@ -660,30 +648,12 @@ class RetentionSummaryExcel(models.TransientModel):
                 if retention_line.retention_type == 'iva':
                     iva.append(retention_line)
             if len(rent) == 2:
-                register = []
-                register.append("F" if invoice.type == 'in_invoice' else "N")  # Tipo
-                register.append(establishment)  # Establecimiento
-                register.append(emission_point)  # P. Emisión
-                register.append(invoice.invoice_number)  # Secuencial
-                register.append(invoice.date_invoice.strftime(STD_FORMAT))  # Fecha
-                register.append(invoice.retention_number if invoice.retention_id else "-")  # No. Retención
-                register.append(line.name)  # Descripción
-                register.append(invoice.partner_id.name)  # Cliente
-                register.append(invoice.partner_id.documentation_number)  # No. Documento
-                register.append(authorization)  # Autorización
-                register.append(invoice.proof_support_id.code)  # S. Tributario
-                register.append(0.00)  # Base iva (11)
-                register.append(0.00)  # Base 0
-                register.append(0.00)  # ICE
-                register.append(0.00)  # Base no iva
-                register.append("-")  # C. Renta
-                register.append("-")  # P. Renta
-                register.append(0.00)  # Monto renta
-                register.append(0.00)  # R. Base I.
-                register.append("-")  # C. Iva
-                register.append("-")  # P. Iva
-                register.append(0.00)  # Valor iva
-                register.append(0.00)  # Total de factura
+                register = [type_voucher, establishment, emission_point,
+                            invoice.invoice_number, invoice.date_invoice.strftime(STD_FORMAT),
+                            invoice.retention_number if invoice.retention_id else "-", line.name,
+                            invoice.partner_id.name, invoice.partner_id.documentation_number, authorization,
+                            invoice.proof_support_id.code, 0.00, 0.00, 0.00, 0.00, "-", "-", 0.00, 0.00, "-", "-", 0.00,
+                            0.00]
                 data.append(register)
             count = -1
             for r in rent:
@@ -745,7 +715,7 @@ class RetentionSummaryExcel(models.TransientModel):
                             'amount': i.amount if invoice.state != 'cancel' else 0.00,
                             'type': "iva"
                         })
-            data[-1][22] = invoice.amount_total
+            data[-1][22] = -1 * invoice.amount_total if invoice.type == 'in_refund' else invoice.amount_total
         return data
 
     def generate_xlsx_report(self, workbook, context, data):
