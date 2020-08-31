@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_form_payment_requirement_purchase" model="ir.ui.view">
+        <field name="name">view_form_payment_requirement_purchase</field>
+        <field name="model">payment.requirement</field>
+        <field name="inherit_id" ref="eliterp_payment_requirement.view_form_payment_requirement"/>
+        <field name="arch" type="xml">
+            <field name="type" position="after">
+                <field name="purchase_id"
+                       groups="purchase.group_purchase_user"
+                       attrs="{'invisible': [('type', '!=', 'supplier')]}"
+                       domain="[('partner_id', '=', supplier_id), ('state','not in', ('purchase','done'))]"
+                       options="{'no_open': True, 'no_create': True}"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>

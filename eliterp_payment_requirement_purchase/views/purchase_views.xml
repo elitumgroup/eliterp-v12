@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_form_purchase_payment_requirement" model="ir.ui.view">
+        <field name="name">view_form_purchase_payment_requirement</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_rfq_send']" position="after">
+                <button name="action_view_requirement"
+                        string="Generar requerimiento"
+                        class="oe_highlight"
+                        type="object"
+                        attrs="{'invisible': ['|', ('state','not in', ('purchase','done')), ('invoice_status','=', 'invoiced')]}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
