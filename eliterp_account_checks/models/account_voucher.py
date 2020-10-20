@@ -265,8 +265,8 @@ class CheckXlsx(models.AbstractModel):
                 sheet.set_row(5, 13.50)
                 sheet.set_row(7, 18)
                 # Datos
-                sheet.write(3, 2, self.beneficiary, bold)
-                sheet.write(3, 6, self.amount_cancel, money_format)
+                sheet.write(3, 2, check.beneficiary, bold)
+                sheet.write(3, 6, check.amount_cancel, money_format)
                 sheet.write(5, 2, amount_words, bold)
                 sheet.write(7, 1, 'GUAYAQUIL, %s' % date, bold)
             elif bic == '40':
