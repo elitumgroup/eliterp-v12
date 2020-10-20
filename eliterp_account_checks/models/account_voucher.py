@@ -246,7 +246,29 @@ class CheckXlsx(models.AbstractModel):
                 sheet.write(3, 5, check.amount_cancel, bold)
                 sheet.write(5, 1, amount_words, bold)
                 sheet.write(7, 0, 'GUAYAQUIL, %s' % date, bold)
-
+            elif bic == 'XXX':
+                # Margins
+                sheet.set_margins(left=0.0, right=0.0, top=0.0, bottom=0.0)
+                # Columnas
+                sheet.set_column("A:A", 1.86)
+                sheet.set_column("B:B", 8.64)
+                sheet.set_column("C:C", 10.71)
+                sheet.set_column("D:D", 10.71)
+                sheet.set_column("E:E", 10.71)
+                sheet.set_column("F:F", 12.43)
+                sheet.set_column("G:G", 11.57)
+                # Filas
+                sheet.set_default_row(15)
+                sheet.set_row(0, 10.50)
+                sheet.set_row(3, 20.25)
+                sheet.set_row(4, 6)
+                sheet.set_row(5, 13.50)
+                sheet.set_row(7, 18)
+                # Datos
+                sheet.write(3, 2, self.beneficiary, bold)
+                sheet.write(3, 6, self.amount_cancel, money_format)
+                sheet.write(5, 2, amount_words, bold)
+                sheet.write(7, 1, 'GUAYAQUIL, %s' % date, bold)
             elif bic == '40':
                 # Margins
                 sheet.set_margins(left=0.18, right=0.7, top=0.73, bottom=0.75)
