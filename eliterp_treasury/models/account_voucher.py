@@ -255,6 +255,13 @@ class Voucher(models.Model):
             move_name = prefix + code + "-" + year + "-" + bank_sequence
         return move_name
 
+    def _check_amount_pay_order(self):
+        if self.pay_order_id and self.state == 'draft':
+            if self.pay_order_id.amount != self.amount_cancel:
+                raise ValidationError(
+                    _("Monto de pago no es igual al de la Orden de Pago (%s)!") % self.pay_order_id.amount)
+        return True
+
     @api.multi
     def post_voucher(self):
         """
@@ -275,6 +282,7 @@ class Voucher(models.Model):
                 'name': new_name
             })
         else:
+            self._check_amount_pay_order()
             move_id = self.env['account.move'].create({
                 'journal_id': journal_id.id,
                 'project_id': self.project_id.id,
